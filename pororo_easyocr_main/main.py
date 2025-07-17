@@ -104,8 +104,6 @@ class EasyPororoOcr(BaseOcr):
     def __init__(self, lang: list[str] = ["ko", "en"], gpu=False, **kwargs):
         super().__init__()
         self._detector = Reader(lang_list=lang, gpu=gpu, **kwargs).detect
-        # ★★★ 변경점 1: Pororo 객체를 __init__에서 한 번만 생성 ★★★
-        self._ocr = Pororo(task="ocr", lang="ko", model="brainocr", **kwargs) # <<<
         self.detect_result = None
 
     def create_result(self, points):
@@ -116,13 +114,10 @@ class EasyPororoOcr(BaseOcr):
         return [points, text]
 
     def run_ocr(self, img_path: str, debug: bool = False, **kwargs):
-
         self.img_path = img_path
         self.img = cv2.imread(img_path) if isinstance(img_path, str) \
             else self.img_path
-        
-        # ★★★ 변경점 2: run_ocr 내부의 Pororo 객체 생성 코드 제거 ★★★
-        # self._ocr = Pororo(task="ocr", lang="ko", model="brainocr", **kwargs) # <<<  한번만 선언하도록 변경
+        self._ocr = Pororo(task="ocr", lang="ko", model="brainocr", **kwargs)
 
         self.detect_result = self._detector(self.img, slope_ths=0.3, height_ths=1)
         if debug:
@@ -150,7 +145,7 @@ class EasyPororoOcr(BaseOcr):
 if __name__ == "__main__":
     # p_ocr = PororoOcr()
     # e_ocr = EasyOcr()
-    m_ocr = EasyPororoOcr()
+    m_ocr = EasyPororoOcr(gpu=True)
     image_path = input("Enter image path: ")
 
     image = load_with_filter(image_path)
