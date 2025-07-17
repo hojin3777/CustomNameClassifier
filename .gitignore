@@ -209,5 +209,6 @@ __marimo__/
 # Custom ignores
 dataset/
 processed_data/
+saved_model/fasttext
 *.pth
 *.zip
