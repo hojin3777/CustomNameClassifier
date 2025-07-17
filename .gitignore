@@ -210,5 +210,6 @@ __marimo__/
 dataset/
 processed_data/
 saved_model/fasttext
+*.safetensors
 *.pth
 *.zip
