@@ -1,0 +1,595 @@
+﻿image_id,text,x_min,y_min,x_max,y_max,label
+final_gen_1.png,07.04,56.0,258.0,130.0,288.0,DATE
+final_gen_1.png,11:46,338.0,260.0,408.0,286.0,TIME
+final_gen_1.png,명재나물,56.0,341.0,180.0,377.0,MERCHANT
+final_gen_1.png,"출금 13,000원",832.0,430.0,1024.0,467.0,AMOUNT_OUT
+final_gen_1.png,"1,821,693원",864.0,498.0,1023.0,535.0,BALANCE
+final_gen_1.png,07.04,56.0,668.0,130.0,698.0,DATE
+final_gen_1.png,08:46,333.0,670.0,408.0,696.0,TIME
+final_gen_1.png,서의원서한의원,56.0,751.0,273.0,787.0,MERCHANT
+final_gen_1.png,"입금 329,100원",816.0,838.0,1024.0,875.0,AMOUNT_IN
+final_gen_1.png,"2,150,793원",862.0,908.0,1023.0,945.0,BALANCE
+final_gen_1.png,07.04,56.0,1078.0,130.0,1108.0,DATE
+final_gen_1.png,03:46,333.0,1080.0,408.0,1106.0,TIME
+final_gen_1.png,돈장군vs소일병,56.0,1157.0,271.0,1193.0,MERCHANT
+final_gen_1.png,"출금 5,300원",845.0,1248.0,1024.0,1285.0,AMOUNT_OUT
+final_gen_1.png,"2,156,093원",862.0,1316.0,1023.0,1353.0,BALANCE
+final_gen_1.png,07.03,56.0,1485.5,131.0,1514.5,DATE
+final_gen_1.png,22:46,334.0,1486.0,408.0,1512.0,TIME
+final_gen_1.png,EMART24황물로점영서철물상사,56.0,1567.0,489.0,1603.0,MERCHANT
+final_gen_1.png,"출금 11,400원",835.0,1656.0,1024.0,1693.0,AMOUNT_OUT
+final_gen_1.png,"2,167,493원",863.0,1726.0,1023.0,1763.0,BALANCE
+final_gen_1.png,07.02,56.0,1895.5,130.0,1924.5,DATE
+final_gen_1.png,21:46,336.0,1896.0,408.0,1922.0,TIME
+final_gen_1.png,유한엔지니어링,56.0,1977.0,273.0,2013.0,MERCHANT
+final_gen_1.png,"출금 17,800원",832.0,2066.0,1024.0,2103.0,AMOUNT_OUT
+final_gen_1.png,"2,185,293원",861.0,2134.0,1023.0,2171.0,BALANCE
+final_gen_2.png,2025.06.29,51.0,448.5,245.0,477.5,DATE
+final_gen_2.png,10:46,264.0,448.5,361.0,477.5,TIME
+final_gen_2.png,호우재한옥,51.0,531.5,251.0,569.5,MERCHANT
+final_gen_2.png,"-19,600원",854.0,533.0,1029.0,572.0,AMOUNT_OUT
+final_gen_2.png,"1,802,523원",817.0,594.0,1029.0,633.0,BALANCE
+final_gen_2.png,2025.06.28,51.0,821.5,245.0,850.5,DATE
+final_gen_2.png,06:46,255.0,821.5,352.0,850.5,TIME
+final_gen_2.png,술주당,51.0,904.5,171.0,942.5,MERCHANT
+final_gen_2.png,"-17,000원",854.0,906.0,1029.0,945.0,AMOUNT_OUT
+final_gen_2.png,"1,785,523원",817.0,967.0,1029.0,1006.0,BALANCE
+final_gen_2.png,2025.06.28,51.0,1129.5,245.0,1158.5,DATE
+final_gen_2.png,01:46,255.0,1129.5,352.0,1158.5,TIME
+final_gen_2.png,에슬로우목동,51.0,1212.5,291.0,1250.5,MERCHANT
+final_gen_2.png,"-15,300원",854.0,1214.0,1029.0,1253.0,AMOUNT_OUT
+final_gen_2.png,"1,770,223원",817.0,1275.0,1029.0,1314.0,BALANCE
+final_gen_2.png,2025.06.26,51.0,1648.5,245.0,1677.5,DATE
+final_gen_2.png,00:46,270.0,1648.5,367.0,1677.5,TIME
+final_gen_2.png,정재환왕갈비,51.0,1731.5,291.0,1769.5,MERCHANT
+final_gen_2.png,"329,800원",848.0,1733.0,1029.0,1772.0,AMOUNT_IN
+final_gen_2.png,"2,100,023원",817.0,1794.0,1029.0,1833.0,BALANCE
+final_gen_2.png,2025.06.23,51.0,1956.5,245.0,1985.5,DATE
+final_gen_2.png,19:46,270.0,1956.5,367.0,1985.5,TIME
+final_gen_2.png,히피들의정원,51.0,2039.5,291.0,2077.5,MERCHANT
+final_gen_2.png,"-3,300원",876.0,2041.0,1029.0,2080.0,AMOUNT_OUT
+final_gen_2.png,"2,096,723원",817.0,2102.0,1029.0,2141.0,BALANCE
+final_gen_2.png,2025년 06월,51.0,359.0,277.0,395.0,DATE_HEADER
+final_gen_3.png,2025.07.08,55.0,753.0,281.0,791.0,DATE
+final_gen_3.png,11:46,92.0,467.5,205.0,504.5,TIME
+final_gen_3.png,업라이트컨설팅,55.0,542.0,321.0,582.0,MERCHANT
+final_gen_3.png,"출금 7,600원",878.0,463.0,1029.0,546.0,AMOUNT_OUT
+final_gen_3.png,2025.07.07,55.0,1167.0,281.0,1205.0,DATE
+final_gen_3.png,07:46,92.0,882.0,205.0,920.0,TIME
+final_gen_3.png,양귀비꽃보다도더붉은내마음흘러라,55.0,956.0,663.0,996.0,MERCHANT
+final_gen_3.png,"출금 2,600원",878.0,879.0,1029.0,962.0,AMOUNT_OUT
+final_gen_3.png,#송금,237.0,880.5,348.0,919.5,MEMO
+final_gen_3.png,2025.07.07,55.0,1581.0,281.0,1619.0,DATE
+final_gen_3.png,02:46,92.0,1296.0,205.0,1334.0,TIME
+final_gen_3.png,한돈소,55.0,1370.5,169.0,1409.5,MERCHANT
+final_gen_3.png,"출금 11,300원",853.0,1293.0,1029.0,1376.0,AMOUNT_OUT
+final_gen_3.png,#송금,237.0,1294.5,348.0,1333.5,MEMO
+final_gen_3.png,2025.07.05,55.0,1995.0,281.0,2033.0,DATE
+final_gen_3.png,23:46,92.0,1710.0,205.0,1748.0,TIME
+final_gen_3.png,링컨스쿨가경어학원,55.0,1784.0,397.0,1824.0,MERCHANT
+final_gen_3.png,"출금 15,700원",853.0,1707.0,1029.0,1790.0,AMOUNT_OUT
+final_gen_3.png,#오픈뱅킹이체,237.0,1708.5,500.0,1747.5,MEMO
+final_gen_3.png,2025.07.05,55.0,2409.0,281.0,2447.0,DATE
+final_gen_3.png,21:46,92.0,2124.0,205.0,2162.0,TIME
+final_gen_3.png,우주자연,55.0,2198.0,207.0,2238.0,MERCHANT
+final_gen_3.png,"출금 2,900원",878.0,2121.0,1029.0,2204.0,AMOUNT_OUT
+final_gen_3.png,#카드결제,237.0,2123.5,424.0,2162.5,MEMO
+final_gen_3.png,2025.07.04,55.0,2823.0,281.0,2861.0,DATE
+final_gen_3.png,17:46,92.0,2539.5,205.0,2576.5,TIME
+final_gen_3.png,3 14파이,55.0,2612.5,219.0,2651.5,MERCHANT
+final_gen_3.png,"입금 379,800원",828.0,2535.0,1029.0,2618.0,AMOUNT_IN
+final_gen_3.png,#오픈뱅킹이체,237.0,2536.5,500.0,2575.5,MEMO
+final_gen_3.png,15:46,92.0,2953.5,205.0,2990.5,TIME
+final_gen_3.png,라그랑자트,55.0,3028.0,245.0,3066.0,MERCHANT
+final_gen_3.png,"출금 8,300원",878.0,2949.0,1029.0,3032.0,AMOUNT_OUT
+final_gen_3.png,#이체,237.0,2950.5,348.0,2989.5,MEMO
+final_gen_3.png,2025년 07월,49.0,353.5,288.0,392.5,DATE_HEADER
+final_gen_4.png,06.12,56.0,265.5,155.0,296.5,DATE
+final_gen_4.png,11:46,308.0,267.0,408.0,297.0,TIME
+final_gen_4.png,세이브어스,56.0,352.5,251.0,389.5,MERCHANT
+final_gen_4.png,"출금 2,200원",797.0,442.0,1024.0,479.0,AMOUNT_OUT
+final_gen_4.png,"1,628,886원",810.0,510.0,1023.0,547.0,BALANCE
+final_gen_4.png,06.11,56.0,675.5,155.0,706.5,DATE
+final_gen_4.png,09:46,308.0,675.5,408.0,706.5,TIME
+final_gen_4.png,봉짬뽕,56.0,762.0,173.0,800.0,MERCHANT
+final_gen_4.png,"출금 9,700원",797.0,850.0,1024.0,887.0,AMOUNT_OUT
+final_gen_4.png,"1,638,586원",810.0,920.0,1023.0,957.0,BALANCE
+final_gen_4.png,06.11,56.0,1085.5,155.0,1116.5,DATE
+final_gen_4.png,06:46,308.0,1085.5,408.0,1116.5,TIME
+final_gen_4.png,피스넷,56.0,1168.5,173.0,1205.5,MERCHANT
+final_gen_4.png,"출금 7,300원",797.0,1260.0,1024.0,1297.0,AMOUNT_OUT
+final_gen_4.png,"1,645,886원",810.0,1328.0,1023.0,1365.0,BALANCE
+final_gen_4.png,06.11,56.0,1491.5,155.0,1522.5,DATE
+final_gen_4.png,01:46,308.0,1491.5,408.0,1522.5,TIME
+final_gen_4.png,더갤러리아치과의원,56.0,1578.5,407.0,1615.5,MERCHANT
+final_gen_4.png,"출금 2,700원",797.0,1668.0,1024.0,1705.0,AMOUNT_OUT
+final_gen_4.png,"1,648,586원",810.0,1738.0,1023.0,1775.0,BALANCE
+final_gen_4.png,06.10,56.0,1901.5,155.0,1932.5,DATE
+final_gen_4.png,00:46,308.0,1901.5,408.0,1932.5,TIME
+final_gen_4.png,빈스빈커피,56.0,1988.5,251.0,2025.5,MERCHANT
+final_gen_4.png,"출금 6,100원",797.0,2078.0,1024.0,2115.0,AMOUNT_OUT
+final_gen_4.png,"1,654,686원",810.0,2146.0,1023.0,2183.0,BALANCE
+final_gen_5.png,6월 11일,43.0,635.0,199.0,673.0,DATE
+final_gen_5.png,11:46,67.0,415.0,167.0,445.0,TIME
+final_gen_5.png,신정이안공인중개사사무소,43.0,470.0,511.0,508.0,MERCHANT
+final_gen_5.png,"입금 273,400원",640.0,409.0,821.0,493.0,AMOUNT_IN
+final_gen_5.png,#용돈,197.0,409.0,302.0,447.0,MEMO
+final_gen_5.png,6월 9일,43.0,967.0,177.0,1005.0,DATE
+final_gen_5.png,06:46,53.0,743.5,153.0,774.5,TIME
+final_gen_5.png,강서YD펫샵,43.0,800.0,250.0,838.0,MERCHANT
+final_gen_5.png,"출금 5,400원",684.0,739.0,821.0,823.0,AMOUNT_OUT
+final_gen_5.png,6월 9일,43.0,1297.0,177.0,1335.0,DATE
+final_gen_5.png,03:46,67.0,1074.0,167.0,1106.0,TIME
+final_gen_5.png,강동한정식,43.0,1132.0,238.0,1170.0,MERCHANT
+final_gen_5.png,"출금 5,600원",684.0,1071.0,821.0,1155.0,AMOUNT_OUT
+final_gen_5.png,#이체,193.0,1071.5,298.0,1108.5,MEMO
+final_gen_5.png,6월 7일,43.0,1629.0,177.0,1667.0,DATE
+final_gen_5.png,23:46,67.0,1404.0,167.0,1436.0,TIME
+final_gen_5.png,해양상사,43.0,1462.0,199.0,1500.0,MERCHANT
+final_gen_5.png,"출금 2,400원",684.0,1401.0,821.0,1485.0,AMOUNT_OUT
+final_gen_5.png,#송금,193.0,1402.5,298.0,1439.5,MEMO
+final_gen_5.png,6월 5일,43.0,1959.0,177.0,1997.0,DATE
+final_gen_5.png,21:46,53.0,1737.5,153.0,1768.5,TIME
+final_gen_5.png,동강맛자랑,43.0,1794.0,238.0,1832.0,MERCHANT
+final_gen_5.png,"출금 10,700원",662.0,1733.0,821.0,1817.0,AMOUNT_OUT
+final_gen_5.png,6월 5일,43.0,2291.0,177.0,2329.0,DATE
+final_gen_5.png,18:46,67.0,2067.5,167.0,2098.5,TIME
+final_gen_5.png,우리동네힐링샵태화,43.0,2124.0,394.0,2162.0,MERCHANT
+final_gen_5.png,"출금 10,200원",662.0,2063.0,821.0,2147.0,AMOUNT_OUT
+final_gen_5.png,6월 4일,43.0,2621.0,177.0,2659.0,DATE
+final_gen_5.png,15:46,71.0,2400.5,171.0,2431.5,TIME
+final_gen_5.png,가곡차부슈퍼,43.0,2456.5,277.0,2493.5,MERCHANT
+final_gen_5.png,"출금 14,800원",662.0,2395.0,821.0,2479.0,AMOUNT_OUT
+final_gen_5.png,#이체,197.0,2395.5,302.0,2432.5,MEMO
+final_gen_5.png,11:46,67.0,2731.0,167.0,2761.0,TIME
+final_gen_5.png,돌과물,43.0,2771.0,160.0,2808.0,MERCHANT
+final_gen_5.png,"출금 4,700원",684.0,2725.0,821.0,2809.0,AMOUNT_OUT
+final_gen_5.png,2025년 06월,43.0,291.0,265.0,329.0,DATE_HEADER
+final_gen_6.png,6월 23일,51.0,426.0,199.0,470.0,DATE
+final_gen_6.png,08:46,266.0,436.0,361.0,470.0,TIME
+final_gen_6.png,뉴중앙부동산중개인사무소,51.0,518.5,507.0,562.5,MERCHANT
+final_gen_6.png,"-6,800원",877.0,520.5,1029.0,566.5,AMOUNT_OUT
+final_gen_6.png,"1,454,576원",829.0,581.5,1029.0,627.5,BALANCE
+final_gen_6.png,6월 22일,51.0,799.0,198.0,843.0,DATE
+final_gen_6.png,06:46,257.0,809.0,352.0,843.0,TIME
+final_gen_6.png,스트로베리상점,51.0,891.5,317.0,935.5,MERCHANT
+final_gen_6.png,"-12,900원",862.0,893.5,1029.0,939.5,AMOUNT_OUT
+final_gen_6.png,"1,441,676원",833.0,954.5,1029.0,1000.5,BALANCE
+final_gen_6.png,6월 22일,51.0,1107.0,198.0,1151.0,DATE
+final_gen_6.png,02:46,258.0,1117.0,352.0,1151.0,TIME
+final_gen_6.png,들향기팥칼국수,51.0,1199.5,317.0,1243.5,MERCHANT
+final_gen_6.png,"-3,000원",876.0,1201.5,1029.0,1247.5,AMOUNT_OUT
+final_gen_6.png,"1,438,676원",830.0,1262.5,1029.0,1308.5,BALANCE
+final_gen_6.png,6월 19일,51.0,1626.0,196.0,1670.0,DATE
+final_gen_6.png,00:46,271.0,1636.0,367.0,1670.0,TIME
+final_gen_6.png,제이에이치유에스택스센터,51.0,1718.5,507.0,1762.5,MERCHANT
+final_gen_6.png,"-15,600원",861.0,1720.5,1029.0,1766.5,AMOUNT_OUT
+final_gen_6.png,"1,423,076원",830.0,1781.5,1029.0,1827.5,BALANCE
+final_gen_6.png,6월 17일,51.0,1934.0,196.0,1978.0,DATE
+final_gen_6.png,20:46,273.0,1944.0,367.0,1978.0,TIME
+final_gen_6.png,아르페지오침구잡화인테리어,51.0,2026.5,545.0,2070.5,MERCHANT
+final_gen_6.png,"90,000원",875.0,2028.5,1029.0,2074.5,AMOUNT_IN
+final_gen_6.png,"1,513,076원",834.0,2089.5,1029.0,2135.5,BALANCE
+final_gen_6.png,2025.06.23 ~ 2025.06.17 (5건),51.0,346.5,561.0,389.5,DATE_HEADER
+final_gen_7.png,6월 18일,50.0,245.5,194.0,278.5,DATE
+final_gen_7.png,08:46,202.0,319.0,301.0,346.0,TIME
+final_gen_7.png,우영아구찜뽈찜,191.0,245.0,429.0,278.0,MERCHANT
+final_gen_7.png,"-17,400원",861.0,246.0,1029.0,281.0,AMOUNT_OUT
+final_gen_7.png,"593,110원",852.0,312.5,1029.0,347.5,BALANCE
+final_gen_7.png,6월 16일,50.0,434.5,194.0,467.5,DATE
+final_gen_7.png,06:46,202.0,508.0,301.0,535.0,TIME
+final_gen_7.png,온하루케이크,191.0,434.0,395.0,467.0,MERCHANT
+final_gen_7.png,"-19,500원",861.0,435.0,1029.0,470.0,AMOUNT_OUT
+final_gen_7.png,"573,610원",852.0,501.5,1029.0,536.5,BALANCE
+final_gen_7.png,6월 15일,50.0,623.5,194.0,656.5,DATE
+final_gen_7.png,04:46,202.0,697.0,301.0,724.0,TIME
+final_gen_7.png,오투그린세탁소,191.0,623.0,429.0,656.0,MERCHANT
+final_gen_7.png,"267,900원",852.0,624.0,1029.0,659.0,AMOUNT_IN
+final_gen_7.png,"841,510원",852.0,690.5,1029.0,725.5,BALANCE
+final_gen_7.png,6월 15일,50.0,812.5,194.0,845.5,DATE
+final_gen_7.png,01:46,202.0,886.0,301.0,913.0,TIME
+final_gen_7.png,다산동대박부동산공인중개사사무소,191.0,812.0,735.0,845.0,MERCHANT
+final_gen_7.png,"-15,400원",861.0,813.0,1029.0,848.0,AMOUNT_OUT
+final_gen_7.png,"826,110원",852.0,879.5,1029.0,914.5,BALANCE
+final_gen_7.png,6월 11일,50.0,1001.5,194.0,1034.5,DATE
+final_gen_7.png,20:46,202.0,1075.0,301.0,1102.0,TIME
+final_gen_7.png,장모님치킨일동점,191.0,1001.0,463.0,1034.0,MERCHANT
+final_gen_7.png,"-12,600원",861.0,1002.0,1029.0,1037.0,AMOUNT_OUT
+final_gen_7.png,"813,510원",852.0,1068.5,1029.0,1103.5,BALANCE
+final_gen_7.png,6월 10일,50.0,1190.5,194.0,1223.5,DATE
+final_gen_7.png,15:46,202.0,1264.0,301.0,1291.0,TIME
+final_gen_7.png,기브미쪼꼬렛,191.0,1189.5,395.0,1223.5,MERCHANT
+final_gen_7.png,"-6,900원",883.0,1191.0,1029.0,1226.0,AMOUNT_OUT
+final_gen_7.png,"806,610원",852.0,1257.5,1029.0,1292.5,BALANCE
+final_gen_7.png,6월 8일,50.0,1379.5,172.0,1412.5,DATE
+final_gen_7.png,14:46,202.0,1453.0,301.0,1480.0,TIME
+final_gen_7.png,팔게팔게삼겹살,191.0,1379.0,429.0,1412.0,MERCHANT
+final_gen_7.png,"-2,000원",883.0,1380.0,1029.0,1415.0,AMOUNT_OUT
+final_gen_7.png,"804,610원",852.0,1446.5,1029.0,1481.5,BALANCE
+final_gen_7.png,6월 7일,50.0,1568.5,172.0,1601.5,DATE
+final_gen_7.png,11:46,202.0,1642.0,301.0,1669.0,TIME
+final_gen_7.png,용암불쭈꾸미,191.0,1568.0,395.0,1601.0,MERCHANT
+final_gen_7.png,"-13,800원",861.0,1569.0,1029.0,1604.0,AMOUNT_OUT
+final_gen_7.png,"790,810원",852.0,1635.5,1029.0,1670.5,BALANCE
+final_gen_7.png,6월 7일,50.0,1757.5,172.0,1790.5,DATE
+final_gen_7.png,06:46,202.0,1831.0,301.0,1858.0,TIME
+final_gen_7.png,갬성스콘,191.0,1757.0,327.0,1790.0,MERCHANT
+final_gen_7.png,"-14,900원",861.0,1758.0,1029.0,1793.0,AMOUNT_OUT
+final_gen_7.png,"775,910원",852.0,1824.5,1029.0,1859.5,BALANCE
+final_gen_7.png,6월 7일,50.0,1946.5,172.0,1979.5,DATE
+final_gen_7.png,02:46,202.0,2020.0,301.0,2047.0,TIME
+final_gen_7.png,케이제이디인베스트먼트,191.0,1946.0,565.0,1979.0,MERCHANT
+final_gen_7.png,"-2,400원",883.0,1947.0,1029.0,1982.0,AMOUNT_OUT
+final_gen_7.png,"773,510원",852.0,2013.5,1029.0,2048.5,BALANCE
+final_gen_8.png,07.11,51.0,458.5,177.0,499.5,DATE
+final_gen_8.png,08:46,267.0,458.5,393.0,499.5,TIME
+final_gen_8.png,THE바른,51.0,553.5,222.0,594.5,MERCHANT
+final_gen_8.png,"-16,500원",807.0,550.5,1029.0,594.5,AMOUNT_OUT
+final_gen_8.png,"1,110,984원",763.0,611.5,1029.0,655.5,BALANCE
+final_gen_8.png,07.08,51.0,766.5,177.0,807.5,DATE
+final_gen_8.png,06:46,267.0,766.5,393.0,807.5,TIME
+final_gen_8.png,푸디스트기아비전,51.0,859.5,387.0,902.5,MERCHANT
+final_gen_8.png,"-4,500원",835.0,858.5,1029.0,902.5,AMOUNT_OUT
+final_gen_8.png,"1,106,484원",763.0,919.5,1029.0,963.5,BALANCE
+final_gen_8.png,07.07,51.0,1073.5,177.0,1114.5,DATE
+final_gen_8.png,04:46,267.0,1073.5,393.0,1114.5,TIME
+final_gen_8.png,가마설렁탕,51.0,1166.5,261.0,1209.5,MERCHANT
+final_gen_8.png,"-19,800원",807.0,1165.5,1029.0,1209.5,AMOUNT_OUT
+final_gen_8.png,"1,086,684원",763.0,1226.5,1029.0,1270.5,BALANCE
+final_gen_8.png,07.06,51.0,1447.5,177.0,1488.5,DATE
+final_gen_8.png,02:46,267.0,1447.5,393.0,1488.5,TIME
+final_gen_8.png,순천우렁총각,51.0,1539.0,302.0,1583.0,MERCHANT
+final_gen_8.png,"-15,100원",807.0,1539.5,1029.0,1583.5,AMOUNT_OUT
+final_gen_8.png,"1,071,584원",763.0,1600.5,1029.0,1644.5,BALANCE
+final_gen_8.png,07.06,51.0,1754.5,177.0,1795.5,DATE
+final_gen_8.png,00:46,267.0,1754.5,393.0,1795.5,TIME
+final_gen_8.png,에네뜨미용실,51.0,1847.5,303.0,1890.5,MERCHANT
+final_gen_8.png,"-1,300원",835.0,1846.5,1029.0,1890.5,AMOUNT_OUT
+final_gen_8.png,"1,070,284원",763.0,1907.5,1029.0,1951.5,BALANCE
+final_gen_8.png,07.05,51.0,2127.5,177.0,2168.5,DATE
+final_gen_8.png,22:46,264.0,2127.5,390.0,2168.5,TIME
+final_gen_8.png,유디치과,51.0,2220.5,220.0,2263.5,MERCHANT
+final_gen_8.png,"-17,100원",807.0,2219.5,1029.0,2263.5,AMOUNT_OUT
+final_gen_8.png,"1,053,184원",763.0,2277.0,1029.0,2321.0,BALANCE
+final_gen_8.png,2025.07.11 ~ 2025.07.05 (6건),51.0,346.5,724.0,389.5,DATE_HEADER
+final_gen_9.png,06.17,50.0,586.5,134.0,609.5,DATE
+final_gen_9.png,11:46,98.0,699.0,182.0,722.0,TIME
+final_gen_9.png,일거양득,50.0,757.0,178.0,788.0,MERCHANT
+final_gen_9.png,"입금 88,200원",897.0,684.0,1032.0,755.0,AMOUNT_IN
+final_gen_9.png,06.16,50.0,950.5,134.0,973.5,DATE
+final_gen_9.png,10:46,92.0,1063.0,176.0,1086.0,TIME
+final_gen_9.png,상하이노래홀,50.0,1121.0,242.0,1152.0,MERCHANT
+final_gen_9.png,"출금 20,000원",897.0,1051.0,1032.0,1121.0,AMOUNT_OUT
+final_gen_9.png,#오픈뱅킹이체,208.0,1054.0,419.0,1085.0,MEMO
+final_gen_9.png,06.16,50.0,1315.5,134.0,1338.5,DATE
+final_gen_9.png,05:46,92.0,1428.0,176.0,1451.0,TIME
+final_gen_9.png,한우리마동독서토론논술교습소,50.0,1486.0,498.0,1517.0,MERCHANT
+final_gen_9.png,"출금 11,200원",897.0,1414.0,1032.0,1484.0,AMOUNT_OUT
+final_gen_9.png,#카드결제,208.0,1419.0,355.0,1450.0,MEMO
+final_gen_9.png,04:46,92.0,1637.0,176.0,1660.0,TIME
+final_gen_9.png,다인산업개발,50.0,1695.0,242.0,1726.0,MERCHANT
+final_gen_9.png,"입금 231,700원",878.0,1622.0,1032.0,1693.0,AMOUNT_IN
+final_gen_9.png,#카드결제,208.0,1628.0,355.0,1659.0,MEMO
+final_gen_9.png,01:46,92.0,1846.0,176.0,1869.0,TIME
+final_gen_9.png,케이비네크워크,50.0,1904.0,274.0,1935.0,MERCHANT
+final_gen_9.png,"출금 9,600원",916.0,1832.0,1032.0,1902.0,AMOUNT_OUT
+final_gen_9.png,#카드결제,208.0,1837.0,355.0,1868.0,MEMO
+final_gen_9.png,20:46,92.0,2049.0,176.0,2072.0,TIME
+final_gen_9.png,아르모니스톤,50.0,2108.5,242.0,2138.5,MERCHANT
+final_gen_9.png,"출금 7,700원",916.0,2035.0,1032.0,2105.0,AMOUNT_OUT
+final_gen_9.png,#체크카드,208.0,2040.0,355.0,2071.0,MEMO
+final_gen_9.png,2025년 06월,51.0,394.5,240.0,424.5,DATE_HEADER
+final_gen_10.png,6월 28일,51.0,525.0,162.0,557.0,DATE
+final_gen_10.png,12:46,303.0,533.0,369.0,557.0,TIME
+final_gen_10.png,라라코스트충주,51.0,620.0,247.0,652.0,MERCHANT
+final_gen_10.png,"352,200원",905.0,618.5,1029.0,652.5,AMOUNT_IN
+final_gen_10.png,"1,616,328원",882.0,679.5,1029.0,713.5,BALANCE
+final_gen_10.png,6월 28일,51.0,833.0,162.0,865.0,DATE
+final_gen_10.png,08:46,299.0,841.0,369.0,865.0,TIME
+final_gen_10.png,365바로치과의원,51.0,928.0,263.0,960.0,MERCHANT
+final_gen_10.png,"181,100원",907.0,926.5,1029.0,960.5,AMOUNT_IN
+final_gen_10.png,"1,797,428원",881.0,987.5,1029.0,1021.5,BALANCE
+final_gen_10.png,6월 27일,51.0,1206.0,161.0,1238.0,DATE
+final_gen_10.png,04:46,300.0,1214.0,369.0,1238.0,TIME
+final_gen_10.png,그놈의삼겹살앤김치찌개,51.0,1301.0,359.0,1333.0,MERCHANT
+final_gen_10.png,"-18,800원",902.0,1299.5,1029.0,1333.5,AMOUNT_OUT
+final_gen_10.png,"1,778,628원",879.0,1360.5,1029.0,1394.5,BALANCE
+final_gen_10.png,6월 27일,51.0,1726.0,161.0,1758.0,DATE
+final_gen_10.png,01:46,285.0,1734.0,352.0,1758.0,TIME
+final_gen_10.png,미니스톱어연,51.0,1821.0,219.0,1853.0,MERCHANT
+final_gen_10.png,"-14,400원",904.0,1819.5,1029.0,1853.5,AMOUNT_OUT
+final_gen_10.png,"1,764,228원",881.0,1880.5,1029.0,1914.5,BALANCE
+final_gen_10.png,6월 25일,51.0,2034.0,160.0,2066.0,DATE
+final_gen_10.png,21:46,286.0,2042.0,352.0,2066.0,TIME
+final_gen_10.png,윈드밀로,51.0,2129.0,163.0,2161.0,MERCHANT
+final_gen_10.png,"-12,800원",904.0,2127.5,1029.0,2161.5,AMOUNT_OUT
+final_gen_10.png,"1,751,428원",883.0,2188.5,1029.0,2222.5,BALANCE
+final_gen_10.png,2025.06.28 ~ 2025.06.25 (5건),51.0,351.0,425.0,383.0,DATE_HEADER
+final_gen_11.png,6월 21일,58.0,217.5,199.0,250.5,DATE
+final_gen_11.png,11:46,319.0,222.5,410.0,249.5,TIME
+final_gen_11.png,통큰닭갈비,58.0,308.0,233.0,342.0,MERCHANT
+final_gen_11.png,"출금 9,200원",821.0,398.0,1026.0,431.0,AMOUNT_OUT
+final_gen_11.png,"1,956,776원",832.0,466.0,1025.0,499.0,BALANCE
+final_gen_11.png,6월 19일,58.0,627.5,199.0,660.5,DATE
+final_gen_11.png,10:46,319.0,631.0,410.0,659.0,TIME
+final_gen_11.png,동원홈푸드크리스피프레시김포공항,58.0,718.0,618.0,752.0,MERCHANT
+final_gen_11.png,"출금 19,700원",801.0,806.0,1026.0,839.0,AMOUNT_OUT
+final_gen_11.png,"1,976,476원",832.0,876.0,1025.0,909.0,BALANCE
+final_gen_11.png,6월 17일,58.0,1037.5,199.0,1070.5,DATE
+final_gen_11.png,06:46,319.0,1041.0,410.0,1069.0,TIME
+final_gen_11.png,늘푸른분식,58.0,1124.5,233.0,1157.5,MERCHANT
+final_gen_11.png,"출금 5,700원",821.0,1216.0,1026.0,1249.0,AMOUNT_OUT
+final_gen_11.png,"1,982,176원",832.0,1284.0,1025.0,1317.0,BALANCE
+final_gen_11.png,6월 15일,58.0,1443.5,199.0,1476.5,DATE
+final_gen_11.png,05:46,319.0,1446.5,410.0,1475.5,TIME
+final_gen_11.png,니드서플라이,58.0,1534.5,268.0,1567.5,MERCHANT
+final_gen_11.png,"출금 15,500원",801.0,1624.0,1026.0,1657.0,AMOUNT_OUT
+final_gen_11.png,"1,997,676원",832.0,1694.0,1025.0,1727.0,BALANCE
+final_gen_11.png,6월 15일,58.0,1853.5,199.0,1886.5,DATE
+final_gen_11.png,01:46,319.0,1857.0,410.0,1885.0,TIME
+final_gen_11.png,스투디오루시아,58.0,1944.5,303.0,1977.5,MERCHANT
+final_gen_11.png,"입금 377,300원",781.0,2034.0,1026.0,2067.0,AMOUNT_IN
+final_gen_11.png,"2,374,976원",832.0,2102.0,1025.0,2135.0,BALANCE
+final_gen_12.png,2025.06.19,51.0,465.0,218.0,499.0,DATE
+final_gen_12.png,10:46,311.0,467.5,393.0,496.5,TIME
+final_gen_12.png,밤새조개구이 회센타,51.0,552.5,379.0,591.5,MERCHANT
+final_gen_12.png,"-9,800원",887.0,551.0,1029.0,592.0,AMOUNT_OUT
+final_gen_12.png,"700,865원",870.0,612.0,1029.0,653.0,BALANCE
+final_gen_12.png,2025.06.19,51.0,773.0,218.0,807.0,DATE
+final_gen_12.png,07:46,308.0,775.5,393.0,804.5,TIME
+final_gen_12.png,풀빌라바다 린,51.0,860.5,273.0,899.5,MERCHANT
+final_gen_12.png,"-10,100원",874.0,859.0,1029.0,900.0,AMOUNT_OUT
+final_gen_12.png,"690,765원",873.0,920.0,1029.0,961.0,BALANCE
+final_gen_12.png,2025.06.18,51.0,1080.0,219.0,1114.0,DATE
+final_gen_12.png,06:46,308.0,1082.5,393.0,1111.5,TIME
+final_gen_12.png,한성인터내셔널,51.0,1167.5,296.0,1206.5,MERCHANT
+final_gen_12.png,"-17,200원",873.0,1166.0,1029.0,1207.0,AMOUNT_OUT
+final_gen_12.png,"673,565원",875.0,1227.0,1029.0,1268.0,BALANCE
+final_gen_12.png,2025.06.17,51.0,1454.0,218.0,1488.0,DATE
+final_gen_12.png,05:46,308.0,1456.5,393.0,1485.5,TIME
+final_gen_12.png,지원행,51.0,1541.5,156.0,1580.5,MERCHANT
+final_gen_12.png,"-11,200원",876.0,1540.0,1029.0,1581.0,AMOUNT_OUT
+final_gen_12.png,"662,365원",875.0,1601.0,1029.0,1642.0,BALANCE
+final_gen_12.png,2025.06.17,51.0,1761.0,218.0,1795.0,DATE
+final_gen_12.png,01:46,311.0,1763.5,393.0,1792.5,TIME
+final_gen_12.png,동암삼거리,51.0,1848.0,226.0,1888.0,MERCHANT
+final_gen_12.png,"314,300원",874.0,1847.0,1029.0,1888.0,AMOUNT_IN
+final_gen_12.png,"976,665원",875.0,1908.0,1029.0,1949.0,BALANCE
+final_gen_12.png,2025.06.14,51.0,2134.0,218.0,2168.0,DATE
+final_gen_12.png,00:46,303.0,2136.5,390.0,2165.5,TIME
+final_gen_12.png,청담이라인치과의원,51.0,2221.0,366.0,2261.0,MERCHANT
+final_gen_12.png,"-4,500원",888.0,2220.0,1029.0,2261.0,AMOUNT_OUT
+final_gen_12.png,"972,165원",878.0,2277.5,1029.0,2318.5,BALANCE
+final_gen_12.png,2025년 06월,51.0,347.5,245.0,386.5,DATE_HEADER
+final_gen_13.png,2025.07.10,58.0,223.0,270.0,255.0,DATE
+final_gen_13.png,11:46,304.0,223.0,410.0,255.0,TIME
+final_gen_13.png,스테이임고,58.0,303.0,278.0,345.0,MERCHANT
+final_gen_13.png,"출금 2,500원",773.0,391.5,1026.0,435.5,AMOUNT_OUT
+final_gen_13.png,"541,176원",827.0,459.5,1025.0,503.5,BALANCE
+final_gen_13.png,2025.07.10,58.0,633.0,270.0,665.0,DATE
+final_gen_13.png,10:46,304.0,633.0,410.0,665.0,TIME
+final_gen_13.png,바로서한의원,58.0,713.0,322.0,755.0,MERCHANT
+final_gen_13.png,"출금 4,700원",773.0,799.5,1026.0,843.5,AMOUNT_OUT
+final_gen_13.png,"545,876원",827.0,869.5,1025.0,913.5,BALANCE
+final_gen_13.png,2025.07.10,58.0,1043.0,270.0,1075.0,DATE
+final_gen_13.png,05:46,304.0,1043.0,410.0,1075.0,TIME
+final_gen_13.png,신성통상TOPTEN키즈고양점,58.0,1119.0,616.0,1161.0,MERCHANT
+final_gen_13.png,"출금 2,800원",773.0,1209.5,1026.0,1253.5,AMOUNT_OUT
+final_gen_13.png,"548,676원",827.0,1277.5,1025.0,1321.5,BALANCE
+final_gen_13.png,2025.07.09,58.0,1449.0,270.0,1481.0,DATE
+final_gen_13.png,03:46,304.0,1449.0,410.0,1481.0,TIME
+final_gen_13.png,미라쥬테라피,58.0,1529.0,322.0,1571.0,MERCHANT
+final_gen_13.png,"출금 15,500원",749.0,1617.5,1026.0,1661.5,AMOUNT_OUT
+final_gen_13.png,"564,176원",827.0,1687.5,1025.0,1731.5,BALANCE
+final_gen_13.png,2025.07.07,58.0,1859.0,270.0,1891.0,DATE
+final_gen_13.png,02:46,304.0,1859.0,410.0,1891.0,TIME
+final_gen_13.png,미크루,58.0,1939.0,190.0,1981.0,MERCHANT
+final_gen_13.png,"출금 12,400원",749.0,2027.5,1026.0,2071.5,AMOUNT_OUT
+final_gen_13.png,"576,576원",827.0,2095.5,1025.0,2139.5,BALANCE
+final_gen_14.png,07.06,43.0,633.0,112.0,661.0,DATE
+final_gen_14.png,10:46,100.0,408.0,167.0,432.0,TIME
+final_gen_14.png,지수헤어,43.0,461.0,155.0,493.0,MERCHANT
+final_gen_14.png,"출금 15,300원",712.0,397.0,821.0,462.0,AMOUNT_OUT
+final_gen_14.png,07.04,43.0,965.0,112.0,993.0,DATE
+final_gen_14.png,06:46,84.0,738.0,153.0,762.0,TIME
+final_gen_14.png,응봉감성,43.0,791.0,155.0,823.0,MERCHANT
+final_gen_14.png,"출금 11,000원",713.0,727.0,821.0,792.0,AMOUNT_OUT
+final_gen_14.png,07.04,43.0,1295.0,112.0,1323.0,DATE
+final_gen_14.png,02:46,99.0,1070.0,167.0,1094.0,TIME
+final_gen_14.png,싱싱한산오징어,43.0,1123.0,239.0,1155.0,MERCHANT
+final_gen_14.png,"입금 310,400원",696.0,1059.0,821.0,1124.0,AMOUNT_IN
+final_gen_14.png,#카드결제,193.0,1062.0,325.0,1094.0,MEMO
+final_gen_14.png,07.03,43.0,1627.0,112.0,1655.0,DATE
+final_gen_14.png,00:46,98.0,1400.0,167.0,1424.0,TIME
+final_gen_14.png,디자인식스나인,43.0,1453.0,239.0,1485.0,MERCHANT
+final_gen_14.png,"출금 3,400원",724.0,1389.0,821.0,1454.0,AMOUNT_OUT
+final_gen_14.png,06.30,43.0,1957.0,112.0,1985.0,DATE
+final_gen_14.png,20:46,85.0,1732.0,153.0,1756.0,TIME
+final_gen_14.png,오형태내과,43.0,1785.0,183.0,1817.0,MERCHANT
+final_gen_14.png,"출금 9,000원",725.0,1721.0,821.0,1786.0,AMOUNT_OUT
+final_gen_14.png,#송금,185.0,1727.0,261.0,1757.0,MEMO
+final_gen_14.png,06.30,43.0,2289.0,112.0,2317.0,DATE
+final_gen_14.png,17:46,100.0,2062.0,167.0,2086.0,TIME
+final_gen_14.png,봄타일,43.0,2115.0,127.0,2147.0,MERCHANT
+final_gen_14.png,"출금 11,900원",714.0,2051.0,821.0,2116.0,AMOUNT_OUT
+final_gen_14.png,06.28,43.0,2619.0,112.0,2647.0,DATE
+final_gen_14.png,13:46,104.0,2394.0,171.0,2418.0,TIME
+final_gen_14.png,풋젠워킹화,43.0,2447.0,183.0,2479.0,MERCHANT
+final_gen_14.png,"출금 7,500원",725.0,2383.0,821.0,2448.0,AMOUNT_OUT
+final_gen_14.png,#월급,197.0,2386.0,273.0,2418.0,MEMO
+final_gen_14.png,12:46,101.0,2724.0,167.0,2748.0,TIME
+final_gen_14.png,멜론당구장,43.0,2761.5,183.0,2793.5,MERCHANT
+final_gen_14.png,"출금 14,400원",711.0,2713.0,821.0,2778.0,AMOUNT_OUT
+final_gen_14.png,#이체,193.0,2716.0,269.0,2748.0,MEMO
+final_gen_14.png,2025.07.06 ~ 2025.06.26 (8건),43.0,283.0,420.0,315.0,DATE_HEADER
+final_gen_15.png,06.14,50.0,586.0,131.0,610.0,DATE
+final_gen_15.png,08:46,100.0,698.5,182.0,722.5,TIME
+final_gen_15.png,쌤소ATSIS이마트군산,50.0,760.5,356.0,790.5,MERCHANT
+final_gen_15.png,"출금 10,400원",903.0,687.0,1032.0,756.0,AMOUNT_OUT
+final_gen_15.png,06.12,50.0,950.0,131.0,974.0,DATE
+final_gen_15.png,05:46,94.0,1062.0,176.0,1087.0,TIME
+final_gen_15.png,상상캔버스,50.0,1124.5,205.0,1154.5,MERCHANT
+final_gen_15.png,"출금 17,200원",903.0,1053.0,1032.0,1122.0,AMOUNT_OUT
+final_gen_15.png,#카드결제,208.0,1057.5,354.0,1087.5,MEMO
+final_gen_15.png,06.10,50.0,1315.0,131.0,1339.0,DATE
+final_gen_15.png,02:46,94.0,1427.5,176.0,1451.5,TIME
+final_gen_15.png,자연을담는아코디자인,50.0,1489.5,360.0,1519.5,MERCHANT
+final_gen_15.png,"출금 18,400원",903.0,1416.0,1032.0,1485.0,AMOUNT_OUT
+final_gen_15.png,#용돈,208.0,1422.5,292.0,1452.5,MEMO
+final_gen_15.png,21:46,94.0,1636.5,176.0,1660.5,TIME
+final_gen_15.png,예스방역,50.0,1698.5,174.0,1728.5,MERCHANT
+final_gen_15.png,"출금 3,800원",921.0,1625.0,1032.0,1694.0,AMOUNT_OUT
+final_gen_15.png,20:46,94.0,1845.5,176.0,1869.5,TIME
+final_gen_15.png,새로나미용신발,50.0,1907.5,267.0,1937.5,MERCHANT
+final_gen_15.png,"입금 283,600원",885.0,1834.0,1032.0,1903.0,AMOUNT_IN
+final_gen_15.png,#체크카드,208.0,1841.0,354.0,1870.0,MEMO
+final_gen_15.png,18:46,94.0,2048.5,176.0,2072.5,TIME
+final_gen_15.png,포낙보청기남포센터,50.0,2110.5,329.0,2140.5,MERCHANT
+final_gen_15.png,"출금 9,900원",921.0,2037.0,1032.0,2106.0,AMOUNT_OUT
+final_gen_15.png,#송금,208.0,2045.0,292.0,2074.0,MEMO
+final_gen_15.png,2025.06.14 ~ 2025.06.06 (6건),51.0,397.5,491.0,427.5,DATE_HEADER
+final_gen_16.png,6월 26일,50.0,578.5,195.0,611.5,DATE
+final_gen_16.png,08:46,94.0,699.5,182.0,725.5,TIME
+final_gen_16.png,아띠헤어,50.0,757.5,194.0,791.5,MERCHANT
+final_gen_16.png,"출금 17,600원",888.0,686.0,1032.0,766.0,AMOUNT_OUT
+final_gen_16.png,#카드결제,219.0,690.5,385.0,724.5,MEMO
+final_gen_16.png,6월 26일,50.0,942.5,195.0,975.5,DATE
+final_gen_16.png,07:46,88.0,1063.5,176.0,1089.5,TIME
+final_gen_16.png,진성전기 음향,50.0,1121.5,279.0,1155.5,MERCHANT
+final_gen_16.png,"출금 3,100원",908.0,1052.0,1032.0,1132.0,AMOUNT_OUT
+final_gen_16.png,6월 26일,50.0,1307.5,195.0,1340.5,DATE
+final_gen_16.png,04:46,88.0,1428.5,176.0,1454.5,TIME
+final_gen_16.png,파리바게뜨고덕리엔파크점,50.0,1486.5,482.0,1520.5,MERCHANT
+final_gen_16.png,"입금 102,900원",868.0,1415.0,1032.0,1495.0,AMOUNT_IN
+final_gen_16.png,#월급,208.0,1420.0,302.0,1453.0,MEMO
+final_gen_16.png,01:46,88.0,1637.5,176.0,1663.5,TIME
+final_gen_16.png,지에스25전하,50.0,1695.5,270.0,1729.5,MERCHANT
+final_gen_16.png,"출금 5,000원",908.0,1624.0,1032.0,1704.0,AMOUNT_OUT
+final_gen_16.png,#체크카드,208.0,1628.5,374.0,1662.5,MEMO
+final_gen_16.png,00:46,88.0,1846.5,176.0,1872.5,TIME
+final_gen_16.png,미송면집,50.0,1904.5,194.0,1938.5,MERCHANT
+final_gen_16.png,"출금 4,900원",908.0,1833.0,1032.0,1913.0,AMOUNT_OUT
+final_gen_16.png,#체크카드,208.0,1837.5,374.0,1871.5,MEMO
+final_gen_16.png,23:46,88.0,2049.5,176.0,2075.5,TIME
+final_gen_16.png,JS메디칼,50.0,2107.5,191.0,2141.5,MERCHANT
+final_gen_16.png,"출금 14,600원",888.0,2036.0,1032.0,2116.0,AMOUNT_OUT
+final_gen_16.png,#오픈뱅킹이체,208.0,2040.5,446.0,2074.5,MEMO
+final_gen_16.png,2025.06.26 ~ 2025.06.21 (6건),51.0,393.0,545.0,430.0,DATE_HEADER
+final_gen_17.png,7월 4일,50.0,574.0,159.0,602.0,DATE
+final_gen_17.png,11:46,101.015625,686.5,182.015625,714.5,TIME
+final_gen_17.png,스텔라3호,50.0,752.0,193.0,781.0,MERCHANT
+final_gen_17.png,"출금 1,300원",916.0,679.0,1032.0,742.0,AMOUNT_OUT
+final_gen_17.png,#오픈뱅킹이체,219.0,684.5,430.0,714.5,MEMO
+final_gen_17.png,7월 4일,50.0,938.0,159.0,966.0,DATE
+final_gen_17.png,07:46,86.0,1050.5,176.0,1078.5,TIME
+final_gen_17.png,유정생아구찜,50.0,1117.0,236.0,1146.0,MERCHANT
+final_gen_17.png,"출금 12,900원",895.0,1045.0,1032.0,1108.0,AMOUNT_OUT
+final_gen_17.png,#월급,208.0,1049.0,295.0,1078.0,MEMO
+final_gen_17.png,7월 4일,50.0,1303.0,159.0,1331.0,DATE
+final_gen_17.png,05:46,85.0,1415.5,176.0,1443.5,TIME
+final_gen_17.png,인정가든,50.0,1482.0,174.0,1511.0,MERCHANT
+final_gen_17.png,"입금 84,900원",889.0,1408.0,1032.0,1471.0,AMOUNT_IN
+final_gen_17.png,#체크카드,208.0,1414.0,357.0,1443.0,MEMO
+final_gen_17.png,01:46,89.0,1624.5,176.0,1652.5,TIME
+final_gen_17.png,국수먹고갈래,50.0,1691.0,236.0,1720.0,MERCHANT
+final_gen_17.png,"입금 303,100원",877.0,1617.0,1032.0,1680.0,AMOUNT_IN
+final_gen_17.png,21:46,89.0,1832.0,176.0,1861.0,TIME
+final_gen_17.png,미진수,50.0,1900.0,143.0,1929.0,MERCHANT
+final_gen_17.png,"출금 8,400원",909.0,1826.0,1032.0,1889.0,AMOUNT_OUT
+final_gen_17.png,17:46,92.0,2036.5,176.0,2064.5,TIME
+final_gen_17.png,로봇초밥마켓안양,50.0,2103.0,299.0,2132.0,MERCHANT
+final_gen_17.png,"출금 14,800원",895.0,2029.0,1032.0,2092.0,AMOUNT_OUT
+final_gen_17.png,2025.07.04 ~ 2025.07.02 (6건),51.0,388.5,535.0,418.5,DATE_HEADER
+final_gen_18.png,6월 30일,55.0,760.5,230.0,801.5,DATE
+final_gen_18.png,11:46,99.0,484.0,205.0,516.0,TIME
+final_gen_18.png,영해가스,55.0,551.0,231.0,593.0,MERCHANT
+final_gen_18.png,"출금 16,600원",855.0,473.0,1029.0,569.0,AMOUNT_OUT
+final_gen_18.png,#오픈뱅킹이체,237.0,473.0,528.0,515.0,MEMO
+final_gen_18.png,6월 29일,55.0,1174.5,230.0,1215.5,DATE
+final_gen_18.png,10:46,99.0,900.0,205.0,932.0,TIME
+final_gen_18.png,패러글라이딩예약센터,55.0,965.0,495.0,1007.0,MERCHANT
+final_gen_18.png,"출금 1,300원",879.0,889.0,1029.0,985.0,AMOUNT_OUT
+final_gen_18.png,#카드결제,237.0,889.0,440.0,931.0,MEMO
+final_gen_18.png,6월 29일,55.0,1588.5,230.0,1629.5,DATE
+final_gen_18.png,07:46,99.0,1314.0,205.0,1346.0,TIME
+final_gen_18.png,길동우동오금역점,55.0,1379.0,407.0,1421.0,MERCHANT
+final_gen_18.png,"입금 348,600원",831.0,1303.0,1029.0,1399.0,AMOUNT_IN
+final_gen_18.png,#이체,237.0,1303.0,352.0,1345.0,MEMO
+final_gen_18.png,6월 28일,55.0,2002.5,230.0,2043.5,DATE
+final_gen_18.png,04:46,99.0,1728.0,205.0,1760.0,TIME
+final_gen_18.png,프림로즈힐,55.0,1793.5,275.0,1834.5,MERCHANT
+final_gen_18.png,"출금 3,300원",879.0,1717.0,1029.0,1813.0,AMOUNT_OUT
+final_gen_18.png,6월 28일,55.0,2416.5,230.0,2457.5,DATE
+final_gen_18.png,01:46,99.0,2142.0,205.0,2174.0,TIME
+final_gen_18.png,고집야식,55.0,2207.0,231.0,2249.0,MERCHANT
+final_gen_18.png,"출금 17,500원",855.0,2131.0,1029.0,2227.0,AMOUNT_OUT
+final_gen_18.png,#용돈,237.0,2134.5,352.0,2173.5,MEMO
+final_gen_18.png,6월 27일,55.0,2830.5,230.0,2871.5,DATE
+final_gen_18.png,21:46,99.0,2556.0,205.0,2588.0,TIME
+final_gen_18.png,애드홀릭,55.0,2621.0,231.0,2663.0,MERCHANT
+final_gen_18.png,"출금 13,200원",855.0,2545.0,1029.0,2641.0,AMOUNT_OUT
+final_gen_18.png,#용돈,237.0,2548.5,352.0,2587.5,MEMO
+final_gen_18.png,18:46,99.0,2970.0,205.0,3002.0,TIME
+final_gen_18.png,세무사최삼태사무소,55.0,3035.0,451.0,3077.0,MERCHANT
+final_gen_18.png,"출금 13,200원",855.0,2959.0,1029.0,3055.0,AMOUNT_OUT
+final_gen_18.png,#송금,237.0,2962.5,352.0,3001.5,MEMO
+final_gen_18.png,2025년 06월,49.0,362.5,296.0,403.5,DATE_HEADER
+final_gen_19.png,7월 5일,45.0,460.0,167.0,493.0,DATE
+final_gen_19.png,오로페플라워,181.0,462.0,385.0,495.0,MERCHANT
+final_gen_19.png,"344,800원",859.0,459.0,1036.0,494.0,AMOUNT_IN
+final_gen_19.png,"1,522,518원",826.0,512.5,1036.0,547.5,BALANCE
+final_gen_19.png,#오픈뱅킹이체,181.0,517.0,407.0,550.0,MEMO
+final_gen_19.png,7월 2일,45.0,702.0,167.0,735.0,DATE
+final_gen_19.png,지나점핑힐링다이어트,181.0,704.0,521.0,737.0,MERCHANT
+final_gen_19.png,"-13,600원",868.0,701.0,1036.0,736.0,AMOUNT_OUT
+final_gen_19.png,"1,508,918원",826.0,754.5,1036.0,789.5,BALANCE
+final_gen_19.png,6월 29일,45.0,946.0,189.0,979.0,DATE
+final_gen_19.png,남다른쌀디저트,181.0,948.0,419.0,981.0,MERCHANT
+final_gen_19.png,"-10,100원",868.0,945.0,1036.0,980.0,AMOUNT_OUT
+final_gen_19.png,"1,498,818원",826.0,998.5,1036.0,1033.5,BALANCE
+final_gen_19.png,6월 27일,45.0,1188.0,189.0,1221.0,DATE
+final_gen_19.png,제주옥탑안산,181.0,1190.0,385.0,1223.0,MERCHANT
+final_gen_19.png,"-1,200원",890.0,1187.0,1036.0,1222.0,AMOUNT_OUT
+final_gen_19.png,"1,497,618원",826.0,1240.5,1036.0,1275.5,BALANCE
+final_gen_19.png,곰곰인테리어,181.0,1434.0,385.0,1467.0,MERCHANT
+final_gen_19.png,"-19,600원",868.0,1431.0,1036.0,1466.0,AMOUNT_OUT
+final_gen_19.png,"1,478,018원",826.0,1484.5,1036.0,1519.5,BALANCE
+final_gen_19.png,#오픈뱅킹이체,181.0,1489.0,407.0,1522.0,MEMO
+final_gen_19.png,에스타시옹1913,181.0,1678.0,439.0,1711.0,MERCHANT
+final_gen_19.png,"-8,500원",890.0,1675.0,1036.0,1710.0,AMOUNT_OUT
+final_gen_19.png,"1,469,518원",826.0,1728.5,1036.0,1763.5,BALANCE
+final_gen_19.png,#송금,181.0,1731.5,271.0,1765.5,MEMO
+final_gen_19.png,톡톡톡,181.0,1920.0,283.0,1953.0,MERCHANT
+final_gen_19.png,"-9,700원",890.0,1917.0,1036.0,1952.0,AMOUNT_OUT
+final_gen_19.png,"1,459,818원",826.0,1970.5,1036.0,2005.5,BALANCE
+final_gen_19.png,#오픈뱅킹이체,181.0,1975.0,407.0,2008.0,MEMO
+final_gen_19.png,6월 26일,45.0,2160.0,189.0,2193.0,DATE
+final_gen_19.png,백련가든,181.0,2162.0,317.0,2195.0,MERCHANT
+final_gen_19.png,"-12,300원",868.0,2159.0,1036.0,2194.0,AMOUNT_OUT
+final_gen_19.png,"1,447,518원",826.0,2212.5,1036.0,2247.5,BALANCE
+final_gen_20.png,6월 16일,51.0,429.5,224.0,468.5,DATE
+final_gen_20.png,11:46,265.015625,430.0,379.015625,468.0,TIME
+final_gen_20.png,수노아공방,51.0,524.0,267.0,564.0,MERCHANT
+final_gen_20.png,"-1,500원",841.0,522.5,1029.0,564.5,AMOUNT_OUT
+final_gen_20.png,"1,121,963원",783.0,583.5,1029.0,625.5,BALANCE
+final_gen_20.png,6월 16일,51.0,737.5,224.0,776.5,DATE
+final_gen_20.png,06:46,250.0,738.0,379.0,776.0,TIME
+final_gen_20.png,육앤샤,51.0,832.5,181.0,871.5,MERCHANT
+final_gen_20.png,"-13,200원",812.0,830.5,1029.0,872.5,AMOUNT_OUT
+final_gen_20.png,"1,108,763원",777.0,891.5,1029.0,933.5,BALANCE
+final_gen_20.png,6월 16일,51.0,1110.5,224.0,1149.5,DATE
+final_gen_20.png,02:46,222.0,1111.0,351.0,1149.0,TIME
+final_gen_20.png,스타필드랩,51.0,1207.0,266.0,1245.0,MERCHANT
+final_gen_20.png,"-13,200원",812.0,1203.5,1029.0,1245.5,AMOUNT_OUT
+final_gen_20.png,"1,095,563원",772.0,1264.5,1029.0,1306.5,BALANCE
+final_gen_20.png,6월 15일,51.0,1630.5,222.0,1669.5,DATE
+final_gen_20.png,23:46,238.0,1631.0,366.0,1669.0,TIME
+final_gen_20.png,관절척추연구회,51.0,1725.0,352.0,1765.0,MERCHANT
+final_gen_20.png,"397,100원",813.0,1723.5,1029.0,1765.5,AMOUNT_IN
+final_gen_20.png,"1,492,663원",768.0,1784.5,1029.0,1826.5,BALANCE
+final_gen_20.png,6월 15일,51.0,2149.5,222.0,2188.5,DATE
+final_gen_20.png,18:46,244.0,2150.0,366.0,2188.0,TIME
+final_gen_20.png,공간플랜,51.0,2246.0,223.0,2284.0,MERCHANT
+final_gen_20.png,"-2,500원",834.0,2242.5,1029.0,2284.5,AMOUNT_OUT
+final_gen_20.png,"1,490,163원",774.0,2290.0,1029.0,2332.0,BALANCE
+final_gen_20.png,2025.06.16 ~ 2025.06.15 (5건),51.0,350.0,708.0,390.0,DATE_HEADER

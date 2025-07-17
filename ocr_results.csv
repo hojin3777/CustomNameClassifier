@@ -1,0 +1,910 @@
+﻿image_id,text,x_min,y_min,x_max,y_max,label
+bank_statement_long.jpg,용 K 얌 ..1 60%& 4:09,684,19,1041,70,O
+bank_statement_long.jpg,거래내역조회,128,104,397,172,O
+bank_statement_long.jpg,2025.02,58,263,228,314,DATE_HEADER
+bank_statement_long.jpg,2025.02.28,62,435,415,486,DATE
+bank_statement_long.jpg,20:22:48,62,435,415,486,TIME
+bank_statement_long.jpg,뚜레쥬르강남직영점,58,521,400,577,MERCHANT
+bank_statement_long.jpg,"출금 19,800원",755,607,1023,735,AMOUNT_OUT
+bank_statement_long.jpg,"잔액 781,250 원",755,607,1023,735,BALANCE
+bank_statement_long.jpg,2025.02.28,58,842,410,893,DATE
+bank_statement_long.jpg,20:05:37,58,842,410,893,TIME
+bank_statement_long.jpg,무인양품 (주) 강남점,57,927,440,989,MERCHANT
+bank_statement_long.jpg,"출금 4,900원",765,1018,1023,1141,AMOUNT_OUT
+bank_statement_long.jpg,"잔액 801,050 원",765,1018,1023,1141,BALANCE
+bank_statement_long.jpg,2025.02.28,58,1248,415,1299,DATE
+bank_statement_long.jpg,19:27:49,58,1248,415,1299,TIME
+bank_statement_long.jpg,(주) 빅바이트컴퍼니,168,1339,439,1395,MERCHANT
+bank_statement_long.jpg,"출금 29,100원",756,1430,1027,1553,AMOUNT_OUT
+bank_statement_long.jpg,"잔액 805,950 원",756,1430,1027,1553,BALANCE
+bank_statement_long.jpg,2025.02.28,58,1659,415,1710,DATE
+bank_statement_long.jpg,17:06:09,58,1659,415,1710,TIME
+bank_statement_long.jpg,Degica,54,1747,285,1814,MERCHANT
+bank_statement_long.jpg,"출금 9,000 원",765,1834,1023,1959,AMOUNT_OUT
+bank_statement_long.jpg,"잔액 835,050 원",765,1834,1023,1959,BALANCE
+bank_statement_long.jpg,2025.02.27,58,2066,415,2117,DATE
+bank_statement_long.jpg,14:10:53,58,2066,415,2117,TIME
+bank_statement_long.jpg,이마트에브리데이,58,2157,367,2212,MERCHANT
+bank_statement_long.jpg,"출금 42,610 원",755,2242,1023,2370,AMOUNT_OUT
+bank_statement_long.jpg,"잔액 844,050 원",755,2242,1023,2370,BALANCE
+bank_statement_long.jpg,2025.02.25,58,2477,415,2528,DATE
+bank_statement_long.jpg,21:01:23,58,2477,415,2528,TIME
+bank_statement_long.jpg,김예빈,52,2562,181,2625,MERCHANT
+bank_statement_long.jpg,"입금 23,300 원",756,2659,1022,2777,AMOUNT_IN
+bank_statement_long.jpg,"잔액 886,660 원",756,2659,1022,2777,BALANCE
+bank_statement_long.jpg,2025.02.25,58,2883,415,2934,DATE
+bank_statement_long.jpg,17:17:35,58,2883,415,2934,TIME
+bank_statement_long.jpg,권은희,58,2974,180,3030,MERCHANT
+bank_statement_long.jpg,"출금 28,800 원",755,3059,1023,3188,AMOUNT_OUT
+bank_statement_long.jpg,"잔액 863,360원",755,3059,1023,3188,BALANCE
+bank_statement_long.jpg,2025.02.25,58,3295,415,3346,DATE
+bank_statement_long.jpg,17:08:23,58,3295,415,3346,TIME
+bank_statement_long.jpg,김호진,57,3380,181,3442,MERCHANT
+bank_statement_long.jpg,"출금 160,000원",731,3470,1023,3594,AMOUNT_OUT
+bank_statement_long.jpg,"잔액 892,160 원",731,3470,1023,3594,BALANCE
+bank_statement_long.jpg,2025.02.25,58,3701,415,3752,DATE
+bank_statement_long.jpg,17:06:23,58,3701,415,3752,TIME
+bank_statement_long.jpg,김예빈,53,3792,180,3848,MERCHANT
+bank_statement_long.jpg,"입금 160,000 원",732,3883,1022,4005,AMOUNT_IN
+bank_statement_long.jpg,"잔액 1,052,160 원",732,3883,1022,4005,BALANCE
+bank_statement_long.jpg,2025.02.25,58,4112,410,4163,DATE
+bank_statement_long.jpg,12:45:47,58,4112,410,4163,TIME
+bank_statement_long.jpg,봄봄,57,4197,143,4260,MERCHANT
+bank_statement_long.jpg,출금 100 원,765,4286,1022,4412,AMOUNT_OUT
+bank_statement_long.jpg,"잔액 892,160 원",765,4286,1022,4412,BALANCE
+bank_statement_long.jpg,2025.02.25,58,4519,415,4570,DATE
+bank_statement_long.jpg,12:06:02,58,4519,415,4570,TIME
+bank_statement_long.jpg,크라이치즈버거숭실,58,4609,400,4665,MERCHANT
+bank_statement_long.jpg,"출금 17,800원",755,4694,1023,4823,AMOUNT_OUT
+bank_statement_long.jpg,"잔액 892,260 원",755,4694,1023,4823,BALANCE
+bank_statement_long.jpg,2025.02.25,58,4930,415,4981,DATE
+bank_statement_long.jpg,9:58:26,58,4930,415,4981,TIME
+bank_statement_long.jpg,김호진,57,5015,181,5077,MERCHANT
+bank_statement_long.jpg,"출금 1,000,000 원",697,5106,1023,5229,AMOUNT_OUT
+bank_statement_long.jpg,"잔액 910,060 원",697,5106,1023,5229,BALANCE
+bank_statement_long.jpg,2025.02.25,59,5342,414,5386,DATE
+bank_statement_long.jpg,8:42:16,59,5342,414,5386,TIME
+bank_statement_long.jpg,권은희,57,5421,181,5484,MERCHANT
+bank_statement_long.jpg,"입금 1,000,000 원",697,5512,1023,5641,AMOUNT_IN
+bank_statement_long.jpg,"잔액 1,910,060 원",697,5512,1023,5641,BALANCE
+bank_statement_long.jpg,2025.02.25,58,5747,415,5798,DATE
+bank_statement_long.jpg,1:46:02,58,5747,415,5798,TIME
+bank_statement_long.jpg,김호진,52,5832,181,5895,MERCHANT
+bank_statement_long.jpg,"출금 2,000,000",696,5913,1022,6047,AMOUNT_OUT
+bank_statement_long.jpg,"잔액 910,060원",696,5913,1022,6047,BALANCE
+kabang1.jpg,KT 7:20,57,29,207,71,O
+kabang1.jpg,(D 5G,806,30,888,68,O
+kabang1.jpg,191,948,34,1008,66,O
+kabang1.jpg,TALK,375,43,405,55,O
+kabang1.jpg,내통장,475,127,609,187,O
+kabang1.jpg,3개월 전체 최신 V,737,281,1025,323,O
+kabang1.jpg,"-12,940원",847,442,1038,545,AMOUNT_OUT
+kabang1.jpg,"5,692원",847,442,1038,545,BALANCE
+kabang1.jpg,06.22,43,444,390,547,DATE
+kabang1.jpg,CJ CGV(주),43,444,390,547,MERCHANT
+kabang1.jpg,#체크카드,43,444,390,547,MEMO
+kabang1.jpg,"-18,400원",847,685,1038,791,AMOUNT_OUT
+kabang1.jpg,"18,632원",847,685,1038,791,BALANCE
+kabang1.jpg,06.22,43,686,326,789,DATE
+kabang1.jpg,신신일호,43,686,326,789,MERCHANT
+kabang1.jpg,#체크카드,43,686,326,789,MEMO
+kabang1.jpg,"30,000원",863,929,1038,1031,AMOUNT_IN
+kabang1.jpg,"37,032원",863,929,1038,1031,BALANCE
+kabang1.jpg,06.22,41,930,292,982,DATE
+kabang1.jpg,윤동근,41,930,292,982,MERCHANT
+kabang1.jpg,"-3,000원",871,1171,1039,1277,AMOUNT_OUT
+kabang1.jpg,"7,032원",871,1171,1039,1277,BALANCE
+kabang1.jpg,06.22,43,1174,406,1275,DATE
+kabang1.jpg,더벤티 이대점,43,1174,406,1275,MERCHANT
+kabang1.jpg,#체크카드,43,1174,406,1275,MEMO
+kabang1.jpg,"-14,500원",847,1414,1039,1517,AMOUNT_OUT
+kabang1.jpg,"10,032원",847,1414,1039,1517,BALANCE
+kabang1.jpg,06.20,43,1415,459,1518,DATE
+kabang1.jpg,(주)우아한형제들,43,1415,459,1518,MERCHANT
+kabang1.jpg,#체크카드,43,1415,459,1518,MEMO
+kabang1.jpg,"-8,000원",871,1657,1038,1760,AMOUNT_OUT
+kabang1.jpg,"24,532원",871,1657,1038,1760,BALANCE
+kabang1.jpg,06.20,43,1660,522,1761,DATE
+kabang1.jpg,씨유(CU) 이대정문점,43,1660,522,1761,MERCHANT
+kabang1.jpg,#체크카드,43,1660,522,1761,MEMO
+kabang1.jpg,"-4,600원",870,1899,1039,2003,AMOUNT_OUT
+kabang1.jpg,"32,532원",870,1899,1039,2003,BALANCE
+kabang1.jpg,06.20,43,1901,510,2005,DATE
+kabang1.jpg,우지커피 이화여대점,43,1901,510,2005,MERCHANT
+kabang1.jpg,#체크카드,43,1901,510,2005,MEMO
+kabang1.jpg,"-6,700원",871,2144,1038,2246,AMOUNT_OUT
+kabang1.jpg,"37,132원",871,2144,1038,2246,BALANCE
+kabang1.jpg,06.19,42,2146,307,2249,DATE
+kabang1.jpg,쿠팡,42,2146,307,2249,MERCHANT
+kabang1.jpg,#자동이체,42,2146,307,2249,MEMO
+kabang2.jpg,CDE,807,29,891,69,O
+kabang2.jpg,KT 7:25,57,31,205,73,O
+kabang2.jpg,Signs 'm),267,31,431,75,O
+kabang2.jpg,789,950,36,1014,68,O
+kabang2.jpg,내통장,475,127,609,187,O
+kabang2.jpg,3개월 전체 - 최신 <,737,277,1022,317,O
+kabang2.jpg,"-4,500원",871,429,1038,532,AMOUNT_OUT
+kabang2.jpg,"4,989원",871,429,1038,532,BALANCE
+kabang2.jpg,06.16,40,430,522,533,DATE
+kabang2.jpg,이마트24 은평한빛점,40,430,522,533,MERCHANT
+kabang2.jpg,#체크카드,40,430,522,533,MEMO
+kabang2.jpg,"-1,800원",870,671,1039,775,AMOUNT_OUT
+kabang2.jpg,"9,489원",870,671,1039,775,BALANCE
+kabang2.jpg,06.16,41,673,510,776,DATE
+kabang2.jpg,우지커피 이화여대점,41,673,510,776,MERCHANT
+kabang2.jpg,#체크카드,41,673,510,776,MEMO
+kabang2.jpg,"-34,000원",847,914,1038,1021,AMOUNT_OUT
+kabang2.jpg,"11,289원",847,914,1038,1021,BALANCE
+kabang2.jpg,06.15,42,918,328,1019,DATE
+kabang2.jpg,쿠팡이츠,42,918,328,1019,MERCHANT
+kabang2.jpg,#체크카드,42,918,328,1019,MEMO
+kabang2.jpg,"17,000원",864,1158,1039,1261,AMOUNT_IN
+kabang2.jpg,"45,289원",864,1158,1039,1261,BALANCE
+kabang2.jpg,06.15,41,1159,289,1211,DATE
+kabang2.jpg,김경필,41,1159,289,1211,MERCHANT
+kabang2.jpg,"28,275원",863,1403,1038,1504,AMOUNT_IN
+kabang2.jpg,"28,289원",863,1403,1038,1504,BALANCE
+kabang2.jpg,06.15,42,1404,292,1456,DATE
+kabang2.jpg,윤동근,42,1404,292,1456,MERCHANT
+kabang2.jpg,06.15,41,1646,336,1749,DATE
+kabang2.jpg,프린트 존,41,1646,336,1749,MERCHANT
+kabang2.jpg,#체크카드,41,1646,336,1749,MEMO
+kabang2.jpg,-400원,906,1646,1038,1745,AMOUNT_OUT
+kabang2.jpg,14원,906,1646,1038,1745,BALANCE
+kabang2.jpg,06.15,40,1890,292,1942,DATE
+kabang2.jpg,윤동근,40,1890,292,1942,MERCHANT
+kabang2.jpg,39원,943,1890,1038,1987,AMOUNT_IN
+kabang2.jpg,414원,943,1890,1038,1987,BALANCE
+kabang2.jpg,"-1,000원",869,2128,1040,2231,AMOUNT_OUT
+kabang2.jpg,375원,869,2128,1040,2231,BALANCE
+kabang2.jpg,06.15,43,2132,482,2235,DATE
+kabang2.jpg,피시웨이(Pc way),43,2132,482,2235,MERCHANT
+kabang2.jpg,#체크카드,43,2132,482,2235,MEMO
+kabang3.jpg,D ,806,26,892,74,O
+kabang3.jpg,KT 7:25,57,31,205,73,O
+kabang3.jpg,Signs 'm),267,31,431,75,O
+kabang3.jpg,789,950,36,1014,68,O
+kabang3.jpg,내통장,475,127,609,187,O
+kabang3.jpg,3개월 전체 - 최신 <,737,277,1022,317,O
+kabang3.jpg,06.15,41,402,483,509,DATE
+kabang3.jpg,피시웨이(Pc way),41,402,483,509,MERCHANT
+kabang3.jpg,#체크카드,41,402,483,509,MEMO
+kabang3.jpg,"-3,000원",869,402,1040,507,AMOUNT_OUT
+kabang3.jpg,"1,375원",869,402,1040,507,BALANCE
+kabang3.jpg,06.15,41,648,500,751,DATE
+kabang3.jpg,라방코인노래연습장,41,648,500,751,MERCHANT
+kabang3.jpg,#체크카드,41,648,500,751,MEMO
+kabang3.jpg,"-5,000원",871,648,1038,749,AMOUNT_OUT
+kabang3.jpg,"4,375원",871,648,1038,749,BALANCE
+kabang3.jpg,06.15,41,890,510,995,DATE
+kabang3.jpg,주식회사 에브리바이,41,890,510,995,MERCHANT
+kabang3.jpg,#체크카드,41,890,510,995,MEMO
+kabang3.jpg,"-1,710원",872,892,1038,993,AMOUNT_OUT
+kabang3.jpg,"9,375원",872,892,1038,993,BALANCE
+kabang3.jpg,06.15,40,1132,520,1237,DATE
+kabang3.jpg,지에스25 비산효자점,40,1132,520,1237,MERCHANT
+kabang3.jpg,#체크카드,40,1132,520,1237,MEMO
+kabang3.jpg,"-3,000원",871,1133,1038,1239,AMOUNT_OUT
+kabang3.jpg,"11,085원",871,1133,1038,1239,BALANCE
+kabang3.jpg,"-5,500원",869,1374,1040,1479,AMOUNT_OUT
+kabang3.jpg,"14,085원",869,1374,1040,1479,BALANCE
+kabang3.jpg,06.14,41,1376,498,1480,DATE
+kabang3.jpg,아이스박스 비산2호,41,1376,498,1480,MERCHANT
+kabang3.jpg,#체크카드,41,1376,498,1480,MEMO
+kabang3.jpg,"-4,900원",870,1618,1039,1721,AMOUNT_OUT
+kabang3.jpg,"19,585원",870,1618,1039,1721,BALANCE
+kabang3.jpg,06.14,41,1620,512,1723,DATE
+kabang3.jpg,씨유 안양종합운동장,41,1620,512,1723,MERCHANT
+kabang3.jpg,#체크카드,41,1620,512,1723,MEMO
+kabang3.jpg,"-2,000원",869,1860,1040,1963,AMOUNT_OUT
+kabang3.jpg,"24,485원",869,1860,1040,1963,BALANCE
+kabang3.jpg,06.14,41,1864,325,1967,DATE
+kabang3.jpg,만복어묵,41,1864,325,1967,MERCHANT
+kabang3.jpg,#체크카드,41,1864,325,1967,MEMO
+kabang3.jpg,"-8,000원",871,2105,1038,2208,AMOUNT_OUT
+kabang3.jpg,"26,485원",871,2105,1038,2208,BALANCE
+kabang3.jpg,06.14,44,2108,474,2209,DATE
+kabang3.jpg,에스.티.피.시 짱치,44,2108,474,2209,MERCHANT
+kabang3.jpg,#체크카드,44,2108,474,2209,MEMO
+kabang4.jpg,CD,807,29,891,71,O
+kabang4.jpg,KT 7:25,57,31,205,73,O
+kabang4.jpg,Signs,267,33,359,75,O
+kabang4.jpg,789,950,36,1014,68,O
+kabang4.jpg,내통장,475,127,609,187,O
+kabang4.jpg,3개월 전체 - 최신 <,737,277,1022,317,O
+kabang4.jpg,"-14,900원",847,418,1039,519,AMOUNT_OUT
+kabang4.jpg,"17,409원",847,418,1039,519,BALANCE
+kabang4.jpg,06.18,41,422,309,525,DATE
+kabang4.jpg,쿠팡,41,422,309,525,MERCHANT
+kabang4.jpg,#자동이체,41,422,309,525,MEMO
+kabang4.jpg,"-4,600원",871,660,1038,763,AMOUNT_OUT
+kabang4.jpg,"32,309원",871,660,1038,763,BALANCE
+kabang4.jpg,06.18,41,664,510,765,DATE
+kabang4.jpg,우지커피 이화여대점,41,664,510,765,MERCHANT
+kabang4.jpg,#체크카드,41,664,510,765,MEMO
+kabang4.jpg,06.17,41,906,512,1009,DATE
+kabang4.jpg,주식회사 무신사페이,41,906,512,1009,MERCHANT
+kabang4.jpg,#체크카드,41,906,512,1009,MEMO
+kabang4.jpg,"-9,980원",872,906,1038,1007,AMOUNT_OUT
+kabang4.jpg,"36,909원",872,906,1038,1007,BALANCE
+kabang4.jpg,"-1,500원",869,1145,1040,1249,AMOUNT_OUT
+kabang4.jpg,"46,889원",869,1145,1040,1249,BALANCE
+kabang4.jpg,06.17,41,1150,522,1251,DATE
+kabang4.jpg,씨유(CU) 이대정문점,41,1150,522,1251,MERCHANT
+kabang4.jpg,#체크카드,41,1150,522,1251,MEMO
+kabang4.jpg,"-4,600원",870,1389,1039,1493,AMOUNT_OUT
+kabang4.jpg,"48,389원",870,1389,1039,1493,BALANCE
+kabang4.jpg,06.17 ,41,1391,510,1494,DATE
+kabang4.jpg,우지커피 이화여대점,41,1391,510,1494,MERCHANT
+kabang4.jpg,#체크카드,41,1391,510,1494,MEMO
+kabang4.jpg,06.17,43,1636,372,1739,DATE
+kabang4.jpg,토스 윤동규,43,1636,372,1739,MERCHANT
+kabang4.jpg,#자동이체,43,1636,372,1739,MEMO
+kabang4.jpg,"-10,000원",848,1636,1038,1736,AMOUNT_OUT
+kabang4.jpg,"52,989원",848,1636,1038,1736,BALANCE
+kabang4.jpg,"-42,000원",847,1876,1038,1981,AMOUNT_OUT
+kabang4.jpg,"62,989원",847,1876,1038,1981,BALANCE
+kabang4.jpg,06.17,40,1880,360,1981,DATE
+kabang4.jpg,카카오페이,40,1880,360,1981,MERCHANT
+kabang4.jpg,#자동이체,40,1880,360,1981,MEMO
+kabang4.jpg,"100,000원",841,2120,1038,2219,AMOUNT_IN
+kabang4.jpg,104989원,841,2120,1038,2219,BALANCE
+kabang4.jpg,06.17,41,2122,290,2172,DATE
+kabang4.jpg,윤정석,41,2122,290,2172,MERCHANT
+kabang4.jpg,입출금,876,2252,982,2300,O
+kookmin1.png,| 99% 1:41,839,29,1039,69,O
+kookmin1.png,거래내역조회,133,107,393,171,O
+kookmin1.png,2025.02.28,59,247,411,289,DATE
+kookmin1.png,20:22:48,59,247,411,289,TIME
+kookmin1.png,뚜레쥬르강남직영점,58,332,402,388,MERCHANT
+kookmin1.png,"출금 19,800 원",757,419,1022,542,AMOUNT_OUT
+kookmin1.png,"잔액 781,250 원",757,419,1022,542,BALANCE
+kookmin1.png,2025.02.28,58,653,410,701,DATE
+kookmin1.png,20:05:37,58,653,410,701,TIME
+kookmin1.png,무인양품 (주) 강남점,58,742,438,798,MERCHANT
+kookmin1.png,"출금 4,900 원",770,832,1022,950,AMOUNT_OUT
+kookmin1.png,"잔액 801,050 원",770,832,1022,950,BALANCE
+kookmin1.png,2025.02.28,59,1065,411,1107,DATE
+kookmin1.png,19:27:49,59,1065,411,1107,TIME
+kookmin1.png,(주) 빅바이트컴퍼니,84,1149,437,1205,MERCHANT
+kookmin1.png,"출금 29,100 원",760,1240,1021,1357,AMOUNT_OUT
+kookmin1.png,"잔액 805,950 원",760,1240,1021,1357,BALANCE
+kookmin1.png,2025.02.28,59,1473,411,1515,DATE
+kookmin1.png,17:06:09,59,1473,411,1515,TIME
+kookmin1.png,Degica,64,1560,284,1616,MERCHANT
+kookmin1.png,"출금 9,000 원",768,1650,1022,1768,AMOUNT_OUT
+kookmin1.png,"잔액 835,050 원",768,1650,1022,1768,BALANCE
+kookmin1.png,2025.02.27,59,1883,411,1925,DATE
+kookmin1.png,14:10:53,59,1883,411,1925,TIME
+kookmin1.png,이마트에브리데이,60,1968,365,2024,MERCHANT
+kookmin1.png,"출금 42,610",760,2058,1021,2178,AMOUNT_OUT
+kookmin1.png,"잔액 844,056원",760,2058,1021,2178,BALANCE
+kookmin1.png,75 07 25 71.01-72,106,2294,406,2316,O
+kookmin2.png,.1| 75% 9:49,829,27,1045,69,O
+kookmin2.png,거래내역조회,59,106,411,245,O
+kookmin2.png,2025.06.16,59,106,411,245,DATE
+kookmin2.png,19:04:42,59,106,411,245,TIME
+kookmin2.png,한화생 0 6 - 0 2,58,287,357,341,MERCHANT
+kookmin2.png,"출금 248,106 원",734,378,1020,497,AMOUNT_OUT
+kookmin2.png,"잔액 1,032,648 원",734,378,1020,497,BALANCE
+kookmin2.png,2025.06.16,59,611,409,653,DATE
+kookmin2.png,18:27:07,59,611,409,653,TIME
+kookmin2.png,인터넷상거래,60,696,290,752,MERCHANT
+kookmin2.png,"출금 8,900 원",740,786,1020,906,AMOUNT_OUT
+kookmin2.png,"잔액 1,280,754원",740,786,1020,906,BALANCE
+kookmin2.png,2025.06.15,59,1021,411,1063,DATE
+kookmin2.png,20:30:22,59,1021,411,1063,TIME
+kookmin2.png,인터넷상거래,60,1106,290,1162,MERCHANT
+kookmin2.png,"출금 9,800 원",740,1196,1020,1314,AMOUNT_OUT
+kookmin2.png,"잔액 1,289,654 원",740,1196,1020,1314,BALANCE
+kookmin2.png,2025.06.14,59,1429,411,1471,DATE
+kookmin2.png,19:14:30,59,1429,411,1471,TIME
+kookmin2.png,베트남식당퍼민,58,1513,325,1569,MERCHANT
+kookmin2.png,"출금 8,500원",740,1604,1020,1724,AMOUNT_OUT
+kookmin2.png,"잔액 1,299,454원",740,1604,1020,1724,BALANCE
+kookmin2.png,2025.06.13,59,1837,411,1879,DATE
+kookmin2.png,17:40:00,59,1837,411,1879,TIME
+kookmin2.png,숭실대학교소비자생,60,1922,402,1978,MERCHANT
+kookmin2.png,"출금 6,000 원",740,2014,1018,2132,AMOUNT_OUT
+kookmin2.png,"잔액 1,307,954 원",740,2014,1018,2132,BALANCE
+kookmin2.png,2025.06.12,59,2246,411,2289,DATE
+kookmin2.png,22:05:06,59,2246,411,2289,TIME
+kookmin3.png,.1| 75% 9:49,829,27,1045,69,O
+kookmin3.png,거래내역조회,133,107,393,171,O
+kookmin3.png,2025.05.24,59,221,411,263,DATE
+kookmin3.png,18:31:12,59,221,411,263,TIME
+kookmin3.png,스타벅스_주문,60,306,328,362,MERCHANT
+kookmin3.png,"출금 1,400원",740,394,1020,516,AMOUNT_OUT
+kookmin3.png,"잔액 1,135,337 원",740,394,1020,516,BALANCE
+kookmin3.png,2025.05.24,59,631,411,673,DATE
+kookmin3.png,18:20:16,59,631,411,673,TIME
+kookmin3.png,낙원의소바,59,713,259,773,MERCHANT
+kookmin3.png,"출금 30,000원",738,806,1020,925,AMOUNT_OUT
+kookmin3.png,"잔액 1,136,737 원",738,806,1020,925,BALANCE
+kookmin3.png,2025.05.23,59,1039,411,1081,DATE
+kookmin3.png,22:31:49,59,1039,411,1081,TIME
+kookmin3.png,인쌩맥주숭실대점,60,1124,364,1180,MERCHANT
+kookmin3.png,"출금 47,100 원",740,1214,1020,1334,AMOUNT_OUT
+kookmin3.png,"잔액 1,166,737원",740,1214,1020,1334,BALANCE
+kookmin3.png,2025.05.23,59,1447,411,1489,DATE
+kookmin3.png,15:54:19,59,1447,411,1489,TIME
+kookmin3.png,김예빈,58,1532,178,1588,MERCHANT
+kookmin3.png,"입금 150,000원",732,1622,1020,1743,AMOUNT_IN
+kookmin3.png,"잔액 1,213,837 원",732,1622,1020,1743,BALANCE
+kookmin3.png,2025.05.23,59,1855,411,1899,DATE
+kookmin3.png,15:27:24,59,1855,411,1899,TIME
+kookmin3.png,헥토_대표 (인증) _2,60,1940,470,2001,MERCHANT
+kookmin3.png,"출금 19,000원",738,2032,1018,2160,AMOUNT_OUT
+kookmin3.png,"잔액 1,063,837 원",738,2032,1018,2160,BALANCE
+kookmin3.png,2025.05.23,59,2265,411,2307,DATE
+kookmin3.png,13:02:36,59,2265,411,2307,TIME
+kookmin4.png,.1| 75% 9:49,829,27,1045,69,O
+kookmin4.png,거래내역조회,59,107,409,237,O
+kookmin4.png,2025.06.03,59,107,409,237,DATE
+kookmin4.png,23:02:37,59,107,409,237,TIME
+kookmin4.png,메가박스_문화비,58,277,365,337,MERCHANT
+kookmin4.png,"출금 2,000원",740,370,1020,490,AMOUNT_OUT
+kookmin4.png,"잔액 1,602,167원",740,370,1020,490,BALANCE
+kookmin4.png,2025.06.03,59,602,411,645,DATE
+kookmin4.png,22:59:04,59,602,411,645,TIME
+kookmin4.png,롯데홈쇼핑,59,685,253,745,MERCHANT
+kookmin4.png,"출금 12,610원",740,778,1020,898,AMOUNT_OUT
+kookmin4.png,"잔액 1,604,167 원",740,778,1020,898,BALANCE
+kookmin4.png,2025.06.03,59,1013,410,1055,DATE
+kookmin4.png,17:07:28,59,1013,410,1055,TIME
+kookmin4.png,SUBWAY_KPN_4,66,1096,506,1152,MERCHANT
+kookmin4.png,"출금 11,800원",740,1185,1020,1308,AMOUNT_OUT
+kookmin4.png,"잔액 1,616,777원",740,1185,1020,1308,BALANCE
+kookmin4.png,2025.06.02,59,1421,411,1463,DATE
+kookmin4.png,21:10:26,59,1421,411,1463,TIME
+kookmin4.png,GS25숭실대점,64,1505,363,1561,MERCHANT
+kookmin4.png,"출금 7,210원",740,1595,1020,1716,AMOUNT_OUT
+kookmin4.png,"잔액 1,628,577 원",740,1595,1020,1716,BALANCE
+kookmin4.png,2025.06.02,59,1829,409,1873,DATE
+kookmin4.png,17:51:37,59,1829,409,1873,TIME
+kookmin4.png,맥도날드,60,1916,215,1970,MERCHANT
+kookmin4.png,"출금 4,000 원",738,2001,1019,2125,AMOUNT_OUT
+kookmin4.png,"잔액 1,635,787",738,2001,1019,2125,BALANCE
+kookmin4.png,2025.06.02,59,2239,407,2281,DATE
+kookmin4.png,12:19:41,59,2239,407,2281,TIME
+shinhan1.png,.l| 33% 6:48,813,27,1037,69,O
+shinhan1.png,거래내역조회,107,113,351,173,O
+shinhan1.png,직접설정 전체 최신순,606,240,982,292,O
+shinhan1.png,2024.07.10~2025.06.21 (11건),49,381,479,425,DATE_HEADER
+shinhan1.png,잔액,984,386,1036,418,O
+shinhan1.png,2024.12.21,49,569,215,605,DATE
+shinhan1.png,3:38:38,49,679,287,719,TIME
+shinhan1.png,이자,49,679,287,719,MEMO
+shinhan1.png,입금 0원,958,679,1029,788,AMOUNT_IN
+shinhan1.png,09.21~12.20,46,742,296,790,MERCHANT
+shinhan1.png,2024.09.21,49,933,217,969,DATE
+shinhan1.png,1:11:28,49,1043,277,1083,TIME
+shinhan1.png,이자,49,1043,277,1083,MEMO
+shinhan1.png,입금 0원,958,1043,1029,1152,AMOUNT_IN
+shinhan1.png,07.10~09.20,46,1106,294,1154,MERCHANT
+shinhan1.png,2024.07.10,51,1297,217,1333,DATE
+shinhan1.png,16:42:16,49,1405,305,1523,TIME
+shinhan1.png,모바일,49,1405,305,1523,MEMO
+shinhan1.png,김호진,49,1405,305,1523,MERCHANT
+shinhan1.png,"출금 598,620원",818,1405,1031,1528,AMOUNT_OUT
+shinhan1.png,15:04:52,49,1615,281,1655,TIME
+shinhan1.png,대체,49,1615,281,1655,MEMO
+shinhan1.png,"입금 598,620원",818,1615,1031,1736,AMOUNT_IN
+shinhan1.png,김호진,50,1678,174,1732,MERCHANT
+shinhan1.png,14:58:16,49,1823,279,1865,TIME
+shinhan1.png,대체,49,1823,279,1865,MEMO
+shinhan1.png,"출금 900,000원",818,1823,1031,1947,AMOUNT_OUT
+shinhan1.png,14:57:09,49,2027,311,2069,TIME
+shinhan1.png,타행IB,49,2027,311,2069,MEMO
+shinhan1.png,"입금 900,000원",818,2027,1031,2151,AMOUNT_IN
+shinhan1.png,김호진,50,2089,173,2143,MERCHANT
+shinhan1.png,14:55:43,49,2237,281,2279,TIME
+shinhan1.png,신규,49,2237,281,2279,MEMO
+shinhan1.png,입금,967,2237,1029,2277,O
+shinhan2.jpg,거래내역조회,50,16,162,44,O
+shinhan2.jpg,직접설정 - 전체 - 최신순,216,74,388,100,O
+shinhan2.jpg,2025.01.01~2025.06.23 (59건),21,139,225,159,DATE_HEADER
+shinhan2.jpg,18:02:44,20,197,155,254,TIME
+shinhan2.jpg,카드결제,20,197,155,254,MEMO
+shinhan2.jpg,신한카드,20,197,155,254,MERCHANT
+shinhan2.jpg,"출금 64,400원",323,197,410,253,AMOUNT_OUT
+shinhan2.jpg,2025.05.16,21,311,99,331,DATE
+shinhan2.jpg,11:51:15,20,363,149,416,TIME
+shinhan2.jpg,SHC입금,20,363,149,416,MEMO
+shinhan2.jpg,K-패스환급금,20,363,149,416,MERCHANT
+shinhan2.jpg,"입금 20,990원",324,363,410,416,AMOUNT_IN
+shinhan2.jpg,2025.05.10,21,477,99,495,DATE
+shinhan2.jpg,10:32:00,21,529,145,584,TIME
+shinhan2.jpg,타행류,21,529,145,584,MEMO
+shinhan2.jpg,김예빈,21,529,145,584,MERCHANT
+shinhan2.jpg,"입금 100,000원",316,529,410,582,AMOUNT_IN
+shinhan2.jpg,2025.04.25,21,643,101,661,DATE
+shinhan2.jpg,18:02:22,21,693,155,750,TIME
+shinhan2.jpg,카드결제,21,693,155,750,MEMO
+shinhan2.jpg,신한카드,21,693,155,750,MERCHANT
+shinhan2.jpg,"출금 79,050원",322,695,410,748,AMOUNT_OUT
+shinhan2.jpg,2025.04.11,21,809,97,827,DATE
+shinhan2.jpg,11:51:12,20,858,150,916,TIME
+shinhan2.jpg,SHC입금,20,858,150,916,MEMO
+shinhan2.jpg,K-패스환급금,20,858,150,916,MERCHANT
+shinhan2.jpg,"입금 22,620원",322,858,410,912,AMOUNT_IN
+shinhan2.jpg,2025.04.10,21,973,99,993,DATE
+shinhan2.jpg,10:59:35,21,1025,145,1082,TIME
+shinhan2.jpg,타행FB,21,1025,145,1082,MEMO
+shinhan2.jpg,김예빈,21,1025,145,1082,MERCHANT
+shinhan2.jpg,"입금 100,000원",316,1025,410,1080,AMOUNT_IN
+shinhan2.jpg,2025.03.28,21,1139,101,1159,DATE
+shinhan2.jpg,9:59:28,21,1191,183,1246,TIME
+shinhan2.jpg,오픈뱅킹이체,21,1191,183,1246,MEMO
+shinhan2.jpg,토스 김예빈,21,1191,183,1246,MERCHANT
+shinhan2.jpg,"출금 48,789원",324,1191,410,1244,AMOUNT_OUT
+shinhan2.jpg,2025.03.25,21,1305,101,1323,DATE
+shinhan2.jpg,18:03:13,21,1357,153,1377,TIME
+shinhan2.jpg,카드결제,21,1357,153,1377,MEMO
+shinhan3.jpg,거래내역조회,61,18,202,54,O
+shinhan3.jpg,직접설정 · 전체 · 최신순,270,94,486,126,O
+shinhan3.jpg,2025.01.01~2025.06.23 (59건),26,174,282,198,DATE_HEADER
+shinhan3.jpg,11:42:33,26,230,180,298,TIME
+shinhan3.jpg,타행FB,26,230,180,298,MEMO
+shinhan3.jpg,김예빈,26,230,180,298,MERCHANT
+shinhan3.jpg,"입금 100,000원",393,230,513,301,AMOUNT_IN
+shinhan3.jpg,2025.03.08,26,372,126,396,DATE
+shinhan3.jpg,21:28:39,26,436,226,507,TIME
+shinhan3.jpg,오픈뱅킹이체,26,436,226,507,MEMO
+shinhan3.jpg,토뱅 김예빈,26,436,226,507,MERCHANT
+shinhan3.jpg,"출금 50,000원",402,438,513,508,AMOUNT_OUT
+shinhan3.jpg,2025.03.06,26,580,126,604,DATE
+shinhan3.jpg,18:08:40,26,644,194,713,TIME
+shinhan3.jpg,카드결제,26,644,194,713,MEMO
+shinhan3.jpg,신한체크교통,26,644,194,713,MERCHANT
+shinhan3.jpg,"출금 54,400원",404,644,512,711,AMOUNT_OUT
+shinhan3.jpg,2025.02.25,26,786,126,810,DATE
+shinhan3.jpg,11:35:08,26,852,192,921,TIME
+shinhan3.jpg,SHC입금,26,852,192,921,MEMO
+shinhan3.jpg,신한할인캐쉬백,26,852,192,921,MERCHANT
+shinhan3.jpg,"입금 1,369원",422,852,513,921,AMOUNT_IN
+shinhan3.jpg,2025.02.19,26,994,124,1018,DATE
+shinhan3.jpg,1:00:26,26,1058,226,1126,TIME
+shinhan3.jpg,오픈뱅킹이체,26,1058,226,1126,MEMO
+shinhan3.jpg,토뱅 김예빈,26,1058,226,1126,MERCHANT
+shinhan3.jpg,"출금 10,312원",412,1058,512,1126,AMOUNT_OUT
+shinhan3.jpg,2025.02.14,26,1200,124,1224,DATE
+shinhan3.jpg,12:41:17,25,1266,187,1335,TIME
+shinhan3.jpg,FB이체,25,1266,187,1335,MEMO
+shinhan3.jpg,0755 신한카드,25,1266,187,1335,MERCHANT
+shinhan3.jpg,입금 1원,474,1266,512,1332,AMOUNT_IN
+shinhan3.jpg,2025.02.13,26,1408,124,1432,DATE
+shinhan3.jpg,11:51:22,25,1472,190,1541,TIME
+shinhan3.jpg,SHC입금,25,1472,190,1541,MEMO
+shinhan3.jpg,K-패스환급금,25,1472,190,1541,MERCHANT
+shinhan3.jpg,"입금 11,690원",411,1472,515,1543,AMOUNT_IN
+shinhan4.jpg,거래내역조회,72,22,241,66,O
+shinhan4.jpg,직접설정 전체 최신순 L,325,113,613,151,O
+shinhan4.jpg,2025.01.01~2025.06.23 (59건),34,210,340,240,DATE_HEADER
+shinhan4.jpg,잔액,582,212,618,236,O
+shinhan4.jpg,12:28:40,31,275,218,355,TIME
+shinhan4.jpg,타행FB,31,275,218,355,MEMO
+shinhan4.jpg,김민규,31,275,218,355,MERCHANT
+shinhan4.jpg,"입금 105,123원",479,276,615,357,AMOUNT_IN
+shinhan4.jpg,2025.01.10,31,444,144,474,DATE
+shinhan4.jpg,11:06:18,30,524,212,605,TIME
+shinhan4.jpg,타행FB,30,524,212,605,MEMO
+shinhan4.jpg,김예빈,30,524,212,605,MERCHANT
+shinhan4.jpg,"입금 100,000원",472,524,615,606,AMOUNT_IN
+shinhan4.jpg,2025.01.08,32,696,148,722,DATE
+shinhan4.jpg,5:40:12,31,772,254,853,TIME
+shinhan4.jpg,FB이체,31,772,254,853,MEMO
+shinhan4.jpg,부족금액자동결제,31,772,254,853,MERCHANT
+shinhan4.jpg,"출금 24,956원",484,772,615,853,AMOUNT_OUT
+shinhan4.jpg,2025.01.07,32,944,146,972,DATE
+shinhan4.jpg,6:51:15,31,1020,255,1101,TIME
+shinhan4.jpg,FB이체,31,1020,255,1101,MEMO
+shinhan4.jpg,부족금액자동결제,31,1020,255,1101,MERCHANT
+shinhan4.jpg,"출금 7,702원",502,1022,615,1101,AMOUNT_OUT
+shinhan4.jpg,4:02:23,30,1164,255,1244,TIME
+shinhan4.jpg,FB이체,30,1164,255,1244,MEMO
+shinhan4.jpg,부족금액자동결제,30,1164,255,1244,MERCHANT
+shinhan4.jpg,"출금 51,152원",494,1164,615,1244,AMOUNT_OUT
+shinhan4.jpg,3:38:59,30,1306,255,1386,TIME
+shinhan4.jpg,FB이체,30,1306,255,1386,MEMO
+shinhan4.jpg,부족금액자동결제,30,1306,255,1386,MERCHANT
+shinhan4.jpg,"12,",491,1349,539,1387,O
+shinhyup.png,',677,27,719,67,O
+shinhyup.png,;.1 34% 6:45,771,27,1037,69,O
+shinhyup.png,계좌상세조회,413,111,667,171,O
+shinhyup.png,직접입력 전체 (,705,255,1002,304,O
+shinhyup.png,2023.01.01 2025.06.21(21건),75,448,598,496,DATE_HEADER
+shinhyup.png,"-5,000,000원",793,545,1028,600,AMOUNT_OUT
+shinhyup.png,05.11,49,586,302,636,DATE
+shinhyup.png,김호진,49,586,302,636,MERCHANT
+shinhyup.png,0원,965,629,1025,673,BALANCE
+shinhyup.png,20:50:57,186,668,502,718,TIME
+shinhyup.png,스마트폰,186,668,502,718,MEMO
+shinhyup.png,"-10,000,000원",771,777,1026,829,AMOUNT_OUT
+shinhyup.png,05.11,49,818,299,868,DATE
+shinhyup.png,김호진,49,818,299,868,MERCHANT
+shinhyup.png,"5,000,000원",812,857,1028,911,BALANCE
+shinhyup.png,20:50:56,186,900,502,948,TIME
+shinhyup.png,스마트폰,186,900,502,948,MEMO
+shinhyup.png,"-10,000,000원",771,1009,1028,1061,AMOUNT_OUT
+shinhyup.png,05.11,51,1048,300,1098,DATE
+shinhyup.png,김호진,51,1048,300,1098,MERCHANT
+shinhyup.png,"15,000,000원",788,1089,1028,1142,BALANCE
+shinhyup.png,20:47:52,186,1130,502,1180,TIME
+shinhyup.png,스마트폰,186,1130,502,1180,MEMO
+shinhyup.png,"-825,863원",827,1239,1026,1291,AMOUNT_OUT
+shinhyup.png,05.11,49,1280,300,1330,DATE
+shinhyup.png,권은희,49,1280,300,1330,MERCHANT
+shinhyup.png,"25,000,000원",787,1319,1028,1374,BALANCE
+shinhyup.png,9:35:10,186,1362,500,1410,TIME
+shinhyup.png,스마트폰,186,1362,500,1410,MEMO
+shinhyup.png,"25,824,850원",787,1469,1026,1523,AMOUNT_IN
+shinhyup.png,05.11,49,1512,630,1562,DATE
+shinhyup.png,자동해지(158031183331),49,1512,630,1562,MERCHANT
+shinhyup.png,"25,825,863원",787,1551,1028,1604,BALANCE
+shinhyup.png,6:30:00,186,1592,501,1642,TIME
+shinhyup.png,자동이체,186,1592,501,1642,MEMO
+shinhyup.png,0원,965,1703,1025,1747,AMOUNT_IN
+shinhyup.png,03.16,49,1742,339,1794,DATE
+shinhyup.png,결산이자,49,1742,339,1794,MERCHANT
+shinhyup.png,"1,013원",886,1781,1029,1835,BALANCE
+shinhyup.png,3:33:45,186,1824,502,1872,TIME
+shinhyup.png,자동이체,186,1824,502,1872,MEMO
+shinhyup.png,0원,965,1935,1025,1977,AMOUNT_IN
+shinhyup.png,12.16,49,1974,340,2026,DATE
+shinhyup.png,결산이자,49,1974,340,2026,MERCHANT
+shinhyup.png,"1,013원",887,2013,1028,2067,BALANCE
+shinhyup.png,3:32:25,185,2053,501,2103,TIME
+shinhyup.png,자동이체,185,2053,501,2103,MEMO
+shinhyup.png,0원,965,2165,1025,2207,AMOUNT_IN
+shinhyup.png,09.16,49,2204,342,2256,DATE
+shinhyup.png,결산이자,49,2204,342,2256,MERCHANT
+shinhyup.png,"1,013원",887,2243,1028,2297,BALANCE
+shinhyup.png,(3-2801자.,190,2290,394,2316,O
+toss1.png,Q,679,27,723,67,O
+toss1.png,.l| 37% 6:32,815,27,1037,67,O
+toss1.png,C,829,111,929,177,O
+toss1.png,KB나라사랑우대통장,187,117,597,181,O
+toss1.png,"-7,900원",831,223,1033,351,AMOUNT_OUT
+toss1.png,"634,668원",831,223,1033,351,BALANCE
+toss1.png,6.21,49,225,495,345,DATE
+toss1.png,KCP(자동과금),49,225,495,345,MERCHANT
+toss1.png,18:19,49,225,495,345,TIME
+toss1.png,"24,000원",816,413,1032,539,AMOUNT_IN
+toss1.png,"642,568원",816,413,1032,539,BALANCE
+toss1.png,6.20,49,415,321,535,DATE
+toss1.png,김예빈,49,415,321,535,MERCHANT
+toss1.png,22:23,49,415,321,535,TIME
+toss1.png,"-48,000원",788,602,1033,727,AMOUNT_OUT
+toss1.png,"618,568원",788,602,1033,727,BALANCE
+toss1.png,떡도리탕강남점,187,605,491,723,MERCHANT
+toss1.png,21:30,187,605,491,723,TIME
+toss1.png,"10,000원",820,792,1033,916,AMOUNT_IN
+toss1.png,"666,568원",820,792,1033,916,BALANCE
+toss1.png,엠브레인,186,793,363,911,MERCHANT
+toss1.png,00:13,186,793,363,911,TIME
+toss1.png,"-3,600원",824,980,1031,1107,AMOUNT_OUT
+toss1.png,"656,568원",824,980,1031,1107,BALANCE
+toss1.png,6.19,49,981,353,1101,DATE
+toss1.png,(주)찬행,49,981,353,1101,MERCHANT
+toss1.png,20:16,49,981,353,1101,TIME
+toss1.png,"12,500원",818,1170,1031,1296,AMOUNT_IN
+toss1.png,"660,168원",818,1170,1031,1296,BALANCE
+toss1.png,김예빈,187,1171,321,1291,MERCHANT
+toss1.png,19:26,187,1171,321,1291,TIME
+toss1.png,"-25,100원",804,1358,1033,1485,AMOUNT_OUT
+toss1.png,"647,668원",804,1358,1033,1485,BALANCE
+toss1.png,샤브로21숭실대,187,1361,505,1479,MERCHANT
+toss1.png,19:24,187,1361,505,1479,TIME
+toss1.png,한전(박원용),186,1545,439,1669,MERCHANT
+toss1.png,16:32,186,1545,439,1669,TIME
+toss1.png,"-34,980원",795,1549,1033,1673,AMOUNT_OUT
+toss1.png,"672,768원",795,1549,1033,1673,BALANCE
+toss1.png,"606,925원",784,1738,1033,1860,AMOUNT_IN
+toss1.png,"707,748원",784,1738,1033,1860,BALANCE
+toss1.png,권은희,187,1739,321,1857,MERCHANT
+toss1.png,02:47,187,1739,321,1857,TIME
+toss1.png,김호진,187,1927,321,2045,MERCHANT
+toss1.png,02:43,187,1927,321,2045,TIME
+toss1.png,"-1,000,000원",727,1927,1033,2050,AMOUNT_OUT
+toss1.png,"100,823원",727,1927,1033,2050,BALANCE
+toss1.png,보내기,721,2159,861,2223,O
+toss1.png,채우기,217,2161,363,2221,O
+toss2.png,QQ 낮 @..l 73% 9:54,693,27,1047,69,O
+toss2.png,TALK,55,39,87,53,O
+toss2.png,C,826,106,934,178,O
+toss2.png,KB나라사랑우대통장,187,117,597,181,O
+toss2.png,"-8,500원",810,238,1034,354,AMOUNT_OUT
+toss2.png,"1,299,454원",810,238,1034,354,BALANCE
+toss2.png,6.14,49,239,489,349,DATE
+toss2.png,베트남식당퍼민,49,239,489,349,MERCHANT
+toss2.png,19:14,49,239,489,349,TIME
+toss2.png,"-6,000원",815,410,1033,526,AMOUNT_OUT
+toss2.png,"1,307,954원",815,410,1033,526,BALANCE
+toss2.png,6.13,49,411,577,521,DATE
+toss2.png,숭실대학교소비자생,49,411,577,521,MERCHANT
+toss2.png,17:40,49,411,577,521,TIME
+toss2.png,"-1,980원",815,580,1031,697,AMOUNT_OUT
+toss2.png,"1,313,954원",815,580,1031,697,BALANCE
+toss2.png,6.12,49,583,495,692,DATE
+toss2.png,GS25숭실대점,49,583,495,692,MERCHANT
+toss2.png,22:05,49,583,495,692,TIME
+toss2.png,"-6,000원",815,752,1033,867,AMOUNT_OUT
+toss2.png,"1,315,934원",815,752,1033,867,BALANCE
+toss2.png,숭실대학교소비자생,187,753,577,863,MERCHANT
+toss2.png,17:48,187,753,577,863,TIME
+toss2.png,"-3,600원",816,922,1033,1038,AMOUNT_OUT
+toss2.png,"1,321,934원",816,922,1033,1038,BALANCE
+toss2.png,맥도날드,187,925,365,1033,MERCHANT
+toss2.png,14:42,187,925,365,1033,TIME
+toss2.png,"-77,000원",802,1094,1033,1209,AMOUNT_OUT
+toss2.png,"1,325,534원",802,1094,1033,1209,BALANCE
+toss2.png,이니시스_3,187,1095,415,1205,MERCHANT
+toss2.png,22:39,187,1095,415,1205,TIME
+toss2.png,6.11,49,1105,121,1147,DATE
+toss2.png,"-6,700원",808,1264,1034,1379,AMOUNT_OUT
+toss2.png,"1,402,534원",808,1264,1034,1379,BALANCE
+toss2.png,뚜레쥬르숭실대학생,186,1265,577,1376,MERCHANT
+toss2.png,21:10,186,1265,577,1376,TIME
+toss2.png,"-25,250원",794,1436,1033,1551,AMOUNT_OUT
+toss2.png,"1,409,234원",794,1436,1033,1551,BALANCE
+toss2.png,6.10,49,1437,409,1547,DATE
+toss2.png,케이티알파,49,1437,409,1547,MERCHANT
+toss2.png,23:59,49,1437,409,1547,TIME
+toss2.png,"-6,300원",807,1605,1032,1722,AMOUNT_OUT
+toss2.png,"1,434,484원",807,1605,1032,1722,BALANCE
+toss2.png,GS25숭실대점,187,1609,495,1719,MERCHANT
+toss2.png,21:31,187,1609,495,1719,TIME
+toss2.png,"-6,000원",811,1778,1034,1893,AMOUNT_OUT
+toss2.png,"1,440,784원",811,1778,1034,1893,BALANCE
+toss2.png,숭실대학교소비자생,187,1779,577,1889,MERCHANT
+toss2.png,17:32,187,1779,577,1889,TIME
+toss2.png,"-5,000원",811,1948,1034,2064,AMOUNT_OUT
+toss2.png,"1,446,784원",811,1948,1034,2064,BALANCE
+toss2.png,숭실대학교소비자생,187,1949,577,2059,MERCHANT
+toss2.png,11:42,187,1949,577,2059,TIME
+toss2.png,보내기,721,2159,861,2223,O
+toss2.png,채우기,219,2161,363,2221,O
+toss3.png,QQ 낮 @..l 73% 9:54,693,27,1047,69,O
+toss3.png,TALK,55,39,83,51,O
+toss3.png,C,829,109,931,177,O
+toss3.png,KB나라사랑우대통장,185,117,597,181,O
+toss3.png,"-22,000원",789,251,1034,370,AMOUNT_OUT
+toss3.png,"1,037,037원",789,251,1034,370,BALANCE
+toss3.png,5.31,49,255,573,365,DATE
+toss3.png,깡우동성남신흥역점,49,255,573,365,MERCHANT
+toss3.png,18:18,49,255,573,365,TIME
+toss3.png,"-25,000원",792,424,1031,541,AMOUNT_OUT
+toss3.png,"1,059,037원",792,424,1031,541,BALANCE
+toss3.png,(주)야놀자,186,427,396,537,MERCHANT
+toss3.png,17:36,186,427,396,537,TIME
+toss3.png,"-5,400원",811,596,1033,712,AMOUNT_OUT
+toss3.png,"1,084,037원",811,596,1033,712,BALANCE
+toss3.png,투썸성남신흥역점,186,597,531,706,MERCHANT
+toss3.png,12:48,186,597,531,706,TIME
+toss3.png,"-11,000원",805,766,1034,883,AMOUNT_OUT
+toss3.png,"1,089,437원",805,766,1034,883,BALANCE
+toss3.png,엄영미,187,769,321,879,MERCHANT
+toss3.png,11:30,187,769,321,879,TIME
+toss3.png,"-6,900원",820,938,1033,1055,AMOUNT_OUT
+toss3.png,"1,100,437원",820,938,1033,1055,BALANCE
+toss3.png,5.30,51,939,549,1049,DATE
+toss3.png,HEYTEA(헤이티),51,939,549,1049,MERCHANT
+toss3.png,21:30,51,939,549,1049,TIME
+toss3.png,스타벅스_주문,186,1108,471,1219,MERCHANT
+toss3.png,14:42,186,1108,471,1219,TIME
+toss3.png,"-1,800원",825,1108,1031,1225,AMOUNT_OUT
+toss3.png,"1,107,337원",825,1108,1031,1225,BALANCE
+toss3.png,서기남헤어클리닉,185,1279,533,1391,MERCHANT
+toss3.png,14:34,185,1279,533,1391,TIME
+toss3.png,"-15,000원",800,1279,1033,1396,AMOUNT_OUT
+toss3.png,"1,109,137원",800,1279,1033,1396,BALANCE
+toss3.png,"-3,000원",822,1450,1034,1566,AMOUNT_OUT
+toss3.png,"1,124,137원",822,1450,1034,1566,BALANCE
+toss3.png,5.29,49,1451,523,1561,DATE
+toss3.png,이건빈(모임통장),49,1451,523,1561,MERCHANT
+toss3.png,16:12,49,1451,523,1561,TIME
+toss3.png,"-6,300원",821,1621,1032,1737,AMOUNT_OUT
+toss3.png,"1,127,137원",821,1621,1032,1737,BALANCE
+toss3.png,5.28,49,1623,365,1733,DATE
+toss3.png,맥도날드,49,1623,365,1733,MERCHANT
+toss3.png,21:12,49,1623,365,1733,TIME
+toss3.png,손동호,187,1795,323,1903,MERCHANT
+toss3.png,17:44,187,1795,323,1903,TIME
+toss3.png,"20,000원",815,1795,1033,1908,AMOUNT_IN
+toss3.png,"1,133,437원",815,1795,1033,1908,BALANCE
+toss3.png,"-6,000원",822,1964,1033,2079,AMOUNT_OUT
+toss3.png,"1,113,437원",822,1964,1033,2079,BALANCE
+toss3.png,숭실대학교소비자생,187,1965,577,2075,MERCHANT
+toss3.png,17:36,187,1965,577,2075,TIME
+toss3.png,보내기,721,2159,861,2223,O
+toss3.png,채우기,219,2161,363,2221,O
+toss4.png,QQ 낮 @..l 73% 9:54,693,27,1047,69,O
+toss4.png,TALK,55,39,83,51,O
+toss4.png,C,827,109,925,177,O
+toss4.png,KB나라사랑우대통장,187,117,597,181,O
+toss4.png,"-24,500원",794,224,1033,341,AMOUNT_OUT
+toss4.png,"1,674,033원",794,224,1033,341,BALANCE
+toss4.png,윤시호,186,227,323,334,MERCHANT
+toss4.png,4:13,186,227,323,334,TIME
+toss4.png,6.8,49,237,115,279,DATE
+toss4.png,KB페이충전,187,395,429,507,MERCHANT
+toss4.png,2:42,187,395,429,507,TIME
+toss4.png,"-10,000원",798,396,1031,513,AMOUNT_OUT
+toss4.png,"1,698,533원",798,396,1031,513,BALANCE
+toss4.png,"-7,000원",813,565,1032,683,AMOUNT_OUT
+toss4.png,"1,708,533원",813,565,1032,683,BALANCE
+toss4.png,우지커피,187,569,363,679,MERCHANT
+toss4.png,19:09,187,569,363,679,TIME
+toss4.png,6.6,49,579,113,621,DATE
+toss4.png,박복순,186,739,325,849,MERCHANT
+toss4.png,18:59,186,739,325,849,TIME
+toss4.png,"-36,000원",793,739,1033,853,AMOUNT_OUT
+toss4.png,"1,715,533원",793,739,1033,853,BALANCE
+toss4.png,"-2,000원",819,908,1034,1026,AMOUNT_OUT
+toss4.png,"1,751,533원",819,908,1034,1026,BALANCE
+toss4.png,메가박스중앙(주)코,187,909,563,1019,MERCHANT
+toss4.png,13:57,187,909,563,1019,TIME
+toss4.png,"-1,000원",813,1076,1033,1195,AMOUNT_OUT
+toss4.png,"1,753,533원",813,1076,1033,1195,BALANCE
+toss4.png,인터넷상거래,187,1081,449,1191,MERCHANT
+toss4.png,23:50,187,1081,449,1191,TIME
+toss4.png,6.5,49,1091,113,1133,DATE
+toss4.png,"-50,000원",790,1250,1031,1368,AMOUNT_OUT
+toss4.png,"1,754,533원",790,1250,1031,1368,BALANCE
+toss4.png,윤동근,187,1251,325,1363,MERCHANT
+toss4.png,23:13,187,1251,325,1363,TIME
+toss4.png,"-50,000원",790,1422,1031,1536,AMOUNT_OUT
+toss4.png,"1,804,533원",790,1422,1031,1536,BALANCE
+toss4.png,김호진,187,1423,321,1533,MERCHANT
+toss4.png,21:04,187,1423,321,1533,TIME
+toss4.png,"-22,640원",792,1592,1033,1709,AMOUNT_OUT
+toss4.png,"1,854,533원",792,1592,1033,1709,BALANCE
+toss4.png,KB카드출금,187,1595,431,1703,MERCHANT
+toss4.png,19:21,187,1595,431,1703,TIME
+toss4.png,"-6,000원",820,1764,1033,1880,AMOUNT_OUT
+toss4.png,"1,877,173원",820,1764,1033,1880,BALANCE
+toss4.png,숭실대학교소비자생,187,1765,577,1875,MERCHANT
+toss4.png,17:39,187,1765,577,1875,TIME
+toss4.png,"287,006원",790,1934,1033,2051,AMOUNT_IN
+toss4.png,"1,883,173원",790,1934,1033,2051,BALANCE
+toss4.png,권은희,187,1937,321,2047,MERCHANT
+toss4.png,9:28,187,1937,321,2047,TIME
+toss4.png,보내기,721,2159,861,2223,O
+toss4.png,채우기,217,2161,363,2221,O
+woori1.png,C,677,27,721,67,O
+woori1.png,.11 36% 6:32,815,27,1037,69,O
+woori1.png,거래내역조회,418,116,660,172,O
+woori1.png,관리,950,118,1030,166,O
+woori1.png,3개월 전체 최신순 값,657,234,1027,282,O
+woori1.png,2025.03.21~2025.06.21,49,347,513,389,DATE_HEADER
+woori1.png,잔액,823,347,895,389,O
+woori1.png,6월 21일,49,427,363,469,DATE
+woori1.png,15:52:10,49,427,363,469,TIME
+woori1.png,예금결산이자,48,513,277,569,MERCHANT
+woori1.png,0원,870,516,1030,625,AMOUNT_OUT
+woori1.png,잔액 40원,870,516,1030,625,BALANCE
+woori1.png,6월 5일,49,799,355,843,DATE
+woori1.png,21:06:48,49,799,355,843,TIME
+woori1.png,"-50,000원",823,887,1030,995,AMOUNT_OUT
+woori1.png,잔액 40원,823,887,1030,995,BALANCE
+woori1.png,0204612070062,49,891,381,935,MERCHANT
+woori1.png,6월 5일,49,1107,355,1151,DATE
+woori1.png,21:04:56,49,1107,355,1151,TIME
+woori1.png,"+50,000원",796,1194,1030,1308,AMOUNT_IN
+woori1.png,"잔액 50,040원",796,1194,1030,1308,BALANCE
+woori1.png,김호진,50,1196,166,1248,MERCHANT
+woori1.png,2025년 4월,48,1474,280,1526,DATE_HEADER
+woori1.png,4월 10일,49,1627,365,1669,DATE
+woori1.png,16:32:41,49,1627,365,1669,TIME
+woori1.png,"-20,000원",825,1715,1030,1825,AMOUNT_OUT
+woori1.png,잔액 40원,825,1715,1030,1825,BALANCE
+woori1.png,카카오페이,46,1716,240,1768,MERCHANT
+woori1.png,4월 10일,49,1935,371,1978,DATE
+woori1.png,16:32:30,49,1935,371,1978,TIME
+woori1.png,"+20,000원",794,2023,1030,2134,AMOUNT_IN
+woori1.png,"잔액 20,040원",794,2023,1030,2134,BALANCE
+woori1.png,김호진,50,2024,166,2076,MERCHANT
+woori2.png,Q,689,25,733,67,O
+woori2.png,~.i1| 74% 9:52,791,25,1045,67,O
+woori2.png,거래내역조회,418,116,658,172,O
+woori2.png,관리,950,118,1030,166,O
+woori2.png,직접입력 전체 최신순 값,616,234,1027,282,O
+woori2.png,2022.07.01~2025.06.22,49,347,513,389,DATE_HEADER
+woori2.png,잔액,823,347,895,389,O
+woori2.png,6월 16일,49,519,371,563,DATE
+woori2.png,1:35:20,49,519,371,563,TIME
+woori2.png,"-315,000원",805,607,1030,719,AMOUNT_OUT
+woori2.png,잔액 268원,805,607,1030,719,BALANCE
+woori2.png,(주)여기어때컴퍼,52,608,342,664,MERCHANT
+woori2.png,6월 16일,49,827,371,871,DATE
+woori2.png,1:33:42,49,827,371,871,TIME
+woori2.png,"+315,000원",778,914,1030,1029,AMOUNT_IN
+woori2.png,"잔액 315,268원",778,914,1030,1029,BALANCE
+woori2.png,김호진,50,916,166,968,MERCHANT
+woori2.png,6월 15일,49,1201,369,1243,DATE
+woori2.png,12:38:55,49,1201,369,1243,TIME
+woori2.png,예금결산이자,46,1285,279,1346,MERCHANT
+woori2.png,0원,848,1291,1030,1399,AMOUNT_OUT
+woori2.png,잔액 268원,848,1291,1030,1399,BALANCE
+woori2.png,2024년 5월,50,1568,280,1620,DATE_HEADER
+woori2.png,5월 3일,49,1721,349,1763,DATE
+woori2.png,11:59:49,49,1721,349,1763,TIME
+woori2.png,숭실대학교소비자,46,1805,351,1865,MERCHANT
+woori2.png,"-5,000원",851,1809,1030,1917,AMOUNT_OUT
+woori2.png,잔액 268원,851,1809,1030,1917,BALANCE
+woori2.png,5월 3일,49,2029,349,2071,DATE
+woori2.png,11:58:43,49,2029,349,2071,TIME
+woori2.png,"+5,000원",820,2116,1030,2229,AMOUNT_IN
+woori2.png,"잔액 5,268원",820,2116,1030,2229,BALANCE
+woori2.png,김호진,50,2118,166,2170,MERCHANT
+woori3.png,Q,689,25,733,67,O
+woori3.png,~.i1| 74% 9:52,791,25,1045,67,O
+woori3.png,거래내역조회,418,116,658,172,O
+woori3.png,관리,950,118,1030,166,O
+woori3.png,직접입력 전체 최신순 값,616,234,1027,282,O
+woori3.png,2022.07.01~2025.06.22,49,347,513,389,DATE_HEADER
+woori3.png,잔액,823,347,895,389,O
+woori3.png,8월 22일,47,423,381,469,DATE
+woori3.png,20:56:43,47,423,381,469,TIME
+woori3.png,"+30,000원",784,513,1030,625,AMOUNT_IN
+woori3.png,"잔액 350,155원",784,513,1030,625,BALANCE
+woori3.png,김호진,50,514,166,566,MERCHANT
+woori3.png,8월 22일,47,733,379,775,DATE
+woori3.png,20:47:56,47,733,379,775,TIME
+woori3.png,"-30,000원",782,819,1031,933,AMOUNT_OUT
+woori3.png,"잔액 320,155원",782,819,1031,933,BALANCE
+woori3.png,대웅주유소,48,822,240,874,MERCHANT
+woori3.png,8월 7일,47,1105,347,1149,DATE
+woori3.png,19:14:24,47,1105,347,1149,TIME
+woori3.png,전환이자입금,48,1193,275,1247,MERCHANT
+woori3.png,+44원,782,1194,1030,1307,AMOUNT_IN
+woori3.png,"잔액 350,155원",782,1194,1030,1307,BALANCE
+woori3.png,2023년 7월,50,1472,278,1528,DATE_HEADER
+woori3.png,7월 15일,47,1625,367,1669,DATE
+woori3.png,9:02:12,47,1625,367,1669,TIME
+woori3.png,예금결산이자,48,1714,277,1768,MERCHANT
+woori3.png,+53원,792,1714,1030,1826,AMOUNT_IN
+woori3.png,"잔액 350,111원",792,1714,1030,1826,BALANCE
+woori3.png,2023년 6월,50,1992,282,2046,DATE_HEADER
+woori3.png,6월 17일,49,2145,363,2187,DATE
+woori3.png,10:18:44,49,2145,363,2187,TIME
+woori3.png,예금결산이자,48,2231,277,2285,MERCHANT
+woori3.png,+53원,908,2234,1028,2282,AMOUNT_IN
+woori4.png,.l| 74% 9:52,827,25,1045,67,O
+woori4.png,C,689,27,733,65,O
+woori4.png,거래내역조회,418,116,658,172,O
+woori4.png,관리,950,118,1030,166,O
+woori4.png,직접입력 전체 최신순 값,616,234,1027,282,O
+woori4.png,2022.07.01 ~ 2025.06.22,49,347,513,389,DATE_HEADER
+woori4.png,잔액,823,347,895,389,O
+woori4.png,12월 27일,47,455,383,499,DATE
+woori4.png,16:06:12,47,455,383,499,TIME
+woori4.png,"-9,894원",851,543,1030,653,AMOUNT_OUT
+woori4.png,잔액 0원,851,543,1030,653,BALANCE
+woori4.png,국민김호진,48,544,238,598,MERCHANT
+woori4.png,12월 27일,49,763,383,807,DATE
+woori4.png,16:03:15,49,763,383,807,TIME
+woori4.png,"-290,106원",808,850,1033,963,AMOUNT_OUT
+woori4.png,"잔액 9,894원",808,850,1033,963,BALANCE
+woori4.png,AIRBNB * HMMSKMW,53,855,475,899,MERCHANT
+woori4.png,12월 27일,47,1071,389,1113,DATE
+woori4.png,16:02:50,47,1071,389,1113,TIME
+woori4.png,김호진,50,1160,166,1212,MERCHANT
+woori4.png,"+163,963원",772,1160,1030,1273,AMOUNT_IN
+woori4.png,"잔액 300,000원",772,1160,1030,1273,BALANCE
+woori4.png,12월 25일,49,1445,389,1487,DATE
+woori4.png,22:41:26,49,1445,389,1487,TIME
+woori4.png,"-289,305원",782,1530,1031,1647,AMOUNT_OUT
+woori4.png,"잔액 136,037원",782,1530,1031,1647,BALANCE
+woori4.png,AIRBNB * HMMSKMW,53,1537,475,1579,MERCHANT
+woori4.png,12월 25일,49,1751,391,1795,DATE
+woori4.png,22:40:41,49,1751,391,1795,TIME
+woori4.png,"+425,342원",774,1839,1030,1953,AMOUNT_IN
+woori4.png,"잔액 425,342원",774,1839,1030,1953,BALANCE
+woori4.png,김호진,50,1840,165,1892,MERCHANT
+woori4.png,12월 16일,47,2125,387,2167,DATE
+woori4.png,12:46:28,47,2125,387,2167,TIME
+woori4.png,예금결산이자,48,2214,276,2268,MERCHANT
+woori4.png,0원,896,2214,1029,2316,AMOUNT_OUT
+woori4.png,잔액 0원,896,2214,1029,2316,BALANCE
