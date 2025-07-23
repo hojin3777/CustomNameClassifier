@@ -73,8 +73,11 @@ def load_merchant_list(data_path):
 
 # --- 3. 데이터 생성 함수 ---
 
-def generate_transaction_data(num_items, merchants, config, parsed_layout, allowed_date_formats):
-    """한 이미지에 들어갈 거래 데이터(텍스트)를 생성합니다."""
+def generate_transaction_data(num_items, merchants, config, parsed_layout, allowed_date_formats, use_balance_keyword):
+    """
+    한 이미지에 들어갈 거래 데이터(텍스트)를 생성합니다.
+    use_balance_keyword 인자를 받아 잔액 표시 스타일을 통일합니다.
+    """
     drawable_items = []
     memos = ['#체크카드', '#용돈', '#월급', '#이체', '#송금', '#카드결제', '#오픈뱅킹이체', '이자', '대체', '타행IB', '모바일']
     current_date = datetime.now() - timedelta(days=random.randint(0, 30))
@@ -108,10 +111,10 @@ def generate_transaction_data(num_items, merchants, config, parsed_layout, allow
         
         balance += amount_val if is_income else -amount_val
         
-        # ★★★ 변경점: 잔액(BALANCE) 생성 방식 다양화 ★★★
-        if random.random() < 0.5: # 50% 확률로 '잔액' 키워드 포함
+        # ★★★ 핵심 수정: 이미지 전체에 적용될 잔액 스타일 결정 ★★★
+        if use_balance_keyword:
             balance_text = f"잔액 {balance:,}원"
-        else: # 50% 확률로 금액만 표시
+        else:
             balance_text = f"{balance:,}원"
 
         drawable_items.extend([
@@ -146,7 +149,6 @@ def generate_synthetic_images(template_configs, merchant_list, loaded_fonts, num
         'blue_black': {'AMOUNT_IN': (50, 100, 255), 'AMOUNT_OUT': (20, 20, 20)}
     }
 
-    # ★★★ 변경점: 메모 색상 옵션 추가 ★★★
     memo_color_options = [
         (120, 120, 120), # 회색
         (44, 160, 44),   # 녹색
@@ -178,10 +180,15 @@ def generate_synthetic_images(template_configs, merchant_list, loaded_fonts, num
         memo_font_size = max(18, int(font.size * 0.85))
         memo_font = ImageFont.truetype(font.path, memo_font_size)
         
-        image_data = generate_transaction_data(items_per_image, merchant_list, chosen_config, parsed_layout, allowed_date_formats)
+        # ★★★ 핵심 수정: 이미지 생성 전, 잔액 스타일을 한번만 결정 ★★★
+        use_balance_keyword_for_this_image = random.random() < 0.5
+        
+        image_data = generate_transaction_data(
+            items_per_image, merchant_list, chosen_config, parsed_layout, 
+            allowed_date_formats, use_balance_keyword_for_this_image
+        )
         
         chosen_color_scheme = random.choice(list(amount_color_schemes.values()))
-        # ★★★ 변경점: 이미지마다 메모 색상 랜덤 선택 ★★★
         chosen_memo_color = random.choice(memo_color_options)
         image_filename = f'synth_{i+1:05d}.png'
 
