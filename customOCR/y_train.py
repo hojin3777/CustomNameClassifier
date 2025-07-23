@@ -7,13 +7,16 @@ import os
 DATASET_YAML_PATH = './customOCR/yolo_dataset/dataset.yaml'
 # 사용할 YOLO 모델 (n: nano, s: small, m: medium, l: large, x: extra-large)
 # 작은 모델로 시작하여 빠르게 성능을 확인하고, 필요 시 더 큰 모델을 사용합니다.
-MODEL_NAME = 'yolov8n.pt' 
+MODEL = 'yolov8m'
+# MODEL_NAME = 'yolov8n.pt' 
+MODEL_NAME = MODEL + '.pt'
+
 # 학습 하이퍼파라미터
 EPOCHS = 50
 IMAGE_SIZE = 640
 BATCH_SIZE = 16 # GPU 메모리에 따라 조절 (예: 8, 16, 32)
 PROJECT_NAME = './customOCR/bank_statement_detector/'
-RUN_NAME = f'yolov8n_e{EPOCHS}_bs{BATCH_SIZE}'
+RUN_NAME = f'{MODEL}_e{EPOCHS}_bs{BATCH_SIZE}'
 
 def train_yolo_model():
     """YOLOv8 모델을 학습시킵니다."""
