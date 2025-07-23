@@ -14,7 +14,7 @@ MODEL_NAME = MODEL + '.pt'
 # 학습 하이퍼파라미터
 EPOCHS = 50
 IMAGE_SIZE = 640
-BATCH_SIZE = 16 # GPU 메모리에 따라 조절 (예: 8, 16, 32)
+BATCH_SIZE = 8 # GPU 메모리에 따라 조절 (예: 8, 16, 32)
 PROJECT_NAME = './customOCR/bank_statement_detector/'
 RUN_NAME = f'{MODEL}_e{EPOCHS}_bs{BATCH_SIZE}'
 
