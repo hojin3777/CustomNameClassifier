@@ -24,7 +24,7 @@ DATE_WIDTH_THRESHOLD = 130
 
 # --- 2. 유틸리티 함수 ---
 
-def load_fonts(font_dir, font_sizes=[32, 34, 36, 38]):
+def load_fonts(font_dir, font_sizes=[30, 32, 34, 36, 38]):
     """지정된 디렉토리에서 폰트 파일들을 로드합니다."""
     loaded_fonts = []
     try:

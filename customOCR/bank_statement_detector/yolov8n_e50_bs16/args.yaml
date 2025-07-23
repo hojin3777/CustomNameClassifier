@@ -12,7 +12,7 @@ save_period: -1
 cache: false
 device: '0'
 workers: 8
-project: bank_statement_detector
+project: ./customOCR/bank_statement_detector/
 name: yolov8n_e50_bs16
 exist_ok: true
 pretrained: true
@@ -102,4 +102,4 @@ auto_augment: randaugment
 erasing: 0.4
 cfg: null
 tracker: botsort.yaml
-save_dir: bank_statement_detector\yolov8n_e50_bs16
+save_dir: customOCR\bank_statement_detector\yolov8n_e50_bs16
