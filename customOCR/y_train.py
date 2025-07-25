@@ -10,13 +10,14 @@ DATASET_YAML_PATH = './customOCR/yolo_dataset/dataset.yaml'
 MODEL = 'yolov8m'
 # MODEL_NAME = 'yolov8n.pt' 
 MODEL_NAME = MODEL + '.pt'
+DATE = '0725'
 
 # 학습 하이퍼파라미터
 EPOCHS = 50
 IMAGE_SIZE = 640
 BATCH_SIZE = 8 # GPU 메모리에 따라 조절 (예: 8, 16, 32)
 PROJECT_NAME = './customOCR/bank_statement_detector/'
-RUN_NAME = f'{MODEL}_e{EPOCHS}_bs{BATCH_SIZE}'
+RUN_NAME = f'{MODEL}_e{EPOCHS}_bs{BATCH_SIZE}_{DATE}'
 
 def train_yolo_model():
     """YOLOv8 모델을 학습시킵니다."""

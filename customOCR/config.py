@@ -23,7 +23,7 @@ PRETRAINED_MODEL_NAME = "microsoft/layoutlmv3-base"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 BATCH_SIZE = 4
 LEARNING_RATE = 5e-5
-NUM_EPOCHS = 10
+NUM_EPOCHS = 3
 TRAIN_RATIO = 0.8 # 전체 데이터 중 학습에 사용할 비율 (나머지는 검증용)
 
 # --- 라벨(클래스) 설정 ---
