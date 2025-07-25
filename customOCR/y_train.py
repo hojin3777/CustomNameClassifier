@@ -7,10 +7,10 @@ import os
 DATASET_YAML_PATH = './customOCR/yolo_dataset/dataset.yaml'
 # 사용할 YOLO 모델 (n: nano, s: small, m: medium, l: large, x: extra-large)
 # 작은 모델로 시작하여 빠르게 성능을 확인하고, 필요 시 더 큰 모델을 사용합니다.
-MODEL = 'yolov8m'
+MODEL = 'yolov8l'
 # MODEL_NAME = 'yolov8n.pt' 
 MODEL_NAME = MODEL + '.pt'
-DATE = '0725'
+DATE = '0726'
 
 # 학습 하이퍼파라미터
 EPOCHS = 50

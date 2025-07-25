@@ -9,7 +9,9 @@ from datetime import datetime, timedelta
 from tqdm import tqdm
 import argparse
 
-# --- 1. 전역 설정 ---
+# --- 1. 전역 설정 및 하이퍼파라미터 ---
+
+# 라벨링을 위한 색상-라벨 매핑
 COLOR_TO_LABEL_MAP = {
     (255, 0, 255): 'DATE',
     (0, 255, 255): 'DATE_HEADER',
@@ -19,12 +21,31 @@ COLOR_TO_LABEL_MAP = {
     (255, 255, 0): 'BALANCE',
     (255, 127, 255): 'TIME',
 }
+
+# 폰트 크기 범위
+FONT_SIZES = [34, 35, 36, 37, 38]
+
+# 생성 로직을 위한 임계값
 MULTILINE_HEIGHT_THRESHOLD = 55
-DATE_WIDTH_THRESHOLD = 130
+DATE_WIDTH_THRESHOLD = 150
+TIME_WIDTH_THRESHOLD = 80
+
+# 생성될 텍스트 및 색상 옵션
+MEMO_OPTIONS = ['#체크카드', '#용돈', '#월급', '#이체', '#송금', '#카드결제', '#오픈뱅킹이체', '이자', '대체', '타행IB', '모바일']
+AMOUNT_STYLE_OPTIONS = ['text', 'sign', 'split_color'] # ★★★ 금액 스타일 옵션화
+AMOUNT_COLOR_SCHEMES = {
+    'blue_red':   {'AMOUNT_IN': (50, 100, 255), 'AMOUNT_OUT': (200, 30, 30)},
+    'blue_black': {'AMOUNT_IN': (50, 100, 255), 'AMOUNT_OUT': (20, 20, 20)}
+}
+MEMO_COLOR_OPTIONS = [(120, 120, 120), (44, 160, 44), (31, 119, 180)]
+DEFAULT_TEXT_COLOR = (20, 20, 20)
+DATE_TIME_COLOR = (100, 100, 100)
+BALANCE_COLOR = (150, 150, 150)
+
 
 # --- 2. 유틸리티 함수 ---
 
-def load_fonts(font_dir, font_sizes=[30, 32, 34, 36, 38]):
+def load_fonts(font_dir, font_sizes=FONT_SIZES):
     """지정된 디렉토리에서 폰트 파일들을 로드합니다."""
     loaded_fonts = []
     try:
@@ -73,26 +94,22 @@ def load_merchant_list(data_path):
 
 # --- 3. 데이터 생성 함수 ---
 
-def generate_transaction_data(num_items, merchants, config, parsed_layout, allowed_date_formats, use_balance_keyword):
-    """
-    한 이미지에 들어갈 거래 데이터(텍스트)를 생성합니다.
-    use_balance_keyword 인자를 받아 잔액 표시 스타일을 통일합니다.
-    """
+def generate_transaction_data(num_items, merchants, config, use_balance_keyword, use_seconds, allowed_date_formats, amount_style, parsed_layout):
+    """한 이미지에 들어갈 거래 데이터(텍스트)를 생성합니다."""
     drawable_items = []
-    memos = ['#체크카드', '#용돈', '#월급', '#이체', '#송금', '#카드결제', '#오픈뱅킹이체', '이자', '대체', '타행IB', '모바일']
     current_date = datetime.now() - timedelta(days=random.randint(0, 30))
     balance = random.randint(500000, 2000000)
     
     last_item_date_str = ""
     date_style = random.choice(config['date_style_options'])
     chosen_date_format = random.choice(allowed_date_formats)
-    transaction_dates = []
+    time_format = '%H:%M:%S' if use_seconds else '%H:%M'
 
     for i in range(num_items):
         day_delta = random.choices([0, 1, 2, 3], weights=[0.4, 0.3, 0.2, 0.1])[0]
         current_date -= timedelta(days=day_delta, hours=random.randint(1, 5))
-        transaction_dates.append(current_date)
-        date_str, time_str = chosen_date_format(current_date), current_date.strftime('%H:%M')
+        
+        date_str, time_str = chosen_date_format(current_date), current_date.strftime(time_format)
 
         if date_style == 'per_item' or (date_style == 'toss_like' and date_str != last_item_date_str):
             drawable_items.append({'label': 'DATE', 'text': date_str, 'item_index': i})
@@ -103,19 +120,14 @@ def generate_transaction_data(num_items, merchants, config, parsed_layout, allow
         is_income = random.random() < 0.15
         amount_val = random.randint(500, 4000) * 100 if is_income else random.randint(10, 200) * 100
         
-        if config['amount_style'] == 'text':
+        if amount_style == 'text' or amount_style == 'split_color':
             label, text = ('AMOUNT_IN', f"입금 {amount_val:,}원") if is_income else ('AMOUNT_OUT', f"출금 {amount_val:,}원")
-        else:
+        else: # 'sign' style
             amount_val_signed = amount_val if is_income else -amount_val
             label, text = ('AMOUNT_IN', f"{amount_val:,}원") if is_income else ('AMOUNT_OUT', f"{amount_val_signed:,}원")
         
         balance += amount_val if is_income else -amount_val
-        
-        # ★★★ 핵심 수정: 이미지 전체에 적용될 잔액 스타일 결정 ★★★
-        if use_balance_keyword:
-            balance_text = f"잔액 {balance:,}원"
-        else:
-            balance_text = f"{balance:,}원"
+        balance_text = f"잔액 {balance:,}원" if use_balance_keyword else f"{balance:,}원"
 
         drawable_items.extend([
             {'label': 'MERCHANT', 'text': merchant_name, 'item_index': i},
@@ -123,16 +135,33 @@ def generate_transaction_data(num_items, merchants, config, parsed_layout, allow
             {'label': 'BALANCE', 'text': balance_text, 'item_index': i}
         ])
         if random.random() < 0.7:
-            drawable_items.append({'label': 'MEMO', 'text': random.choice(memos), 'item_index': i})
+            drawable_items.append({'label': 'MEMO', 'text': random.choice(MEMO_OPTIONS), 'item_index': i})
 
-    if transaction_dates and parsed_layout.get('DATE_HEADER'):
-        start_date, end_date = min(transaction_dates), max(transaction_dates)
-        header_format_options = [
-            lambda s, e, n: f"{e.strftime('%Y.%m.%d')} ~ {s.strftime('%Y.%m.%d')} ({n}건)",
-            lambda s, e, n: f"{e.strftime('%Y년 %m월')}"
-        ]
-        header_text = random.choice(header_format_options)(start_date, end_date, num_items)
+    # ★★★ 템플릿에 DATE_HEADER 영역이 존재할 때만 헤더 텍스트를 생성 ★★★
+    num_headers = len(parsed_layout.get('DATE_HEADER', []))
+    if num_headers > 0:
+        # 첫 번째 헤더: 전체 기간
+        start_date, end_date = current_date, datetime.now()
+        header_text = f"{end_date.strftime('%Y.%m.%d')} ~ {start_date.strftime('%Y.%m.%d')} ({num_items}건)"
         drawable_items.append({'label': 'DATE_HEADER', 'text': header_text, 'item_index': 0})
+        
+        # ★★★ 나머지 헤더: "YYYY년 n월" 형식으로 랜덤하게 채움 ★★★
+        if num_headers > 1:
+            # 사용된 월 기록 (중복 방지)
+            used_months = {current_date.month}
+            year = current_date.year
+
+            for header_idx in range(1, num_headers):
+                random_month = random.randint(1, 12)
+                # 이전에 사용되지 않은 월이 나올 때까지 반복
+                while random_month in used_months:
+                    random_month = random.randint(1, 12)
+                used_months.add(random_month)
+                
+                # 헤더 텍스트 생성 및 추가
+                month_header_text = f"{year}년 {random_month}월"
+                drawable_items.append({'label': 'DATE_HEADER', 'text': month_header_text, 'item_index': header_idx})
+        
     return drawable_items
 
 # --- 4. 메인 생성 함수 ---
@@ -144,102 +173,117 @@ def generate_synthetic_images(template_configs, merchant_list, loaded_fonts, num
         return
 
     all_labels_data = []
-    amount_color_schemes = {
-        'blue_red':   {'AMOUNT_IN': (50, 100, 255), 'AMOUNT_OUT': (200, 30, 30)},
-        'blue_black': {'AMOUNT_IN': (50, 100, 255), 'AMOUNT_OUT': (20, 20, 20)}
-    }
-
-    memo_color_options = [
-        (120, 120, 120), # 회색
-        (44, 160, 44),   # 녹색
-        (31, 119, 180)   # 연한 파란색 (토스 스타일)
-    ]
-    
     print(f"\n총 {num_images}개의 다양한 은행 명세서 이미지 생성을 시작합니다...")
 
     for i in tqdm(range(num_images), desc="이미지 생성 중"):
+        image_filename = f'img_{i+1:05d}.png'
         chosen_config = random.choice(template_configs)
         parsed_layout = parse_layout_from_color_template(chosen_config['colored_path'], COLOR_TO_LABEL_MAP)
         if not parsed_layout or not parsed_layout.get('MERCHANT'):
-            print(f"경고: '{chosen_config['name']}' 템플릿 파싱 실패. 건너뜁니다.")
             continue
             
-        allowed_date_formats = [
-            lambda d: d.strftime('%Y.%m.%d'), lambda d: d.strftime('%m.%d'), lambda d: f"{d.month}월 {d.day}일"
-        ]
+        allowed_date_formats = [lambda d: d.strftime('%Y.%m.%d'), lambda d: d.strftime('%m.%d'), lambda d: f"{d.month}월 {d.day}일"]
         if 'DATE' in parsed_layout and parsed_layout['DATE']:
-            date_box_width = parsed_layout['DATE'][0][2] - parsed_layout['DATE'][0][0]
-            if date_box_width < DATE_WIDTH_THRESHOLD:
+            if (parsed_layout['DATE'][0][2] - parsed_layout['DATE'][0][0]) < DATE_WIDTH_THRESHOLD:
                 allowed_date_formats = [lambda d: d.strftime('%m.%d'), lambda d: f"{d.month}월 {d.day}일"]
+
+        use_long_format_possible = False
+        if 'TIME' in parsed_layout and parsed_layout['TIME']:
+            if (parsed_layout['TIME'][0][2] - parsed_layout['TIME'][0][0]) > TIME_WIDTH_THRESHOLD:
+                use_long_format_possible = True
+        use_seconds_for_this_image = use_long_format_possible and random.random() < 0.5
 
         items_per_image = len(parsed_layout.get('MERCHANT', []))
         img = Image.open(chosen_config['clean_path']).convert("RGB")
         draw = ImageDraw.Draw(img)
         
         font = random.choice(loaded_fonts)
-        memo_font_size = max(18, int(font.size * 0.85))
-        memo_font = ImageFont.truetype(font.path, memo_font_size)
+        memo_font = ImageFont.truetype(font.path, max(18, int(font.size * 0.85)))
+        datetime_font = ImageFont.truetype(font.path, max(18, font.size - 2))
         
-        # ★★★ 핵심 수정: 이미지 생성 전, 잔액 스타일을 한번만 결정 ★★★
-        use_balance_keyword_for_this_image = random.random() < 0.5
+        use_balance_keyword = random.random() < 0.5
+        chosen_amount_style = random.choice(AMOUNT_STYLE_OPTIONS) # ★★★ 금액 스타일 랜덤 선택
         
-        image_data = generate_transaction_data(
-            items_per_image, merchant_list, chosen_config, parsed_layout, 
-            allowed_date_formats, use_balance_keyword_for_this_image
-        )
+        image_data = generate_transaction_data(items_per_image, merchant_list, chosen_config, use_balance_keyword, use_seconds_for_this_image, allowed_date_formats, chosen_amount_style, parsed_layout)
         
-        chosen_color_scheme = random.choice(list(amount_color_schemes.values()))
-        chosen_memo_color = random.choice(memo_color_options)
-        image_filename = f'synth_{i+1:05d}.png'
+        chosen_color_scheme = random.choice(list(AMOUNT_COLOR_SCHEMES.values()))
+        chosen_memo_color = random.choice(MEMO_COLOR_OPTIONS)
+        
 
         for item in image_data:
             label, text, item_idx = item['label'], item['text'], item['item_index']
             layout_label = 'AMOUNT' if 'AMOUNT' in label else label
-            current_item_idx = 0 if label == 'DATE_HEADER' else item_idx
+            current_item_idx = item_idx
 
-            if layout_label in parsed_layout and current_item_idx < len(parsed_layout[layout_label]):
-                x_min, y_min, x_max, y_max = parsed_layout[layout_label][current_item_idx]
+            if layout_label not in parsed_layout or current_item_idx >= len(parsed_layout[layout_label]):
+                continue
+            
+            x_min, y_min, x_max, y_max = parsed_layout[layout_label][current_item_idx]
+            
+            if label == 'MEMO': current_font = memo_font
+            elif label in ['DATE', 'TIME', 'DATE_HEADER']: current_font = datetime_font
+            else: current_font = font
+            
+            align_right = label in ['AMOUNT_OUT', 'AMOUNT_IN', 'BALANCE']
+            
+            final_bbox = (0,0,0,0)
+            is_multiline_amount = 'AMOUNT' in label and (y_max - y_min) > MULTILINE_HEIGHT_THRESHOLD
+
+            if is_multiline_amount:
+                # 두 줄짜리 금액은 항상 'text' 스타일(입금/출금)을 강제 사용
+                parts = text.split(' ', 1)
+                if len(parts) == 2:
+                    prefix, number_part = parts
+                else: # 혹시 모를 예외 처리 (sign 스타일로 생성된 경우)
+                    prefix = "입금" if float(text.replace(',', '').replace('원','')) > 0 else "출금"
+                    number_part = text.lstrip('-+')
+
+                color = chosen_color_scheme[label]
                 
-                current_font = memo_font if label == 'MEMO' else font
+                # 1. 첫 번째 줄 (접두사: "입금" 또는 "출금") 그리기
+                prefix_bbox = draw.textbbox((0,0), prefix, font=current_font)
+                prefix_h = prefix_bbox[3] - prefix_bbox[1]
+                prefix_x = x_max - draw.textlength(prefix, font=current_font) if align_right else x_min
+                prefix_y = y_min + (y_max - y_min) / 2 - prefix_h - 2 # 중앙보다 살짝 위로
+                draw.text((prefix_x, prefix_y), prefix, font=current_font, fill=color)
+
+                # 2. 두 번째 줄 (숫자 금액) 그리기
+                number_x = x_max - draw.textlength(number_part, font=current_font) if align_right else x_min
+                number_y = y_min + (y_max - y_min) / 2 + 2 # 중앙보다 살짝 아래로
+                draw.text((number_x, number_y), number_part, font=current_font, fill=color)
+
+                # 전체 영역에 대한 바운딩 박스 계산
+                final_bbox = (min(prefix_x, number_x), prefix_y, x_max, number_y + prefix_h)
+
+            elif chosen_amount_style == 'split_color' and 'AMOUNT' in label:
+                # 기존 'split_color' 로직 (한 줄)
+                parts = text.split(' ', 1)
+                prefix, number_part = (parts[0] + ' ', parts[1]) if len(parts) > 1 else ('', parts[0])
                 
-                is_multiline = False
-                if label in ['AMOUNT_IN', 'AMOUNT_OUT'] and chosen_config['amount_style'] == 'text':
-                    if (y_max - y_min) > MULTILINE_HEIGHT_THRESHOLD:
-                        text = text.replace(' ', '\n', 1)
-                        is_multiline = True
+                prefix_w = draw.textlength(prefix, font=current_font)
+                draw_x_start = x_max - draw.textlength(text, font=current_font) if align_right else x_min
+                draw_y = y_min + (y_max - y_min - current_font.getbbox("A")[3]) / 2
 
-                align_right = label in ['AMOUNT_OUT', 'AMOUNT_IN', 'BALANCE', 'TIME']
+                draw.text((draw_x_start, draw_y), prefix, font=current_font, fill=DEFAULT_TEXT_COLOR)
+                draw.text((draw_x_start + prefix_w, draw_y), number_part, font=current_font, fill=chosen_color_scheme[label])
                 
-                if align_right:
-                    max_line_width = max(draw.textlength(line, font=current_font) for line in text.split('\n'))
-                    draw_x = x_max - max_line_width
-                else:
-                    draw_x = x_min
+                final_bbox = draw.textbbox((draw_x_start, draw_y), text, font=current_font)
 
-                if is_multiline:
-                    color = chosen_color_scheme.get(label, (20,20,20))
-                    draw.multiline_text((draw_x, y_min), text, font=current_font, fill=color, align="right" if align_right else "left")
-                    final_bbox = draw.multiline_textbbox((draw_x, y_min), text, font=current_font)
-                else:
-                    text_bbox = draw.textbbox((0,0), text, font=current_font)
-                    draw_y = y_min + (y_max - y_min - (text_bbox[3] - text_bbox[1])) / 2
-                    
-                    # ★★★ 변경점: 메모 색상 적용 ★★★
-                    if label == 'MEMO':
-                        color = chosen_memo_color
-                    elif label == 'BALANCE':
-                        color = (150, 150, 150)  # 잔액은 연한 회색으로 고정
-                    elif label in ['DATE_HEADER', 'DATE', 'TIME']:
-                        color = (100, 100, 100)
-                    elif label in chosen_color_scheme:
-                        color = chosen_color_scheme[label]
-                    else:
-                        color = (20, 20, 20)
+            else:
+                draw_x = x_max - draw.textlength(text, font=current_font) if align_right else x_min
+                text_bbox = draw.textbbox((0,0), text, font=current_font)
+                draw_y = y_min + (y_max - y_min - (text_bbox[3] - text_bbox[1])) / 2
+                
+                if label == 'MEMO': color = chosen_memo_color
+                elif label == 'BALANCE': color = BALANCE_COLOR
+                elif label in ['DATE_HEADER', 'DATE', 'TIME']: color = DATE_TIME_COLOR
+                elif 'AMOUNT' in label: color = chosen_color_scheme[label]
+                else: color = DEFAULT_TEXT_COLOR
 
-                    draw.text((draw_x, draw_y), text, font=current_font, fill=color)
-                    final_bbox = draw.textbbox((draw_x, draw_y), text, font=current_font)
+                draw.text((draw_x, draw_y), text, font=current_font, fill=color)
+                final_bbox = draw.textbbox((draw_x, draw_y), text, font=current_font)
 
-                all_labels_data.append({'image_id': image_filename, 'text': text.replace('\n', ' '), 'x_min': final_bbox[0], 'y_min': final_bbox[1], 'x_max': final_bbox[2], 'y_max': final_bbox[3], 'label': label})
+            all_labels_data.append({'image_id': image_filename, 'text': text, 'x_min': final_bbox[0], 'y_min': final_bbox[1], 'x_max': final_bbox[2], 'y_max': final_bbox[3], 'label': label})
 
         img.save(os.path.join(output_dir, image_filename), "PNG")
 
@@ -250,48 +294,44 @@ def generate_synthetic_images(template_configs, merchant_list, loaded_fonts, num
     print(f"총 {len(labels_df['image_id'].unique())}개의 이미지가 생성되었습니다.")
 
 # --- 5. 스크립트 실행 부분 ---
-# usage : python .\customOCR\generate.py --num_images 1000
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="합성 은행 거래내역 이미지 데이터셋 생성기")
-    parser.add_argument('--num_images', type=int, default=100, help='생성할 총 이미지 개수')
+    parser.add_argument('--num_images', type=int, default=50000, help='생성할 총 이미지 개수')
     parser.add_argument('--template_dir', type=str, default='./bank_templates', help='템플릿 이미지가 있는 디렉토리')
     parser.add_argument('--font_dir', type=str, default='./fonts', help='TTF 폰트 파일이 있는 디렉토리')
     parser.add_argument('--merchant_data', type=str, default='./processed_data/region_all_processed_data_remap.csv', help='거래처명 데이터 CSV 파일 경로')
     parser.add_argument('--output_dir', type=str, default='./customOCR/generated_dataset', help='생성된 이미지와 라벨을 저장할 디렉토리')
     
     args = parser.parse_args()
-
-    # 출력 디렉토리 생성
     os.makedirs(args.output_dir, exist_ok=True)
 
-    # 1. 필요 데이터 로드
     fonts = load_fonts(args.font_dir)
     merchants = load_merchant_list(args.merchant_data)
 
-    # 2. 템플릿 설정 로드
     template_files = glob.glob(os.path.join(args.template_dir, '*_clean.png'))
     template_configs = []
     for clean_path in template_files:
         colored_path = clean_path.replace('_clean.png', '_colored.png')
-        if os.path.exists(colored_path):
-            name = os.path.basename(clean_path).replace('_clean.png', '')
-            amount_style = 'text' if 'shinhan' in name.lower() or 'kookmin' in name.lower() else 'sign'
-            date_style_options = ['per_item', 'toss_like'] if 'kakao' in name.lower() else ['per_item']
-            template_configs.append({
-                'name': name, 'clean_path': clean_path, 'colored_path': colored_path,
-                'amount_style': amount_style, 'date_style_options': date_style_options
-            })
+        if not os.path.exists(colored_path): continue
+        
+        name = os.path.basename(clean_path).replace('_clean.png', '').lower()
+        # ★★★ has_date_header 설정을 제거하여 로직 단순화 ★★★
+        config = {
+            'name': name, 'clean_path': clean_path, 'colored_path': colored_path,
+            'date_style_options': ['per_item'],
+        }
+        
+        if 'kakao' in name or 'toss' in name:
+            config['date_style_options'] = ['per_item', 'toss_like']
+            
+        template_configs.append(config)
+        
     print(f"{len(template_configs)}개의 템플릿 설정을 로드했습니다.")
+    for cfg in template_configs:
+        # ★★★ 출력문에서 불필요한 정보 제거 ★★★
+        print(f" - {cfg['name']}: date_styles={cfg['date_style_options']}")
 
-    # 3. 이미지 생성 실행
     if merchants and template_configs and fonts:
-        generate_synthetic_images(
-            template_configs=template_configs,
-            merchant_list=merchants,
-            loaded_fonts=fonts,
-            num_images=args.num_images,
-            output_dir=args.output_dir
-        )
+        generate_synthetic_images(template_configs, merchants, fonts, args.num_images, args.output_dir)
     else:
         print("데이터 또는 템플릿, 폰트가 부족하여 이미지 생성을 시작할 수 없습니다.")
