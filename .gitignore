@@ -215,3 +215,6 @@ customOCR/yolo_dataset/
 *.safetensors
 *.pth
 *.zip
+*.pt
+
+.venv_donut/

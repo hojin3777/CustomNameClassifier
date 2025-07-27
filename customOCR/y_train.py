@@ -1,23 +1,26 @@
 import torch
 from ultralytics import YOLO
+import sys
 import os
 
 # --- 1. 설정 ---
 # 데이터셋 설정 파일 경로
 DATASET_YAML_PATH = './customOCR/yolo_dataset/dataset.yaml'
+CONTINUE_TRAIN_MODEL_PATH = 'C:/code/customOCR/bank_statement_detector/yolov8l_e50_bs8_0726/weights/best.pt'
 # 사용할 YOLO 모델 (n: nano, s: small, m: medium, l: large, x: extra-large)
 # 작은 모델로 시작하여 빠르게 성능을 확인하고, 필요 시 더 큰 모델을 사용합니다.
 MODEL = 'yolov8l'
 # MODEL_NAME = 'yolov8n.pt' 
 MODEL_NAME = MODEL + '.pt'
-DATE = '0726'
+DATE = '0727'
 
 # 학습 하이퍼파라미터
 EPOCHS = 50
 IMAGE_SIZE = 640
 BATCH_SIZE = 8 # GPU 메모리에 따라 조절 (예: 8, 16, 32)
+LOSS_WEIGHT = 1.0 # 클래스 분류 손실 가중치
 PROJECT_NAME = './customOCR/bank_statement_detector/'
-RUN_NAME = f'{MODEL}_e{EPOCHS}_bs{BATCH_SIZE}_{DATE}'
+BASE_RUN_NAME = f'{MODEL}_e{EPOCHS}_bs{BATCH_SIZE}_{DATE}'
 
 def train_yolo_model():
     """YOLOv8 모델을 학습시킵니다."""
@@ -30,12 +33,27 @@ def train_yolo_model():
         device = 'cpu'
         print("GPU를 사용할 수 없습니다. CPU로 학습을 진행합니다.")
 
-    # --- 3. YOLO 모델 로드 ---
-    # 사전 학습된 모델을 로드합니다.
+    # ★★★ 3. 학습 모드 결정 및 모델 로드 ★★★
+    # 터미널 명령어에 '--continue'가 있는지 확인
+    continue_training = '--continue' in sys.argv
+    
+    if continue_training:
+        # 이어서 학습 모드
+        initial_model_path = CONTINUE_TRAIN_MODEL_PATH
+        run_name = f'{BASE_RUN_NAME}_continued' # 실행 이름 변경
+        print(f"\n[모드] 이전 학습에 이어서 훈련을 시작합니다.")
+        print(f"  - 로드할 모델: {os.path.abspath(initial_model_path)}")
+    else:
+        # 신규 학습 모드
+        initial_model_path = MODEL_NAME
+        run_name = BASE_RUN_NAME
+        print(f"\n[모드] 새로운 훈련을 시작합니다.")
+        print(f"  - 로드할 모델: {initial_model_path}")
+
     try:
-        model = YOLO(MODEL_NAME)
+        model = YOLO(initial_model_path)
     except Exception as e:
-        print(f"오류: YOLO 모델('{MODEL_NAME}') 로딩에 실패했습니다. ultralytics가 올바르게 설치되었는지 확인하세요.")
+        print(f"오류: YOLO 모델('{initial_model_path}') 로딩에 실패했습니다. 경로를 확인하세요.")
         print(e)
         return
 
@@ -45,6 +63,7 @@ def train_yolo_model():
     print(f"  - 에포크: {EPOCHS}")
     print(f"  - 이미지 크기: {IMAGE_SIZE}")
     print(f"  - 배치 사이즈: {BATCH_SIZE}")
+    print(f"  - 실행 이름: {run_name}")
 
     try:
         results = model.train(
@@ -53,10 +72,11 @@ def train_yolo_model():
             imgsz=IMAGE_SIZE,
             batch=BATCH_SIZE,
             project=PROJECT_NAME,
-            name=RUN_NAME,
+            name=run_name, # 동적으로 결정된 실행 이름 사용
             device=device,
             patience=10, # 10 에포크 동안 성능 향상이 없으면 조기 종료
-            exist_ok=True # 동일한 이름의 실행이 있어도 덮어쓰기
+            exist_ok=True, # 동일한 이름의 실행이 있어도 덮어쓰기
+            cls=LOSS_WEIGHT, # 클래스 분류 손실 가중치
         )
         print("\n모델 학습이 성공적으로 완료되었습니다.")
         

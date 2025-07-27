@@ -11,3 +11,9 @@ Classify store names with deeplearning
 - 커스텀 템플릿 3가지 추가, 폰트 7종 추가 및 이미지 내용 좀 더 실제 이미지와 유사하게 개선(generate.py 변경내역 참조)
 - 데이터셋 7만개로 증가
 - 커밋 후 yolov8L 모델로 학습 예정
+
+### 0727
+- yolov8L모델 학습 완료, 일부 DATE 클래스를 놓치는 경향
+- loss weight 를 조정하여 추가 학습 진행중
+- donut 모듈 pull 및 가상환경 분리, gitignore 추가
+- *.pt 파일 업로드 제외(용량제한)
