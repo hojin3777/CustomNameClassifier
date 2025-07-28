@@ -46,7 +46,7 @@ if __name__ == "__main__":
     if args.sample_img_path:
         example_sample.append(args.sample_img_path)
 
-    pretrained_model = DonutModel.from_pretrained(args.pretrained_path)
+    pretrained_model = DonutModel.from_pretrained(args.pretrained_path, ignore_mismatched_sizes=True)
 
     if torch.cuda.is_available():
         pretrained_model.half()

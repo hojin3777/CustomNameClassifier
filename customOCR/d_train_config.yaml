@@ -1,0 +1,36 @@
+# Donut 모델 학습을 위한 설정 파일
+
+# --- 1. 데이터셋 및 모델 경로 (절대 경로로 수정) ---
+# ★★★ 우리가 방금 생성한 데이터셋 폴더 경로 ★★★
+dataset_name_or_paths: ['C:/code/customOCR/donut_dataset/'] 
+# 파인튜닝을 시작할 기본 모델 (범용 Donut 모델)
+pretrained_model_name_or_path: 'C:/code/donut-master/dataset/donut-base/' 
+
+# --- 2. 학습 결과 저장 경로 (절대 경로로 수정) ---
+# 학습 결과가 저장될 기본 폴더
+result_path: 'C:/code/customOCR/donut_results'
+# 실행 이름 (YOLO의 'run_name'과 유사)
+exp_name: 'donut_custom_bs_scan'
+exp_version: '0728_v1'
+
+# --- 3. 학습 하이퍼파라미터 ---
+# 입력 이미지 크기
+input_size: [1280, 960] 
+# 디코더가 생성할 최대 토큰 길이
+max_length: 768 
+align_long_axis : False
+# 학습 배치 사이즈 (GPU 메모리에 따라 조절)
+train_batch_sizes: [4]
+# 검증 배치 사이즈
+val_batch_sizes: [1]
+# 최대 에포크
+max_epochs: 30
+# 학습률 (Learning Rate)
+lr: 3e-5
+# 학습 초반에 학습률을 서서히 올리는 단계 수
+warmup_steps: 300
+# 검증 주기 (1.0 = 1 에포크마다 검증)
+val_check_interval: 1.0
+# 기타 설정
+sort_json_key: False
+verbose: True

@@ -82,7 +82,7 @@ def train_yolo_model():
         
         # 학습된 모델의 가중치 파일 경로 출력
         # 가장 마지막에 저장된 best 모델 가중치를 찾습니다.
-        best_model_path = os.path.join(PROJECT_NAME, RUN_NAME, 'weights', 'best.pt')
+        best_model_path = os.path.join(PROJECT_NAME, run_name, 'weights', 'best.pt')
         if os.path.exists(best_model_path):
             print(f"\n🎉 최적의 모델 가중치가 다음 경로에 저장되었습니다:")
             print(f"   {os.path.abspath(best_model_path)}")

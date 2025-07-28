@@ -212,6 +212,7 @@ processed_data/
 saved_model/fasttext
 customOCR/generated_dataset/
 customOCR/yolo_dataset/
+customOCR/donut_dataset/
 *.safetensors
 *.pth
 *.zip
