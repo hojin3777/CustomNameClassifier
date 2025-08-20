@@ -218,4 +218,10 @@ customOCR/donut_dataset/
 *.zip
 *.pt
 
+#image files
+*.jpg
+*.jpeg
+*.png
+*.psd
+
 .venv_donut/

@@ -17,3 +17,10 @@ Classify store names with deeplearning
 - loss weight 를 조정하여 추가 학습 진행중
 - donut 모듈 pull 및 가상환경 분리, gitignore 추가
 - *.pt 파일 업로드 제외(용량제한)
+
+### 0728
+- yolov8L 추가 학습 완료, 성능 변동 없음
+- donut 모듈 학습 트러블슈팅 진행 중
+- torch 모듈 내 distributetd_c10d.py에서 line 1671에 분산 처리 모듈 gloo로 고정
+
+### 0730

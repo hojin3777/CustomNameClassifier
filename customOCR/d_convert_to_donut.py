@@ -21,7 +21,7 @@ def convert_to_donut_format():
     
     # --- CSV 파일 로드 ---
     try:
-        df = pd.read_csv(LABELS_CSV_PATH)
+        df = pd.read_csv(LABELS_CSV_PATH, encoding='utf-8')
         # Donut은 텍스트 정보가 필수적이므로 'word' 컬럼이 없는 경우를 대비
         if 'text' not in df.columns:
             print("오류: '_labels.csv' 파일에 'word' 컬럼이 없습니다. Donut 변환을 위해서는 텍스트 정보가 필요합니다.")
@@ -42,6 +42,7 @@ def convert_to_donut_format():
     for split, files in datasets.items():
         print(f"\n'{split}' 데이터셋 생성 중...")
         target_dir = os.path.join(DONUT_DATASET_DIR, split)
+        os.makedirs(target_dir, exist_ok=True)
         metadata_path = os.path.join(target_dir, 'metadata.jsonl')
 
         with open(metadata_path, 'w', encoding='utf-8') as f:

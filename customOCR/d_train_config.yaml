@@ -1,4 +1,5 @@
 # Donut 모델 학습을 위한 설정 파일
+distributed_backend: 'gloo'
 
 # --- 1. 데이터셋 및 모델 경로 (절대 경로로 수정) ---
 # ★★★ 우리가 방금 생성한 데이터셋 폴더 경로 ★★★
@@ -13,24 +14,37 @@ result_path: 'C:/code/customOCR/donut_results'
 exp_name: 'donut_custom_bs_scan'
 exp_version: '0728_v1'
 
-# --- 3. 학습 하이퍼파라미터 ---
-# 입력 이미지 크기
+# --- 3. 모델 및 데이터 파라미터 ---
 input_size: [1280, 960] 
-# 디코더가 생성할 최대 토큰 길이
+align_long_axis: False
 max_length: 768 
-align_long_axis : False
-# 학습 배치 사이즈 (GPU 메모리에 따라 조절)
-train_batch_sizes: [4]
-# 검증 배치 사이즈
+
+# --- 4. 학습 루프 파라미터 (VRAM 및 속도 최적화) ---
+# ★★★ VRAM 사용량을 줄이기 위해 배치 사이즈를 1로 대폭 감소 ★★★
+train_batch_sizes: [1]
 val_batch_sizes: [1]
-# 최대 에포크
+
+# ★★★ 배치 사이즈 감소를 보완하고 학습 안정성을 높이기 위한 설정 ★★★
+# 4번의 스텝마다 그래디언트를 모아서 한번에 모델을 업데이트합니다.
+# (실질적으로 배치 사이즈 4의 효과를 내면서 VRAM은 적게 사용)
+gradient_accumulation_steps: 4
+
 max_epochs: 30
-# 학습률 (Learning Rate)
+max_steps: -1
 lr: 3e-5
-# 학습 초반에 학습률을 서서히 올리는 단계 수
-warmup_steps: 300
-# 검증 주기 (1.0 = 1 에포크마다 검증)
+warmup_steps: 0
 val_check_interval: 1.0
-# 기타 설정
-sort_json_key: False
+check_val_every_n_epoch: 1
+gradient_clip_val: 1.0
+seed: 42
+num_nodes: 1
+# ★★★ 캐시 생성 속도 향상을 위해 num_workers를 2로 설정 ★★★
+# (Windows에서 0이 아닌 값을 사용할 때 발생할 수 있는 오류는
+# d_train.py의 if __name__ == '__main__': 구문이 방지해줍니다.)
+num_workers: 2
+num_training_samples_per_epoch: 56000
+
+# --- 5. 기타 설정 ---
+sort_json_key: True
 verbose: True
+use_cache: True

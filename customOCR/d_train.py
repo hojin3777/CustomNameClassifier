@@ -26,30 +26,26 @@ def train_donut_model():
         '--config',
         CONFIG_FILE_PATH
     ]
+    env = os.environ.copy()
+    env["PL_TORCH_DISTRIBUTED_BACKEND"] = "gloo"
 
-    try:
-        # 서브프로세스로 학습 스크립트 실행
-        # cwd: train.py가 있는 donut-master 폴더에서 명령어를 실행하도록 설정
-        process = subprocess.Popen(command, cwd=DONUT_MASTER_DIR, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding='utf-8')
+    # 서브프로세스로 학습 스크립트 실행
+    # cwd: train.py가 있는 donut-master 폴더에서 명령어를 실행하도록 설정
+    process = subprocess.Popen(command, cwd=DONUT_MASTER_DIR, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding='utf-8', errors='ignore')
 
-        # 학습 과정의 출력을 실시간으로 터미널에 표시
-        while True:
-            output = process.stdout.readline()
-            if output == '' and process.poll() is not None:
-                break
-            if output:
-                print(output.strip())
-        
-        rc = process.poll()
-        if rc == 0:
-            print("\n🎉 Donut 모델 학습이 성공적으로 완료되었습니다.")
-        else:
-            print(f"\n오류: Donut 모델 학습 중 문제가 발생했습니다. (Exit code: {rc})")
-
-    except FileNotFoundError:
-        print(f"오류: '{PYTHON_EXECUTABLE}' 또는 'train.py'를 찾을 수 없습니다. 경로를 확인해주세요.")
-    except Exception as e:
-        print(f"학습 실행 중 예외가 발생했습니다: {e}")
+    # 학습 과정의 출력을 실시간으로 터미널에 표시
+    while True:
+        output = process.stdout.readline()
+        if output == '' and process.poll() is not None:
+            break
+        if output:
+            print(output.strip())
+    
+    rc = process.poll()
+    if rc == 0:
+        print("\n🎉 Donut 모델 학습이 성공적으로 완료되었습니다.")
+    else:
+        print(f"\n오류: Donut 모델 학습 중 문제가 발생했습니다. (Exit code: {rc})")
 
 if __name__ == '__main__':
     train_donut_model()

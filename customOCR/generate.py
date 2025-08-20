@@ -289,7 +289,7 @@ def generate_synthetic_images(template_configs, merchant_list, loaded_fonts, num
 
     label_output_file = os.path.join(output_dir, '_labels.csv')
     labels_df = pd.DataFrame(all_labels_data)
-    labels_df.to_csv(label_output_file, index=False, encoding='utf-8-sig')
+    labels_df.to_csv(label_output_file, index=False, encoding='utf-8')
     print(f"\n이미지 및 라벨 생성이 완료되었습니다. '{output_dir}' 폴더를 확인하세요.")
     print(f"총 {len(labels_df['image_id'].unique())}개의 이미지가 생성되었습니다.")
 
