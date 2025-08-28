@@ -23,4 +23,8 @@ Classify store names with deeplearning
 - donut 모듈 학습 트러블슈팅 진행 중
 - torch 모듈 내 distributetd_c10d.py에서 line 1671에 분산 처리 모듈 gloo로 고정
 
-### 0730
+### 0828
+- yolov11l, yolov8x 모델 테스트, 성능 큰 향상 없음.
+- 레이아웃 4종 추가
+- 후보정 로직 생성
+- 레이아웃 3종 추가된 모델 학습 전 커밋
