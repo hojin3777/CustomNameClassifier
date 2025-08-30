@@ -12,7 +12,7 @@ CONTINUE_TRAIN_MODEL_PATH = 'C:/code/customOCR/bank_statement_detector/yolov8l_e
 MODEL = 'yolov8l'
 # MODEL_NAME = 'yolov8n.pt' 
 MODEL_NAME = MODEL + '.pt'
-DATE = '0823'
+DATE = '0828'
 
 # 학습 하이퍼파라미터
 EPOCHS = 50
