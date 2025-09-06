@@ -1,131 +1,86 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, createContext, useContext } from 'react';
+import { BrowserRouter, Routes, Route, NavLink, Navigate, useNavigate } from 'react-router-dom';
 import './App.css';
+import Dashboard from './pages/Dashboard';
+import Monthly from './pages/Monthly';
+import Transactions from './pages/Transactions';
+import Categories from './pages/Categories';
+import { FaBars, FaQuestionCircle, FaCog } from 'react-icons/fa';
 
-// Transaction 데이터의 타입을 정의합니다.
-interface Transaction {
-  id: number;
-  trans_date: string;
-  merchant: string;
-  amount: number;
-  category: string;
-  balance: string;
-}
+// ✨ 1. isDirty 상태를 전역적으로 관리하기 위한 Context 생성
+const DirtyContext = createContext<{ isDirty: boolean; setIsDirty: (dirty: boolean) => void; } | null>(null);
+export const useDirty = () => useContext(DirtyContext);
 
-function App() {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [statusMessage, setStatusMessage] = useState('Loading transactions...');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
+// ✨ 2. isDirty 상태를 확인하고 내비게이션을 처리하는 NavLink 래퍼 컴포넌트
+const GuardedNavLink = ({ to, children }: { to: string; children: React.ReactNode }) => {
+  const dirtyContext = useDirty();
+  const navigate = useNavigate();
 
-  const fetchTransactions = useCallback(async () => {
-    try {
-      setStatusMessage('Loading transactions...');
-      const response = await fetch('http://localhost:5000/api/transactions');
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
+  const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault(); // 일단 기본 이동을 막습니다.
+    if (dirtyContext?.isDirty) {
+      if (window.confirm('저장하지 않은 변경사항이 있습니다. 페이지를 떠나시겠습니까?')) {
+        dirtyContext.setIsDirty(false); // 상태를 초기화하고
+        navigate(to); // 수동으로 이동합니다.
       }
-      const data: Transaction[] = await response.json();
-      setTransactions(data);
-      if (data.length === 0) {
-        setStatusMessage('No transactions found. Upload an image to get started!');
-      }
-    } catch (error) {
-      console.error('Failed to fetch transactions:', error);
-      setStatusMessage('Failed to load transactions. Is the backend server running?');
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchTransactions();
-  }, [fetchTransactions]);
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      setSelectedFile(event.target.files[0]);
+      // 사용자가 '취소'를 누르면 아무것도 하지 않습니다.
+    } else {
+      navigate(to); // 저장할 내용이 없으면 바로 이동합니다.
     }
   };
 
-  const handleUpload = async () => {
-    if (!selectedFile) {
-      alert('Please select an image file first.');
-      return;
-    }
+  return <NavLink to={to} onClick={handleClick}>{children}</NavLink>;
+};
 
-    setIsUploading(true);
-    setStatusMessage('Uploading and processing image...');
-
-    const formData = new FormData();
-    formData.append('image', selectedFile);
-
-    try {
-      const response = await fetch('http://localhost:5000/api/ocr', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Image upload failed.');
-      }
-      
-      const updatedTransactions: Transaction[] = await response.json();
-      setTransactions(updatedTransactions);
-      alert('Upload successful!');
-
-    } catch (error) {
-      console.error('Error uploading file:', error);
-      alert('An error occurred during upload.');
-      setStatusMessage('Upload failed. Please try again.');
-    } finally {
-      setIsUploading(false);
-      setSelectedFile(null);
-    }
-  };
+const AppContent = () => {
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const openSidebar = () => setSidebarOpen(true);
+  const closeSidebar = () => setSidebarOpen(false);
 
   return (
-    <div className="App">
-      <h1>My Custom MyData</h1>
-      
-      <div className="upload-section">
-        <h2>Upload New Transactions</h2>
-        <input type="file" accept="image/*" onChange={handleFileChange} disabled={isUploading} />
-        <button onClick={handleUpload} disabled={!selectedFile || isUploading}>
-          {isUploading ? 'Uploading...' : 'Upload'}
-        </button>
+    <div className="app-container">
+      <div className={`sidebar-container ${isSidebarOpen ? 'open' : ''}`} onMouseLeave={closeSidebar}>
+        <div className={`sidebar-wrapper ${isSidebarOpen ? 'open' : ''}`}>
+          <aside className="sidebar">
+            <div className="sidebar-header"><h2>MyData</h2></div>
+            <nav className="sidebar-nav">
+              <ul>
+                <li><GuardedNavLink to="/dashboard">Dashboard</GuardedNavLink></li>
+                <li><GuardedNavLink to="/monthly">Monthly</GuardedNavLink></li>
+                <li><GuardedNavLink to="/transactions">Transactions</GuardedNavLink></li>
+                <li><GuardedNavLink to="/categories">Categories</GuardedNavLink></li>
+              </ul>
+            </nav>
+            <div className="sidebar-footer">
+              <button className="icon-button"><FaQuestionCircle /></button>
+              <button className="icon-button"><FaCog /></button>
+            </div>
+          </aside>
+        </div>
       </div>
-
-      <h2>Transaction List</h2>
-      {transactions.length > 0 ? (
-        // --- ✨ 여기가 테이블 전체 구조입니다 ---
-        <table>
-          {/* thead는 테이블의 제목 행입니다. */}
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Merchant</th>
-              <th>Category</th>
-              <th>Amount</th>
-            </tr>
-          </thead>
-          {/* tbody가 실제 데이터 목록이 들어가는 본문입니다. */}
-          <tbody>
-            {transactions.map((trans) => (
-              <tr key={trans.id}>
-                <td>{trans.trans_date || 'N/A'}</td>
-                <td>{trans.merchant}</td>
-                <td>{trans.category}</td>
-                <td style={{ color: trans.amount < 0 ? 'blue' : 'red', textAlign: 'right' }}>
-                  {(trans.amount || 0).toLocaleString()}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        // -----------------------------------------
-      ) : (
-        <p>{statusMessage}</p>
-      )}
+      <main className="main-content">
+        <FaBars className="hamburger-menu" onMouseEnter={openSidebar} />
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/monthly" element={<Monthly />} />
+          <Route path="/transactions" element={<Transactions />} />
+          <Route path="/categories" element={<Categories />} />
+        </Routes>
+      </main>
     </div>
   );
-}
+};
+
+const App = () => {
+  const [isDirty, setIsDirty] = useState(false);
+  return (
+    <BrowserRouter>
+      <DirtyContext.Provider value={{ isDirty, setIsDirty }}>
+        <AppContent />
+      </DirtyContext.Provider>
+    </BrowserRouter>
+  );
+};
 
 export default App;
