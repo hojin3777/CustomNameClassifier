@@ -7,8 +7,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import './Transactions.css';
 import FilterPopup from './FilterPopup'; // ✨ 1. FilterPopup 컴포넌트 import
 import './FilterPopup.css'; // ✨ FilterPopup CSS import
-import ConfirmPopup from './ConfirmPopup'; // ✨ ConfirmPopup 컴포넌트 import
-import './ConfirmPopup.css'; // ✨ ConfirmPopup CSS import
+import ConfirmPopup from '../components/ConfirmPopup'; // ✨ ConfirmPopup 컴포넌트 import
+import '../components/ConfirmPopup.css'; // ✨ ConfirmPopup CSS import
 
 // ... 타입 정의는 기존과 동일 ...
 export type Transaction = {

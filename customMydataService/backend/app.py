@@ -4,6 +4,7 @@ import ocr_service
 import classification_service
 import database
 import category_utils
+import account_utils
 import os
 from datetime import date
 
@@ -75,6 +76,8 @@ def process_image_ocr():
         print(f"Error during OCR processing: {e}")
         return jsonify({"error": f"An error occurred during image processing: {e}"}), 500
 
+
+# ------------------- 거래내역 API -------------------
 @app.route('/api/transactions', methods=['GET'])
 def get_transactions():
     """데이터베이스에 저장된 모든 거래 내역을 JOIN하여 조회합니다. (필요시 기본값 생성)"""
@@ -152,29 +155,17 @@ def reset_transactions():
         print(f"Error resetting transactions: {e}")
         return jsonify({"error": str(e)}), 500
 
-@app.route('/api/categories', methods=['GET'])
-def get_categories():
-    """DB에서 계좌와 카테고리 데이터를 불러와 프론트엔드 형식으로 반환합니다."""
-    try:
-        data = category_utils.load_categories_from_db()
-        return jsonify(data)
-    except Exception as e:
-        print(f"Error loading categories from DB: {e}")
-        return jsonify({"error": str(e)}), 500
-
-@app.route('/api/categories', methods=['POST'])
-def save_categories():
-    """프론트엔드에서 받은 데이터로 계좌와 카테고리를 업데이트합니다."""
-    try:
-        data = request.json
+# ------------------- 카테고리 API -------------------
+@app.route('/api/categories', methods=['GET', 'POST'])
+def manage_categories():
+    if request.method == 'GET':
+        categories = category_utils.load_categories_from_db()
+        return jsonify(categories)
+    if request.method == 'POST':
+        data = request.get_json()
         category_utils.save_categories_to_db(data)
-        # 성공 시, 최신 데이터를 다시 불러와 프론트엔드에 보내줌
-        updated_data = category_utils.load_categories_from_db()
-        return jsonify(updated_data)
-    except Exception as e:
-        # ✨ 오류 메시지를 프론트엔드에 전달하도록 수정
-        print(f"Error saving categories: {e}")
-        return jsonify({"error": str(e)}), 400 # 400 Bad Request 상태 코드 사용
+        return jsonify({"status": "success", "message": "Categories saved successfully"})
+
 
 @app.route('/api/categories/usage', methods=['GET'])
 def get_category_usage():
@@ -220,6 +211,18 @@ def delete_minor_category():
         return jsonify({"message": "카테고리가 성공적으로 삭제되었습니다."})
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+
+# ------------------- 계좌 API -------------------
+@app.route('/api/accounts', methods=['GET', 'POST'])
+def manage_accounts():
+    if request.method == 'GET':
+        accounts = account_utils.load_accounts()
+        return jsonify(accounts)
+    if request.method == 'POST':
+        data = request.get_json()
+        account_utils.save_accounts(data)
+        return jsonify({"status": "success"})
+
 
 # 이 파일이 직접 실행될 때만 서버를 실행
 if __name__ == '__main__':

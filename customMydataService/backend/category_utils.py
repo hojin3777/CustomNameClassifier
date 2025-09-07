@@ -25,24 +25,19 @@ DEFAULT_CATEGORIES = {
     "경조/선물": ["축의금", "부조금", "선물", "회비"]
 }
 
-# ✨ 1. DB가 비어있을 때 기본값으로 채우는 함수
+# DB가 비어있을 때 기본값으로 채우는 함수
 def initialize_default_categories():
     """accounts와 categories 테이블이 비어있으면 기본값으로 초기화합니다."""
     conn = database.get_db_connection()
     # 테이블이 비어있는지 확인
-    accounts_count = conn.execute('SELECT COUNT(*) FROM accounts').fetchone()[0]
     categories_count = conn.execute('SELECT COUNT(*) FROM categories').fetchone()[0]
     
     # 두 테이블이 모두 비어있을 때만 실행
-    if accounts_count == 0 and categories_count == 0:
-        print("Initializing default accounts and categories in the database...")
+    if categories_count == 0:
+        print("Initializing default categories in the database...")
         major_order_index = 0
         major_code_char_code = ord('A')
         for major, minors in DEFAULT_CATEGORIES.items():
-            if major == "계좌":
-                for name in minors:
-                    conn.execute('INSERT INTO accounts (name) VALUES (?)', (name,))
-            else:
                 major_code = chr(major_code_char_code)
                 minor_order_index = 0
                 minor_num = 1
@@ -58,26 +53,20 @@ def initialize_default_categories():
                 major_code_char_code += 1
         conn.commit()
         print("Default data initialization complete.")
-    
     conn.close()
 
-# ✨ 2. DB에서 데이터를 불러와 프론트엔드 형식으로 변환하는 함수
+# DB에서 데이터를 불러와 프론트엔드 형식으로 변환하는 함수
 def load_categories_from_db():
     """DB에서 계좌와 카테고리를 읽어 프론트엔드 형식으로 그룹화하여 반환합니다."""
     conn = database.get_db_connection()
-    # 계좌 데이터 불러오기 (ID 순)
-    accounts_cursor = conn.execute('SELECT name FROM accounts ORDER BY id')
-    account_minors = [row['name'] for row in accounts_cursor.fetchall()]
-    
-    # ✨ 카테고리 데이터 불러오기 (대분류의 첫 등장 ID, 그 다음 소분류 ID 순으로 정렬)
     categories_cursor = conn.execute('''
         SELECT uuid, major, minor 
         FROM categories 
         ORDER BY major_order, minor_order
-    ''').fetchall()
+    ''').fetchall() # 카테고리 SELECT
     conn.close()
 
-    final_data = [{"major": "계좌", "minors": account_minors}]
+    final_data = []
     if categories_cursor:
         # 마지막으로 처리한 대분류를 추적
         last_major = None
@@ -94,29 +83,10 @@ def load_categories_from_db():
             
     return final_data
 
-# ✨ 3. 프론트엔드에서 받은 데이터로 DB를 업데이트하는 함수
+# 프론트엔드에서 받은 데이터로 DB를 업데이트하는 함수
 def save_categories_to_db(data):
     conn = database.get_db_connection()
     cursor = conn.cursor()
-
-    # --- 1. 계좌 업데이트 ---
-    # 프론트에서 받은 계좌 목록
-    frontend_accounts_data = next((item for item in data if item['major'] == '계좌'), None)
-    frontend_accounts = set(frontend_accounts_data['minors']) if frontend_accounts_data else set()
-
-    # DB의 현재 계좌 목록
-    db_accounts_cursor = cursor.execute('SELECT name FROM accounts').fetchall()
-    db_accounts = {row['name'] for row in db_accounts_cursor}
-
-    # 삭제/추가할 계좌 처리
-    accounts_to_delete = db_accounts - frontend_accounts
-    if accounts_to_delete:
-        delete_tuple = tuple(accounts_to_delete)
-        cursor.execute(f"DELETE FROM accounts WHERE name IN ({','.join('?'*len(delete_tuple))})", delete_tuple)
-    
-    accounts_to_add = frontend_accounts - db_accounts
-    for name in accounts_to_add:
-        cursor.execute('INSERT INTO accounts (name) VALUES (?)', (name,))
 
     # --- 2. 카테고리 지능형 업데이트 ---
     db_categories_raw = cursor.execute('SELECT id, uuid, major, minor FROM categories').fetchall()
