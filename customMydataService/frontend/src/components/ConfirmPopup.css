@@ -30,7 +30,7 @@
   color: #e53e3e; /* 경고색 */
   font-weight: bold;
   font-size: 1.5rem; /* 글자 크기 키움 */
-  letter-spacing: 0.5em; /* 자간 넓게 */
+  letter-spacing: 0.3em; /* 자간 넓게 */
   padding-bottom: 10px;
   border-bottom: 1px solid #424242;
 }

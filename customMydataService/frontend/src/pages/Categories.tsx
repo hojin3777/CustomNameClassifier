@@ -6,12 +6,12 @@ import ConfirmPopup from '../components/ConfirmPopup';
 // 타입 정의
 type Account = {id: number; name: string};
 type MinorCategory = { uuid: string; name: string };
-type CategoryItem = { major: string; minors: MinorCategory[]};
+type CategoryItem = { majorUuid: string; major: string; minors: MinorCategory[]};
 type CategoriesData = CategoryItem[];
 type EditingState = 
   | { type: 'account'; id: number}
-  | { type: 'major'; major: string }
-  | { type: 'minor'; major: string; minorIndex: number };
+  | { type: 'major'; majorUuid: string }
+  | { type: 'minor'; majorUuid: string; minorUuid: string };
 type AlertInfo = {
   isOpen: boolean;
   type?: 'input' | 'confirm' | 'alert' | 'destructive';
@@ -22,7 +22,8 @@ type AlertInfo = {
   placeholder?: string;
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+// const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+const API_BASE_URL = 'http://localhost:5000'; // 개발 시
 const Categories = () => {
   // vars
   const protectedCategories = ['고정수입', '유동수입', '이체분류'];
@@ -61,20 +62,22 @@ const Categories = () => {
       setStatus('Loading...');
       const accountsRes = await fetch(`${API_BASE_URL}/api/accounts`);
       const categoriesRes = await fetch(`${API_BASE_URL}/api/categories`);
-      if (!accountsRes.ok || !categoriesRes.ok) {
-        throw new Error('Failed to fetch data from server.');
-      }
+      if (!accountsRes.ok || !categoriesRes.ok) { throw new Error('Failed to fetch data from server.');}
 
       const accountsData = await accountsRes.json();
       const rawCategoriesData = await categoriesRes.json();
 
-      const processedCategories = rawCategoriesData.map((cat: any) => ({
-        major: cat.major,
-        minors: Array.isArray(cat.minors) ? cat.minors.map((minor: any) =>
-          typeof minor === 'string' ? { uuid: '', name: minor } : minor
-        ): [],
-      }));
-
+      const processedCategories: CategoryItem[] = rawCategoriesData.map((cat: any) => {
+        const majorUuid = cat.minors.length > 0 ? cat.minors[0].uuid[0] : `tmp-${crypto.randomUUID()}`;
+        return {
+          majorUuid : majorUuid,
+          major: cat.major,
+          minors: cat.minors.map((minor: any) =>({
+            uuid: minor.uuid,
+            name: minor.name
+          })) 
+        };
+      });
       setAccounts(accountsData); 
       setCategories(processedCategories);
       
@@ -147,11 +150,15 @@ const Categories = () => {
         setOriginalEditValue(account.name);
       }
     } else if (state.type === 'major') {
-      setOriginalEditValue(state.major);
+      const category = categories.find(c => c.majorUuid === state.majorUuid);
+      if (category){
+        setOriginalEditValue(category.major);
+      }
     } else if (state.type === 'minor') {
-      const category = categories.find(c => c.major === state.major);
-      if (category) {
-        setOriginalEditValue(category.minors[state.minorIndex]?.name);
+      const majorCategory = categories.find(c => c.majorUuid === state.majorUuid);
+      const minorCategory = majorCategory?.minors.find(m => m.uuid === state.minorUuid);
+      if (minorCategory) {
+        setOriginalEditValue(minorCategory.name);
       }
     }
     setEditing(state);
@@ -174,6 +181,7 @@ const Categories = () => {
   };
 
   // ******* 계좌 관련 함수 *******
+  // 계좌 추가
   const addAccount = () => {
     setAlertInfo({
       isOpen: true, type: 'input', message: '새로운 계좌 이름을 입력하세요:', placeholder: '계좌 이름 입력',
@@ -191,6 +199,7 @@ const Categories = () => {
     });
   };
 
+  // 계좌 삭제
   const deleteAccount = async (id: number) => {
     const account = accounts.find(acc => acc.id === id);
     if (!account) return;
@@ -204,9 +213,10 @@ const Categories = () => {
     }
     // 계좌 사용 여부 확인(id가 양수인 경우에만 체크)
     if(id > 0){
-      const usageCheckResponse = await fetch(`${API_BASE_URL}/api/accounts/usage?name=${encodeURIComponent(account.name)}`)
-      const usageData = await usageCheckResponse.json();
-      if (usageData.in_use) {
+      // const usageCheckResponse = await fetch(`${API_BASE_URL}/api/accounts/usage?name=${encodeURIComponent(account.name)}`)
+      // const usageData = await usageCheckResponse.json();
+      // if (usageData.in_use) {
+      if(false){ // ✨ 테스트용으로 항상 false 처리
         setAlertInfo({
           isOpen: true,
           type: 'alert',
@@ -228,7 +238,7 @@ const Categories = () => {
       onCancel: () => setAlertInfo({ ...alertInfo, isOpen: false }),
     });
   }
-
+  // 계좌 편집 완료 처리
   const handleAccountEditCommit = (newValue: string, id: number) => {
     const trimmedValue = newValue.trim();
     const originalValue = accounts.find(acc => acc.id === id);
@@ -238,7 +248,7 @@ const Categories = () => {
     }
     setEditing(null);
   };
-
+  // 계좌 항목 렌더링
   const renderAccountItem = (account: Account) => {
     const isEditing = editing?.type === 'account' && editing.id === account.id;
     return isEditing ? (
@@ -255,7 +265,7 @@ const Categories = () => {
       <div key={account.id} className='category-item' onDoubleClick={() => startEditing({ type: 'account', id: account.id })}>
         <span>{account.name}</span>
         <div className="item-actions">
-          <FaPen className="action-icon edit" onClick={() => setEditing({ type: 'account', id: account.id })} />
+          <FaPen className="action-icon edit" onClick={() => startEditing({ type: 'account', id: account.id })} />
           <FaTrash className="action-icon delete" onClick={() => deleteAccount(account.id)} />
         </div>
       </div>
@@ -281,17 +291,18 @@ const Categories = () => {
       onCancel: () => setAlertInfo({ ...alertInfo, isOpen: false }),
     });
   };
-
+  // 대분류 추가
   const addMajorCategory = () => {
     if (categories.length >= 30) return;
     setAlertInfo({
-      isOpen: true,
+      isOpen: true,  
       type: 'input',
       message: '새로운 대분류 이름을 입력하세요:',
       placeholder: '대분류 이름 입력',
-      onConfirm: (newMajor) => {
-        if (newMajor && !categories.find(c => c.major === newMajor)) {
-          setCategories(prev => [...prev, { major: newMajor, minors: [] }]);
+      onConfirm: (newMajorName) => {
+        if (newMajorName && !categories.find(c => c.major === newMajorName)) {
+          const newMajorCategory: CategoryItem = { majorUuid: `tmp-${crypto.randomUUID()}`, major: newMajorName, minors: [] };
+          setCategories(prev => [...prev, newMajorCategory]);
           setIsDirty(true);
         }
         setAlertInfo({ ...alertInfo, isOpen: false });
@@ -299,20 +310,20 @@ const Categories = () => {
       onCancel: () => setAlertInfo({ ...alertInfo, isOpen: false }),
     });
   }
-
-  const addMinorCategory = (major: string) => {
-    const category = categories.find(c => c.major === major);
+  // 소분류 추가
+  const addMinorCategory = (majorUuid: string) => {
+    const category = categories.find(c => c.majorUuid === majorUuid);
     if (!category || category.minors.length >= 20) return;
     setAlertInfo({
       isOpen: true,
       type: 'input',
-      message: `${major}에 추가할 소분류 이름을 입력하세요:`,
+      message: `${category.major}에 추가할 소분류 이름을 입력하세요:`,
       placeholder: '소분류 이름 입력',
       onConfirm: (newMinorName) => {
         if (newMinorName) {
-          const newMinor: MinorCategory = { name: newMinorName, uuid: '' };
+          const newMinor: MinorCategory = { name: newMinorName, uuid: `tmp-${crypto.randomUUID()}` };
           setCategories(prev => prev.map(c =>
-            c.major === major ? { ...c, minors: [...c.minors, newMinor] } : c
+            c.majorUuid === majorUuid ? { ...c, minors: [...c.minors, newMinor] } : c
           ));
           setIsDirty(true);
         }
@@ -321,45 +332,59 @@ const Categories = () => {
       onCancel: () => setAlertInfo({ ...alertInfo, isOpen: false }),
     });
   };
-
-  const deleteMajorCategory = (major: string) => {
-    if (protectedCategories.includes(major)) return;
+  // 대분류 삭제
+  const deleteMajorCategory = (majorUuid: string) => {
+    const category = categories.find(c => c.majorUuid === majorUuid);
+    if (!category || protectedCategories.includes(category.major)) return;
     setAlertInfo({
       isOpen: true,
       type: 'destructive',
       title: '대분류 삭제',
-      message: `'${major}' 대분류와 모든 하위 항목을 삭제하시겠습니까?`,
+      message: `'${category.major}' 대분류와 모든 하위 항목을 삭제하시겠습니까?`,
       onConfirm: () => {
-        setCategories(prev => prev.filter(c => c.major !== major));
+        setCategories(prev => prev.filter(c => c.majorUuid !== majorUuid));
         setIsDirty(true);
         setAlertInfo({ ...alertInfo, isOpen: false });
       },
       onCancel: () => setAlertInfo({ ...alertInfo, isOpen: false }),
     });
   };
-
-  const deleteMinorCategory = async (major: string, minor: MinorCategory) => {
-    if(minor.uuid){
-      const usageCheckResponse = await fetch(`${API_BASE_URL}/api/categories/usage?uuid=${minor.uuid}`);
+  // 소분류 삭제
+  const deleteMinorCategory = async (majorUuid: string, minorUuid: string) => {
+    const majorCategory = categories.find(c => c.majorUuid === majorUuid);
+    const minorCategory = majorCategory?.minors.find(m => m.uuid === minorUuid);
+    if (!majorCategory || !minorCategory) return;
+    // 최소 1개의 소분류는 유지
+    if(majorCategory.minors.length <= 1) {
+      setAlertInfo({
+        isOpen: true, type: 'alert', message: '최소 1개의 소분류는 유지해야 합니다.',
+        onConfirm: () => setAlertInfo({ ...alertInfo, isOpen: false }),
+      });
+      return;
+    }
+    // 소분류 사용 여부 확인(uuid가 있는 경우에만 체크), 임시항목은 API호출 없이 바로 삭제
+    if(!minorUuid.startsWith('tmp-')) {
+      const usageCheckResponse = await fetch(`${API_BASE_URL}/api/categories/usage?uuid=${minorUuid}`);
       const usageData = await usageCheckResponse.json();
       if (usageData.in_use) {
         setAlertInfo({
           isOpen: true,
           type: 'alert',
-          message: `카테고리 '${major}-${minor.name}'는 거래내역에서 사용 중이므로 삭제할 수 없습니다.`,
+          message: `카테고리 '${majorCategory?.major}-${minorCategory.name}'는 거래내역에서 사용 중이므로 삭제할 수 없습니다.`,
           onConfirm: () => setAlertInfo({ ...alertInfo, isOpen: false }),
         });
         return;
       }
     }
+
     setAlertInfo({
       isOpen: true,
       type: 'confirm',
-      message: `'${minor.name}' 항목을 정말 삭제하시겠습니까?`,
+      message: `'${minorCategory.name}' 항목을 정말 삭제하시겠습니까?`,
       onConfirm: () => {
         setCategories(prev => prev.map(c => {
-          if (c.major !== major) return c;
-          const updatedMinors = c.minors.filter(m => (m as MinorCategory).uuid ? (m as MinorCategory).uuid !== minor.uuid : (m as MinorCategory).name !== minor.name);
+          if (c.majorUuid !== majorUuid) return c;
+          const updatedMinors = c.minors.filter(m => m.uuid !== minorUuid);
           return { ...c, minors: updatedMinors };
       }));
         setIsDirty(true);
@@ -368,7 +393,7 @@ const Categories = () => {
       onCancel: () => setAlertInfo({ ...alertInfo, isOpen: false }),
     });
   };
-
+  // 카테고리 편집 완료 처리
   const handleCategoryEditCommit = (newValue: string) => {
     if (!editing || !newValue) {
       setEditing(null);
@@ -376,31 +401,28 @@ const Categories = () => {
     }
     let isChanged = false;
     if (editing.type === 'major') {
-      const originalValue = editing.major;
-      if (newValue !== originalValue && !categories.some(c => c.major === newValue)) {
-        setCategories(prev => prev.map(c => c.major === originalValue ? { ...c, major: newValue } : c));
+      if (newValue !== originalEditValue && !categories.some(c => c.major === newValue)) {
+        setCategories(prev => prev.map(c => c.majorUuid === editing.majorUuid ? { ...c, major: newValue } : c));
         isChanged = true;
       }
     } else if (editing.type === 'minor') {
-      const originalValue = categories.find(c => c.major === editing.major)?.minors[editing.minorIndex!].name;
-      if (newValue !== originalValue) {
+      if (newValue !== originalEditValue) {
         setCategories(prev => prev.map(c => {
-          if (c.major !== editing.major) return c;
-          const newMinors = c.minors.map((m, i) => i === editing.minorIndex ? { ...m, name: newValue } : m);
+          if (c.majorUuid !== editing.majorUuid) return c;
+          const newMinors = c.minors.map(m => m.uuid  === editing.minorUuid ? { ...m, name: newValue } : m);
           return { ...c, minors: newMinors };
         }));
         isChanged = true;
       }
     }
-    
     if (isChanged) {
       setIsDirty(true); // ✨ isDirty 직접 설정
     }
     setEditing(null);
   };
-
-  const renderItem = (major: string, minor: MinorCategory, index: number) => {
-    const isEditing = editing?.type === 'minor' && editing.major === major && editing.minorIndex === index;
+  // 소분류 항목 렌더링
+  const renderItem = (majorUuid: string, minor: MinorCategory) => {
+    const isEditing = editing?.type === 'minor' && editing.majorUuid === majorUuid && editing.minorUuid === minor.uuid;
     return isEditing ? (
       <input
         ref={inputRef}
@@ -411,35 +433,35 @@ const Categories = () => {
         className="inline-edit-input"
       />
     ) : (
-      <div key={minor.uuid || `new-${index}`} className="category-item" onDoubleClick={() => startEditing({ type: 'minor', major, minorIndex: index })}>
+      <div key={minor.uuid} className="category-item" onDoubleClick={() => startEditing({ type: 'minor', majorUuid, minorUuid: minor.uuid })}>
         <span>{minor.name}</span>
         <div className="item-actions">
-          <FaPen className="action-icon edit" onClick={() => setEditing({ type: 'minor', major, minorIndex: index })} />
-          <FaTrash className="action-icon delete" onClick={() => deleteMinorCategory(major, minor)} />
+          <FaPen className="action-icon edit" onClick={() => startEditing({ type: 'minor', majorUuid, minorUuid: minor.uuid })} />
+          <FaTrash className="action-icon delete" onClick={() => deleteMinorCategory(majorUuid, minor.uuid)} />
         </div>
       </div>
     );
   };
-
-  const renderHeader = (major: string) => {
-    const isEditing = editing?.type === 'major' && editing.major === major;
-    const isProtected = protectedCategories.includes(major);
+  // 대분류 헤더 렌더링
+  const renderHeader = (category: CategoryItem) => {
+    const isEditing = editing?.type === 'major' && editing.majorUuid === category.majorUuid;
+    const isProtected = protectedCategories.includes(category.major);
     return isEditing ? (
       <input
         ref={inputRef}
         type="text"
-        defaultValue={major}
+        defaultValue={category.major}
         onBlur={(e) => handleCategoryEditCommit(e.target.value)}
         onKeyDown={handleEditKeyDown}
         className='inline-edit-input header-edit'
       />
     ) : (
-      <div className="card category-header" onDoubleClick={() => !isProtected && startEditing({ type: 'major', major })}>
-        <span>{major}</span>
+      <div className="card category-header" onDoubleClick={() => !isProtected && startEditing({ type: 'major', majorUuid: category.majorUuid })}>
+        <span>{category.major}</span>
         {!isProtected && (
           <div className="item-actions">
-            <FaPen className="action-icon edit" onClick={() => setEditing({ type: 'major', major })} />
-            <FaTrash className="action-icon delete" onClick={() => deleteMajorCategory(major)} />
+            <FaPen className="action-icon edit" onClick={() => startEditing({ type: 'major', majorUuid: category.majorUuid })} />
+            <FaTrash className="action-icon delete" onClick={() => deleteMajorCategory(category.majorUuid)} />
           </div>
         )}
       </div>
@@ -475,13 +497,13 @@ const Categories = () => {
             </div>
             <div className="vertical-divider"></div>
             {/* Categories Columns */}
-            {categories.map(({ major, minors }) => (
-              <div className="category-column-wrapper" key={major}>
-              {renderHeader(major)}
+            {categories.map((category) => (
+              <div className="category-column-wrapper" key={category.majorUuid}>
+              {renderHeader(category)}
               <div className="card category-column">
-                {minors.map((minor, index) => renderItem(major, minor as MinorCategory, index))}
-                {minors.length < 20 && (
-                  <div className="category-item add-item" onClick={() => addMinorCategory(major)}>
+                {category.minors.map((minor) => renderItem(category.majorUuid, minor))}
+                {category.minors.length < 20 && (
+                  <div className="category-item add-item" onClick={() => addMinorCategory(category.majorUuid)}>
                     <FaPlusCircle />
                   </div>
                 )}

@@ -1,9 +1,10 @@
 import database
+import uuid
+from collections import defaultdict
 import os
 import json
 
 DEFAULT_CATEGORIES = {
-    "계좌": ["계좌1", "계좌2", "계좌3"],
     "고정수입": ["정기급여", "금융수입", "용돈"],
     "유동수입": ["상여금", "사업수입", "금융수입", "용돈", "기타수입"],
     "이체분류": ["내계좌이체", "이체", "저축", "현금", "투자"],
@@ -29,7 +30,6 @@ DEFAULT_CATEGORIES = {
 def initialize_default_categories():
     """accounts와 categories 테이블이 비어있으면 기본값으로 초기화합니다."""
     conn = database.get_db_connection()
-    # 테이블이 비어있는지 확인
     categories_count = conn.execute('SELECT COUNT(*) FROM categories').fetchone()[0]
     
     # 두 테이블이 모두 비어있을 때만 실행
@@ -55,6 +55,17 @@ def initialize_default_categories():
         print("Default data initialization complete.")
     conn.close()
 
+def get_next_major_code(cursor):
+    """사용중이지 않은 다음 대분류 코드 반환"""
+    cursor.execute("SELECT DISTINCT SUBSTR(uuid, 1, 1) AS major_code FROM categories WHERE LENGTH(uuid) > 1")
+    used_codes = {row['major_code'] for row in cursor.fetchall()}
+    for i in range(ord('A'), ord('Z') + 1):
+        code = chr(i)
+        if code not in used_codes:
+            return code
+    return -1
+    
+
 # DB에서 데이터를 불러와 프론트엔드 형식으로 변환하는 함수
 def load_categories_from_db():
     """DB에서 계좌와 카테고리를 읽어 프론트엔드 형식으로 그룹화하여 반환합니다."""
@@ -62,6 +73,7 @@ def load_categories_from_db():
     categories_cursor = conn.execute('''
         SELECT uuid, major, minor 
         FROM categories 
+        WHERE uuid IS NOT NULL AND minor IS NOT NULL
         ORDER BY major_order, minor_order
     ''').fetchall() # 카테고리 SELECT
     conn.close()

@@ -84,3 +84,37 @@ UI와 Python 백엔드 사이의 안전한 다리(통신 채널) 역할을 합�
 - 금액 열 내용은 클릭 시 숫자를 편집할 수 있도록 구성하며, 기본적으로 입력된 값은 모두 음수로 처리하며 파란색으로 출력하고, +1,000 처럼 앞에 +가 붙은 경우에만 입금으로 처리하며 빨간색으로 값 표시
 - 거래처, 메모는 선택 시 일반 텍스트 값 입력
 - 저장 클릭 시 메모 열을 제외한 모든 셀은 올바른 값이 채워져 있어야 하며, 빈 값이 있을 시 경고
+
+
+
+
+### DB 정의
+#### 대분류 테이블
+컬럼            타입        설명    
+id              i           PK
+name            string      대분류 이름
+display_order   i           표시 순서
+
+#### 소분류 테이블
+컬럼                타입        설명
+uuid                string      PK
+name                string      소분류 이름
+major_category_id   i           FK, 대분류 참조키
+display_order       i           표시 순서
+
+#### 계좌 테이블
+컬럼            타입        설명
+id              i           PK
+name            string      계좌 이름
+display_order   i           표시 순서
+
+#### 거래내역
+컬럼                타입        설명
+id                  i           PK
+transaction_date    string      거래날짜
+account_id          i           FK, 계좌id참조
+type                string      소비유형
+minor_category_uuid string      FK, 소분류 uuid 참조
+amount              i           금액
+merchant            string      거래처
+memo                string      메모

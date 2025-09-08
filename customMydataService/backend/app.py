@@ -226,4 +226,5 @@ def manage_accounts():
 
 # 이 파일이 직접 실행될 때만 서버를 실행
 if __name__ == '__main__':
-    app.run(debug=False, port=5000, host='0.0.0.0') # 실제 서비스 시 debug=False 권장
+    app.run(debug=False, port=5000) # 개발 시 debug=True
+    # app.run(debug=False, port=5000, host='0.0.0.0') # 실제 서비스 시 debug=False 권장
