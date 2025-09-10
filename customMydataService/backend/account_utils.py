@@ -57,13 +57,13 @@ def save_accounts(frontend_accounts):
         if not acc_name:
             continue
         
-        if isinstance(acc_id, int) and acc_id > 0:
+        if isinstance(acc_id, int):
             # 기존 계좌 업데이트
             cursor.execute(
                 'UPDATE accounts SET name = ?, display_order = ? WHERE id = ?',
                 (acc_name, display_order, acc_id)
             )
-        else:
+        elif isinstance(acc_id, str) and acc_id.startswith('tmp-'):
             # 새로운 계좌 추가
             cursor.execute(
                 'INSERT INTO accounts (name, display_order) VALUES (?, ?)',

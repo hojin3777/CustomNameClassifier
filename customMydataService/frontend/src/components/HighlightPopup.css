@@ -1,0 +1,44 @@
+.highlight-popup {
+  position: absolute;
+  background-color: var(--background-color-offset);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 6px;
+  display: flex;
+  gap: 6px;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.color-swatch-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.color-swatch-btn:hover {
+  background-color: var(--border-color);
+}
+
+.color-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color-heavy);
+}
+
+.color-swatch.none {
+  border-color: red;
+  background-color: transparent;
+}
+
+.color-swatch.none svg {
+  width: 100%;
+  height: 100%;
+}

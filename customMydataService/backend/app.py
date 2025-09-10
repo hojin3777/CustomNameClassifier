@@ -1,12 +1,17 @@
+import os
+import sqlite3
+import uuid
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
+from datetime import date
+
+# 유틸리티 모듈
 import ocr_service
 import classification_service
 import database
 import category_utils
 import account_utils
-import os
-from datetime import date
+import transaction_utils
 
 # Flask 앱 초기화
 app = Flask(__name__, static_folder='../frontend/dist', static_url_path='/')
@@ -18,6 +23,7 @@ print("Starting server...")
 # 1. DB 초기화
 try:
     database.init_db()
+    account_utils.initialize_default_accounts() # 계좌 기본값 채우기
     category_utils.initialize_default_categories() # 카테고리 기본값 채우기
 except Exception as e:
     print(f"ERROR: Database initialization failed - {e}")
@@ -78,72 +84,25 @@ def process_image_ocr():
 
 
 # ------------------- 거래내역 API -------------------
-@app.route('/api/transactions', methods=['GET'])
-def get_transactions():
+@app.route('/api/transactions', methods=['GET', 'POST'])
+def manage_transactions():
     """데이터베이스에 저장된 모든 거래 내역을 JOIN하여 조회합니다. (필요시 기본값 생성)"""
-    try:
-        all_trans = database.get_all_transactions_joined()
-
-        # ✨ 거래내역이 비어있을 때 기본값 생성 로직
-        if not all_trans:
-            print("No transactions found. Creating default entry...")
-            conn = database.get_db_connection()
-            # 계좌 DB의 첫 번째 값을 가져옵니다.
-            first_account_row = conn.execute('SELECT name FROM accounts ORDER BY id LIMIT 1').fetchone()
-            conn.close()
-
-            if first_account_row:
-                default_transaction = {
-                    "id": 1, # 첫 번째 거래내역이므로 ID를 1로 지정
-                    "date": date.today().strftime('%Y-%m-%d'),
-                    "account": first_account_row['name'],
-                    "type": '이체',
-                    "majorCategory": '이체분류',
-                    "minorCategory": '내계좌이체',
-                    "amount": 100000,
-                    "payee": '계좌등록',
-                    "memo": '첫 계좌의 초기 잔액을 입력하세요.'
-                }
-                # DB에 기본값 추가
-                database.add_single_transaction(default_transaction)
-                # 추가 후 데이터를 다시 불러옵니다.
-                all_trans = database.get_all_transactions_joined()
-            else:
-                print("No accounts found. Cannot create default transaction.")
-
-
-        # 프론트엔드 형식에 맞게 키 이름 변경
-        renamed_trans = [
-            {
-                "id": t["id"],
-                "checked": False,
-                "date": t["trans_date"],
-                "account": t["account"],
-                "type": t["type"],
-                "majorCategory": t["major_category"],
-                "minorCategory": t.get("minor_category", ""),
-                "amount": t["amount"],
-                "payee": t["merchant"],
-                "memo": t["memo"]
-            } for t in all_trans
-        ]
-        return jsonify(renamed_trans)
-    except Exception as e:
-        print(f"Error fetching transactions: {e}")
-        return jsonify({"error": "Failed to fetch transactions"}), 500
-
-# ✨ 거래내역 저장 API 엔드포인트 추가
-@app.route('/api/transactions', methods=['POST'])
-def update_transactions():
-    """프론트엔드에서 받은 거래내역 데이터를 DB에 저장하고 결과를 반환합니다."""
-    transactions_data = request.get_json()
-    try:
-        database.save_all_transactions(transactions_data)
-        # 저장 후, 최신 데이터를 다시 불러와서 반환 (get_transactions 로직 재사용)
-        return get_transactions()
-    except Exception as e:
-        print(f"Error saving transactions: {e}")
-        return jsonify({"error": str(e)}), 500
+    if request.method == 'GET':
+        try:
+            transactions = transaction_utils.load_transactions()
+            return jsonify(transactions)
+        except Exception as e:
+            print(f"Error loading transactions: {e}")
+            return jsonify({"error": "Failed to load transactions"}), 500
+    
+    if request.method == 'POST':
+        try:
+            frontend_data = request.get_json()
+            updated_transactions = transaction_utils.save_transactions(frontend_data)
+            return jsonify(updated_transactions)
+        except Exception as e:
+            print(f"Error saving transactions: {e}")
+            return jsonify({"error": "Failed to save transactions"}), 500
 
 @app.route('/api/transactions/reset', methods=['POST'])
 def reset_transactions():
@@ -155,16 +114,37 @@ def reset_transactions():
         print(f"Error resetting transactions: {e}")
         return jsonify({"error": str(e)}), 500
 
+# -------------------- 계좌 카테고리 초기화 -------------------
+@app.route('/api/initialize-defaults', methods=['POST'])
+def initialize_defaults():
+    """계좌와 카테고리 테이블을 기본값으로 초기화합니다."""
+    try:
+        conn = database.get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute('DELETE FROM accounts')
+        cursor.execute('DELETE FROM major_categories')
+        cursor.execute('DELETE FROM minor_categories')
+        conn.commit()
+        conn.close()
+
+        account_utils.initialize_default_accounts()
+        category_utils.initialize_default_categories()
+        return jsonify({"message": "Default accounts and categories initialized successfully."}), 200
+    except Exception as e:
+        print(f"Error initializing defaults: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
 # ------------------- 카테고리 API -------------------
 @app.route('/api/categories', methods=['GET', 'POST'])
 def manage_categories():
     if request.method == 'GET':
-        categories = category_utils.load_categories_from_db()
+        categories = category_utils.load_categories()
         return jsonify(categories)
     if request.method == 'POST':
         data = request.get_json()
-        category_utils.save_categories_to_db(data)
-        return jsonify({"status": "success", "message": "Categories saved successfully"})
+        updated_categories = category_utils.save_categories(data)
+        return jsonify(updated_categories)
 
 
 @app.route('/api/categories/usage', methods=['GET'])
@@ -173,44 +153,10 @@ def get_category_usage():
     if not uuid:
         return jsonify({"error": "UUID parameter is required."}), 400
     try:
-        in_use = database.is_category_in_use(uuid)
+        in_use = database.is_minor_category_in_use(uuid)
         return jsonify({"in_use": in_use})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-@app.route('/api/categories/minor', methods=['PUT'])
-def update_minor_category():
-    """단일 소분류 카테고리의 이름을 변경합니다."""
-    try:
-        data = request.json
-        old_major = data.get('oldMajor')
-        old_minor = data.get('oldMinor')
-        new_minor = data.get('newMinor')
-
-        if not all([old_major, old_minor, new_minor]):
-            return jsonify({"error": "필수 정보가 누락되었습니다."}), 400
-
-        database.update_minor_category_name(old_major, old_minor, new_minor)
-        return jsonify({"message": "카테고리 이름이 성공적으로 변경되었습니다."})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 400
-
-# ✨ 2. 카테고리 삭제(DELETE) API 추가
-@app.route('/api/categories/minor', methods=['DELETE'])
-def delete_minor_category():
-    """단일 소분류 카테고리를 삭제합니다. 사용 중인 경우 오류를 반환합니다."""
-    try:
-        data = request.json
-        major = data.get('major')
-        minor = data.get('minor')
-
-        if not all([major, minor]):
-            return jsonify({"error": "필수 정보가 누락되었습니다."}), 400
-
-        database.delete_minor_category_if_unused(major, minor)
-        return jsonify({"message": "카테고리가 성공적으로 삭제되었습니다."})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 400
 
 # ------------------- 계좌 API -------------------
 @app.route('/api/accounts', methods=['GET', 'POST'])
@@ -220,8 +166,19 @@ def manage_accounts():
         return jsonify(accounts)
     if request.method == 'POST':
         data = request.get_json()
-        account_utils.save_accounts(data)
-        return jsonify({"status": "success"})
+        updated_accounts = account_utils.save_accounts(data)
+        return jsonify(updated_accounts)
+    
+@app.route('/api/accounts/usage', methods=['GET'])
+def get_account_usage():
+    account_id = request.args.get('id', type=int)
+    if account_id is None:
+        return jsonify({"error": "Account ID parameter is required."}), 400
+    try:
+        in_use = database.is_account_in_use(account_id)
+        return jsonify({"in_use": in_use})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 # 이 파일이 직접 실행될 때만 서버를 실행

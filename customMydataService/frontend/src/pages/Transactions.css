@@ -3,9 +3,14 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  height: 100vh;
+  overflow: hidden;
 }
-
+.main-header{
+  flex-shrink: 0;
+}
 .transactions-toolbar {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   padding: 8px 12px;
@@ -39,11 +44,30 @@
 
 /* Table Styles */
 .table-container {
+  flex-grow: 1;
   width: 100%;
+  overflow-y: auto;
   overflow-x: auto;
+  position: relative;
   background-color: var(--color-background-secondary);
   border-radius: 8px;
   border: 1px solid var(--color-border);
+}
+.table-container::-webkit-scrollbar {
+  width: 10px; /* 스크롤바 너비 */
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: var(--background-color-offset); /* 트랙 배경색 */
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: #555; /* 스크롤바 색상 */
+  border-radius: 5px; /* 둥근 모서리 */
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: #777; /* 호버 시 스크롤바 색상 */
 }
 
 table {
@@ -51,12 +75,11 @@ table {
   border-collapse: collapse;
 }
 
-/* ✨ 1. 테이블 셀 스타일 통합 및 오류 수정 */
+/* 테이블 셀 스타일 통합 및 오류 수정 */
 .table-container th, 
 .table-container td {
-  padding: 12px 15px;
+  padding: 8px 12px;
   white-space: nowrap;
-  /* 정의되지 않은 변수를 var(--color-border)로 수정 */
   border-bottom: 1px solid var(--color-border); 
   border-right: 1px solid var(--color-border);
 }
@@ -73,8 +96,10 @@ table {
   font-weight: 600;
   text-align: center;
   position: sticky;
+  position: sticky;
   top: 0;
   z-index: 10;
+  border-bottom: 2px solid var(--border-color-heavy);
 }
 
 /* 헤더 컨텐츠 (클릭 영역) */
@@ -171,4 +196,20 @@ td.editing select option {
 
 .react-datepicker-popper {
   z-index: 10;
+}
+
+/* 편집 모드 강조 스타일 */
+.bold-row td{
+  font-weight: bold;
+}
+.highlighted-row-1 { background-color: #FFF38A; }
+.highlighted-row-2 { background-color: #AEE4FF; }
+.highlighted-row-3 { background-color: #FFC1D6; }
+.highlighted-row-4 { background-color: #B8F3B8; }
+.highlighted-row-5 { background-color: #FFDDAA; }
+.highlighted-row-6 { background-color: #E0C8FF; }
+
+/* 하이라이트된 행의 텍스트 색상을 어둡게 하여 가독성 확보 */
+[class*="highlighted-row-"] td {
+  color: #222;
 }

@@ -30,12 +30,19 @@ const FilterPopup: React.FC<FilterPopupProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedValues, setSelectedValues] = useState<any[]>(appliedFilters);
 
-  const uniqueValues = useMemo(() => Array.from(new Set(allValues)).sort(), [allValues]);
+  const uniqueValues = useMemo(() => {
+    return Array.from(new Set(allValues)).sort((a,b) => {
+      const strA = a === null || a === undefined ? '' : String(a);
+      const strB = b === null || b === undefined ? '' : String(b);
+      return strA.localeCompare(strB);
+    });
+  }, [allValues]);
 
   const filteredOptions = useMemo(() => {
-    return uniqueValues.filter(value =>
-      value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    return uniqueValues.filter(value => {
+      const stringValue = String(value ?? '').toLowerCase();
+      return stringValue.includes(searchTerm.toLowerCase());
+    });
   }, [uniqueValues, searchTerm]);
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,7 +102,7 @@ const FilterPopup: React.FC<FilterPopupProps> = ({
                   checked={selectedValues.includes(value)}
                   onChange={() => handleValueChange(value)}
                 />
-                {value.toString() || '(비어 있음)'}
+                {value?.toString() || '(비어 있음)'}
               </label>
             ))}
           </div>

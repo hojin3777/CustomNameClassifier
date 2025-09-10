@@ -62,12 +62,37 @@ def init_db():
             amount INTEGER NOT NULL,
             merchant TEXT NOT NULL,
             memo TEXT,
-            FOREIGN KEY (account_id) REFERENCES accounts (id),
-            FOREIGN KEY (minor_category_uuid) REFERENCES minor_categories (uuid),
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            is_bold INTEGER DEFAULT 0,
+            is_highlighted INTEGER DEFAULT 0,
+            FOREIGN KEY (account_id) REFERENCES accounts (id) ON DELETE SET NULL,
+            FOREIGN KEY (minor_category_uuid) REFERENCES minor_categories (uuid) ON DELETE SET NULL
         )
     ''')
 
     conn.commit()
     conn.close()
     print(f"Database and tables created successfully created at: {DB_PATH}")
+
+def is_account_in_use(account_id):
+    """특정 계좌가 거래내역에서 사용 중인지 확인합니다."""
+    conn = get_db_connection()
+    count = conn.execute('SELECT COUNT(*) FROM transactions WHERE account_id = ?', (account_id,)).fetchone()[0]
+    conn.close()
+    return count > 0
+
+def is_minor_category_in_use(minor_uuid):
+    """특정 소분류가 거래내역에서 사용 중인지 확인합니다."""
+    conn = get_db_connection()
+    count = conn.execute('SELECT COUNT(*) FROM transactions WHERE minor_category_uuid = ?', (minor_uuid,)).fetchone()[0]
+    conn.close()
+    return count > 0
+
+def reset_all_transactions():
+    """거래내역 테이블을 초기화합니다."""
+    conn = get_db_connection()
+    conn.execute('DELETE FROM transactions')
+    conn.execute('DELETE FROM sqlite_sequence WHERE name="transactions"')  # AUTOINCREMENT 초기화
+    conn.commit()
+    conn.close()
+    print("All transactions have been reset.")

@@ -1,8 +1,5 @@
 import database
 import uuid
-from collections import defaultdict
-import os
-import json
 
 DEFAULT_CATEGORIES = {
     "고정수입": ["정기급여", "금융수입", "용돈"],
@@ -30,141 +27,150 @@ DEFAULT_CATEGORIES = {
 def initialize_default_categories():
     """accounts와 categories 테이블이 비어있으면 기본값으로 초기화합니다."""
     conn = database.get_db_connection()
-    categories_count = conn.execute('SELECT COUNT(*) FROM categories').fetchone()[0]
+    cursor = conn.cursor()
+    major_count = cursor.execute('SELECT COUNT(*) FROM major_categories').fetchone()[0]
     
-    # 두 테이블이 모두 비어있을 때만 실행
-    if categories_count == 0:
-        print("Initializing default categories in the database...")
-        major_order_index = 0
-        major_code_char_code = ord('A')
-        for major, minors in DEFAULT_CATEGORIES.items():
-                major_code = chr(major_code_char_code)
-                minor_order_index = 0
-                minor_num = 1
-                for minor in minors:
-                    uuid = f"{major_code}{minor_num}"
-                    conn.execute(
-                        'INSERT INTO categories (uuid, major, minor, major_order, minor_order) VALUES (?, ?, ?, ?, ?)',
-                        (uuid, major, minor, major_order_index, minor_order_index)
-                    )
-                    minor_order_index += 1
-                    minor_num += 1
-                major_order_index += 1
-                major_code_char_code += 1
-        conn.commit()
-        print("Default data initialization complete.")
-    conn.close()
+    if major_count == 0:
+        print("Categories table is empty. Initializing default categories...")
+        for major_order, (major_name, minors) in enumerate(DEFAULT_CATEGORIES.items()):
+            cursor.execute(
+                'INSERT INTO major_categories (name, display_order) VALUES (?, ?)',
+                (major_name, major_order)
+            )
+            major_id = cursor.lastrowid
 
-def get_next_major_code(cursor):
-    """사용중이지 않은 다음 대분류 코드 반환"""
-    cursor.execute("SELECT DISTINCT SUBSTR(uuid, 1, 1) AS major_code FROM categories WHERE LENGTH(uuid) > 1")
-    used_codes = {row['major_code'] for row in cursor.fetchall()}
-    for i in range(ord('A'), ord('Z') + 1):
-        code = chr(i)
-        if code not in used_codes:
-            return code
-    return -1
-    
+            # 해당 대분류에 속한 소분류 추가
+            minor_list_to_insert = []
+            for minor_order, minor_name in enumerate(minors):
+                minor_list_to_insert.append({
+                    "uuid": str(uuid.uuid4()),
+                    "name": minor_name,
+                    "major_category_id": major_id,
+                    "display_order": minor_order
+                })
+            
+            cursor.executemany(
+                """
+                INSERT INTO minor_categories (uuid, name, major_category_id, display_order)
+                VALUES (:uuid, :name, :major_category_id, :display_order)
+                """,
+                minor_list_to_insert
+            )
+        conn.commit()
+        print("Default categories initialization complete.")
+    conn.close()
 
 # DB에서 데이터를 불러와 프론트엔드 형식으로 변환하는 함수
-def load_categories_from_db():
-    """DB에서 계좌와 카테고리를 읽어 프론트엔드 형식으로 그룹화하여 반환합니다."""
+def load_categories():
+    """
+    DB에서 모든 카테고리를 로드하여 프론트엔드 형식에 맞게 그룹화하여 반환합니다.
+    """
     conn = database.get_db_connection()
-    categories_cursor = conn.execute('''
-        SELECT uuid, major, minor 
-        FROM categories 
-        WHERE uuid IS NOT NULL AND minor IS NOT NULL
-        ORDER BY major_order, minor_order
-    ''').fetchall() # 카테고리 SELECT
+    
+    # 1. 모든 대분류를 순서대로 가져옵니다.
+    majors_cursor = conn.execute('SELECT id, name FROM major_categories ORDER BY display_order').fetchall()
+    
+    # 2. 모든 소분류를 순서대로 가져옵니다.
+    minors_cursor = conn.execute('SELECT uuid, name, major_category_id FROM minor_categories ORDER BY display_order').fetchall()
     conn.close()
 
-    final_data = []
-    if categories_cursor:
-        # 마지막으로 처리한 대분류를 추적
-        last_major = None
-        for row in categories_cursor:
-            major, minor, uuid = row['major'], row['minor'], row['uuid']
-            minor_obj = {"name": minor, "uuid": uuid}
-            # 새로운 대분류를 만나면, final_data에 새 객체를 추가
-            if major != last_major:
-                final_data.append({"major": major, "minors": [minor_obj]})
-                last_major = major
-            # 같은 대분류이면, 마지막 객체의 minors 배열에 소분류만 추가
-            else:
-                final_data[-1]["minors"].append(minor)
-            
-    return final_data
+    # 3. 대분류 ID를 키로 하는 딕셔너리를 만들어 데이터를 효율적으로 조립합니다.
+    # 프론트엔드가 사용할 데이터 구조: {id: 1, name: '...', minors: [...]}
+    categories_map = {
+        row['id']: {"id": row['id'], "name": row['name'], "minors": []}
+        for row in majors_cursor
+    }
+
+    # 4. 소분류를 순회하며 적절한 대분류의 'minors' 리스트에 추가합니다.
+    for minor in minors_cursor:
+        major_id = minor['major_category_id']
+        if major_id in categories_map:
+            categories_map[major_id]['minors'].append({
+                "uuid": minor['uuid'],
+                "name": minor['name']
+            })
+    
+    # 5. 딕셔너리의 값들만 리스트로 변환하여 최종 반환합니다.
+    return list(categories_map.values())
 
 # 프론트엔드에서 받은 데이터로 DB를 업데이트하는 함수
-def save_categories_to_db(data):
+def save_categories(frontend_data):
+    """
+    프론트엔드에서 받은 카테고리 리스트를 기준으로 DB를 지능적으로 업데이트합니다.
+    (INSERT, UPDATE, DELETE, MOVE)
+    """
     conn = database.get_db_connection()
     cursor = conn.cursor()
 
-    # --- 2. 카테고리 지능형 업데이트 ---
-    db_categories_raw = cursor.execute('SELECT id, uuid, major, minor FROM categories').fetchall()
-    db_categories_by_uuid = {row['uuid']: row for row in db_categories_raw}
-    
-    major_codes = {row['uuid'][0] for row in db_categories_raw}
-    next_major_code_char_code = ord('A')
-    while chr(next_major_code_char_code) in major_codes:
-        next_major_code_char_code += 1
+    # --- 1. DB의 현재 상태 파악 ---
+    db_major_ids = {row['id'] for row in cursor.execute('SELECT id FROM major_categories').fetchall()}
+    db_minor_uuids = {row['uuid'] for row in cursor.execute('SELECT uuid FROM minor_categories').fetchall()}
 
-    major_to_code_map = {}
-    for uuid_val, row in db_categories_by_uuid.items():
-        if row['major'] not in major_to_code_map:
-            major_to_code_map[row['major']] = uuid_val[0]
+    # --- 2. 프론트엔드의 최종 상태 파악 ---
+    frontend_major_ids = {cat['id'] for cat in frontend_data if isinstance(cat.get('id'), int)}
+    frontend_minor_uuids = {
+        minor['uuid'] 
+        for cat in frontend_data 
+        for minor in cat.get('minors', []) 
+        if isinstance(minor.get('uuid'), str) and not minor['uuid'].startswith('tmp-')
+    }
 
-    frontend_uuids = set()
-    major_order_index = 0
-    # '계좌'를 제외한 카테고리만 순회
-    for item in [d for d in data if d.get('major') != '계좌']:
-        major = item['major']
-        if not major: continue
+    # --- 3. 삭제 처리 (가장 먼저 수행) ---
+    # 삭제된 대분류 처리 (ON DELETE CASCADE에 의해 소속된 소분류도 함께 삭제됨)
+    majors_to_delete = db_major_ids - frontend_major_ids
+    if majors_to_delete:
+        cursor.executemany('DELETE FROM major_categories WHERE id = ?', [(id,) for id in majors_to_delete])
 
-        if major not in major_to_code_map:
-            major_code = chr(next_major_code_char_code)
-            major_to_code_map[major] = major_code
-            next_major_code_char_code += 1
+    # (대분류 이동 등으로 인해) 개별적으로 삭제된 소분류 처리
+    minors_to_delete = db_minor_uuids - frontend_minor_uuids
+    if minors_to_delete:
+        cursor.executemany('DELETE FROM minor_categories WHERE uuid = ?', [(uuid,) for uuid in minors_to_delete])
+
+    # --- 4. 추가 / 업데이트 / 이동 처리 ---
+    for major_order, major_cat in enumerate(frontend_data):
+        major_id = major_cat.get('id')
+        major_name = major_cat.get('name')
+
+        # 4-1. 대분류 처리
+        if isinstance(major_id, str) and major_id.startswith('tmp-'):
+            # 신규 대분류 INSERT
+            cursor.execute(
+                'INSERT INTO major_categories (name, display_order) VALUES (?, ?)',
+                (major_name, major_order)
+            )
+            major_id = cursor.lastrowid # 새로 생성된 실제 ID를 가져옴
         else:
-            major_code = major_to_code_map[major]
+            # 기존 대분류 이름 및 순서 UPDATE
+            cursor.execute(
+                'UPDATE major_categories SET name = ?, display_order = ? WHERE id = ?',
+                (major_name, major_order, major_id)
+            )
         
-        next_minor_num = 1
-        for uuid_key in db_categories_by_uuid:
-            if uuid_key.startswith(major_code):
-                try:
-                    num = int(uuid_key[1:])
-                    if num >= next_minor_num:
-                        next_minor_num = num + 1
-                except (ValueError, IndexError):
-                    continue
+        # 4-2. 소분류 처리
+        for minor_order, minor_cat in enumerate(major_cat.get('minors', [])):
+            minor_uuid = minor_cat.get('uuid')
+            minor_name = minor_cat.get('name')
 
-        minor_order_index = 0
-        for minor_item in item.get('minors', []):
-            # ✨ 여기서 minor_item이 객체임을 보장합니다.
-            minor_name = minor_item.get('name')
-            minor_uuid = minor_item.get('uuid')
-
-            if minor_uuid and minor_uuid in db_categories_by_uuid:
-                frontend_uuids.add(minor_uuid)
+            if isinstance(minor_uuid, str) and minor_uuid.startswith('tmp-'):
+                # 신규 소분류 INSERT
+                new_uuid = str(uuid.uuid4())
                 cursor.execute(
-                    'UPDATE categories SET major = ?, minor = ?, major_order = ?, minor_order = ? WHERE uuid = ?',
-                    (major, minor_name, major_order_index, minor_order_index, minor_uuid)
+                    '''INSERT INTO minor_categories (uuid, name, major_category_id, display_order) 
+                       VALUES (?, ?, ?, ?)''',
+                    (new_uuid, minor_name, major_id, minor_order)
                 )
             else:
-                new_uuid = f"{major_code}{next_minor_num}"
-                frontend_uuids.add(new_uuid)
+                # 기존 소분류 이름, 순서, 그리고 소속 대분류(major_category_id)까지 모두 UPDATE
+                # 이를 통해 '대분류 간 이동'이 완벽하게 처리됨.
                 cursor.execute(
-                    'INSERT INTO categories (uuid, major, minor, major_order, minor_order) VALUES (?, ?, ?, ?, ?)',
-                    (new_uuid, major, minor_name, major_order_index, minor_order_index)
+                    '''UPDATE minor_categories 
+                       SET name = ?, major_category_id = ?, display_order = ? 
+                       WHERE uuid = ?''',
+                    (minor_name, major_id, minor_order, minor_uuid)
                 )
-                next_minor_num += 1
-            minor_order_index += 1
-        major_order_index += 1
-
-    uuids_to_delete = set(db_categories_by_uuid.keys()) - frontend_uuids
-    if uuids_to_delete:
-        delete_tuple = tuple(uuids_to_delete)
-        cursor.execute(f"DELETE FROM categories WHERE uuid IN ({','.join('?'*len(delete_tuple))})", delete_tuple)
 
     conn.commit()
     conn.close()
+
+    # ✨ 변경사항이 적용된 최신 목록을 다시 로드하여 프론트엔드에 반환합니다.
+    return load_categories()
