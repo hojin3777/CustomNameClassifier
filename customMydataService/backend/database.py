@@ -64,7 +64,9 @@ def init_db():
             memo TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             is_bold INTEGER DEFAULT 0,
-            is_highlighted INTEGER DEFAULT 0,
+            flag_color_id INTEGER DEFAULT 0,
+            highlight_color_id INTEGER DEFAULT 0,
+            background_color_id INTEGER DEFAULT 0,
             FOREIGN KEY (account_id) REFERENCES accounts (id) ON DELETE SET NULL,
             FOREIGN KEY (minor_category_uuid) REFERENCES minor_categories (uuid) ON DELETE SET NULL
         )

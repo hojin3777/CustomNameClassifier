@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react'; // useRef 추가
 import { FaSave, FaUndo, FaTrash,
-  FaBold, FaHighlighter,
+  FaBold, FaHighlighter, FaFlag, FaFillDrip,
   FaCaretDown, FaArrowUp, FaArrowDown, FaFilter,
   FaPlus, FaArrowRight, FaAngleDoubleDown } from 'react-icons/fa'; // 각 아이콘 로드
 import DatePicker from 'react-datepicker';
@@ -12,6 +12,8 @@ import FilterPopup from './FilterPopup'; // ✨ 1. FilterPopup 컴포넌트 impo
 import './FilterPopup.css'; // ✨ FilterPopup CSS import
 import ConfirmPopup from '../components/ConfirmPopup'; // ✨ ConfirmPopup 컴포넌트 import
 import '../components/ConfirmPopup.css'; // ✨ ConfirmPopup CSS import
+import HighlightPopup from '../components/HighlightPopup'; // ✨ HighlightPopup 컴포넌트 import
+import '../components/HighlightPopup.css'; // ✨ HighlightPopup CSS import
 
 // ******* 타입 정의 *******
 type Account = { id: number; name: string; };
@@ -28,7 +30,9 @@ export type Transaction = {
   merchant: string;
   memo: string;
   is_bold: number; // 0 또는 1
-  is_highlighted: number; // 0 또는 1
+  flag_color_id: number; // 0 또는 1
+  highlight_color_id: number; // 0~6
+  background_color_id: number; // 0~6
 
   account_id: number | null; // 계좌 ID
   minor_category_uuid: string | null; // 소분류 UUID
@@ -51,9 +55,11 @@ const Transactions = () => {
   // state 정의
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [originalTransactions, setOriginalTransactions] = useState<Transaction[]>([]);
+  const [checkedRows, setCheckedRows] = useState<Set<number | string>>(new Set());
   const [appData, setAppData] = useState<Appdata>({ accounts: [], categories: [] });
 
   const [editingCell, setEditingCell] = useState<{ rowId: number | string; column: keyof Transaction | null } | null>(null);
+  const editingCellRef = useRef<any>(null);
   const [filters, setFilters] = useState<{ [key: string]: any[] }>({});
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
   const [activeFilter, setActiveFilter] = useState<{ column: keyof Transaction, name: string } | null>(null);
@@ -63,16 +69,55 @@ const Transactions = () => {
   const [status, setStatus] = useState('Loading...');
   const tableContainerRef = useRef<HTMLDivElement>(null); // 테이블 컨테이너 참조
   
+  // highlight 팝업 관련 state
+  const [isColorPopupOpen, setColorPopupOpen] = useState(false);
+  const [colorPopupPosition, setColorPopupPosition] = useState({ top: 0, left: 0 });
+  const [activeStyleType, setActiveStyleType] = useState<'flag' | 'highlight' | 'background' | null>(null);
+
   // dirty state
   const dirtyContext = useDirty();
   const isDirty = dirtyContext?.isDirty ?? false;
   const setIsDirty = dirtyContext?.setIsDirty ?? (() => {});
 
+
+  // ESC키로 팝업 닫기
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setActiveFilter(null);
+        setColorPopupOpen(false);
+        if (editingCell) {
+          setEditingCell(null);
+        }
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [editingCell]);
+  // 외부 클릭 감지하여 편집 완료처리
+  useEffect(() => {
+    if(!editingCell) return;
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (editingCellRef.current && !editingCellRef.current.contains(event.target as Node)) {
+        const nodeName = editingCellRef.current.nodeName;
+        if (nodeName === 'INPUT' ) {
+          const value = editingCellRef.current.value;
+          handleUpdateCell(editingCell.rowId, editingCell.column!, value);
+        }
+        setEditingCell(null);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, [editingCell]);
+
+  // ******* dirty 상태 감지 *******
   useEffect(() => {
     const isDifferent = JSON.stringify(transactions) !== JSON.stringify(originalTransactions);
     setIsDirty(isDifferent);
   }, [transactions, originalTransactions, setIsDirty]);
 
+  // ******* 언마운트/새로고침 방지 *******
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (isDirty) {
@@ -106,6 +151,7 @@ const Transactions = () => {
       setTransactions(processedTrans);
       setOriginalTransactions(processedTrans);
       setAppData({ accounts: accData, categories: catData });
+      setCheckedRows(new Set());
       setStatus('Loaded successfully');
       setTimeout(() => setStatus(''), 3000);
     } catch (error) {
@@ -118,7 +164,49 @@ const Transactions = () => {
 
 
   // ******* 데이터 저장/초기화 *******
+  // 빈 셀 체크 후 저장
   const handleSave = async () => {
+    let emptyCellFound = null;
+    for (const t of transactions) {
+      if (t.account_id === null) {
+       emptyCellFound = { rowId: t.id, column: 'account_name' as keyof Transaction };
+        break;
+      }
+      if (t.minor_category_uuid === null) {
+        emptyCellFound = { rowId: t.id, column: 'minor_category_name' as keyof Transaction };
+        break;
+      }
+      if (t.merchant === '') {  
+        emptyCellFound = { rowId: t.id, column: 'merchant' as keyof Transaction };
+        break;
+      }
+      if (t.amount === null) {
+        emptyCellFound = { rowId: t.id, column: 'amount' as keyof Transaction };
+        break;
+      }
+    }
+    if (emptyCellFound) {
+      setConfirmPopup({
+        isOpen: true,
+        type: 'confirm',
+        title: '미입력 항목 경고',
+        message: '필수 입력 항목이 비어 있습니다. 해당 행을 제외하고 저장을 진행하시겠습니까?',
+        onConfirm: () => {
+          setConfirmPopup(prev => ({ ...prev, isOpen: false }));
+          proceedSave();
+        },
+        onCancel: () => {
+          scrollToAndHighlightCell(emptyCellFound);
+          setConfirmPopup(prev => ({ ...prev, isOpen: false }));
+        },
+      });
+      return;
+    }
+    proceedSave();
+  };
+  
+  // 실제 저장 로직
+  const proceedSave = async () => {
     setStatus('Saving...');
     try{
       const payload = transactions.map(t => ({
@@ -131,7 +219,9 @@ const Transactions = () => {
         account_id: t.account_id,
         minor_category_uuid: t.minor_category_uuid,
         is_bold: t.is_bold,
-        is_highlighted: t.is_highlighted,
+        flag_color_id: t.flag_color_id,
+        highlight_color_id: t.highlight_color_id,
+        background_color_id: t.background_color_id
     }));
     const response = await fetch(`${API_BASE_URL}/api/transactions`, {
       method: 'POST',
@@ -152,6 +242,41 @@ const Transactions = () => {
     await fetchAllData(); // 저장 실패 시 데이터 다시 불러오기
   }};
 
+  // 빈 셀 스크롤
+  const scrollToAndHighlightCell = (cellinfo: { rowId: number | string; column: keyof Transaction }) => {
+    const cellId = `cell-${cellinfo.rowId}-${cellinfo.column}`;
+    const cellElement = document.getElementById(cellId);
+    const containerElement = tableContainerRef.current;
+    if (cellElement && containerElement) {
+      // element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const duration = 200; // 스크롤 지속 시간 (ms). 이 값을 줄이면 더 빨라집니다.
+      const start = containerElement.scrollTop;
+      const end = cellElement.offsetTop - (containerElement.clientHeight / 2) + (cellElement.clientHeight / 2);
+      const distance = end - start;
+      let startTime: number | null = null;
+      // 애니메이션을 실행하는 함수
+      const step = (timestamp: number) => {
+        if (!startTime) {
+          startTime = timestamp;
+        }
+        const elapsed = timestamp - startTime;
+        const progress = Math.min(elapsed / duration, 1); // 0과 1 사이의 진행률
+        const easeInOutQuad = progress < 0.5 ? 2 * progress * progress : -1 + (4 - 2 * progress) * progress; // 부드러운 시작과 끝을 위한 Easing 함수 적용
+        containerElement.scrollTop = start + distance * easeInOutQuad;
+        if (elapsed < duration) {
+          requestAnimationFrame(step); // 애니메이션이 끝나지 않았으면 다음 프레임 요청
+        }
+      };
+      requestAnimationFrame(step); // 애니메이션 시작
+      cellElement.classList.add('highlight-error');
+      setTimeout(() => {
+        cellElement.classList.remove('highlight-error');
+      }, 3000);
+    }
+  };
+
+
+  // 초기화(모든 데이터 삭제) 핸들러
   const handleReset = () => {
     setConfirmPopup({
       isOpen: true,
@@ -177,7 +302,7 @@ const Transactions = () => {
     });
   };
 
-  // ******* 편집 관련 핸들러 *******
+  // ******* 툴박스 관련 핸들러 *******
   // 행 추가 핸들러
   const handleAddRow = () => {
     const newRow: Transaction = {
@@ -194,14 +319,17 @@ const Transactions = () => {
       major_category_name: null,
       minor_category_name: null,
       is_bold: 0,
-      is_highlighted: 0,
+      flag_color_id: 0,
+      highlight_color_id: 0,
+      background_color_id: 0
     };
     let lastCheckedIndex = -1;
-    for (let i = transactions.length - 1; i >= 0; i--) {
-      if (transactions[i].checked) {
+    if (checkedRows.size > 0){
+      for (let i = transactions.length - 1; i >= 0; i--) {
+      if (checkedRows.has(transactions[i].id)) {
         lastCheckedIndex = i;
         break;
-      }
+      }}
     }
     if (lastCheckedIndex === -1) { // 선택된 행이 없으면 맨 뒤에 추가
       setTransactions(prev => [...prev, newRow]);
@@ -216,8 +344,7 @@ const Transactions = () => {
 
   // handleDeleteSelected 함수를 커스텀 팝업을 사용하도록 수정
   const handleDeleteSelected = () => {
-    const selectedCount = transactions.filter(t => t.checked).length;
-    if (selectedCount === 0) {
+    if (checkedRows.size === 0) {
       setConfirmPopup({
         isOpen: true,
         type: 'alert', // 일반 정보 팝업
@@ -228,41 +355,51 @@ const Transactions = () => {
       });
       return;
     }
-
     setConfirmPopup({
       isOpen: true,
       type: 'confirm',
       title: '',
-      message: `${selectedCount}개의 행을 삭제하시겠습니까?`,
+      message: `${checkedRows.size}개의 행을 삭제하시겠습니까?`,
       onConfirm: () => {
-        setTransactions(prev => prev.filter(t => !t.checked));
+        setTransactions(prev => prev.filter(t => !checkedRows.has(t.id)));
+        setCheckedRows(new Set());
         setConfirmPopup({ ...confirmPopup, isOpen: false });
       },
       onCancel: () => setConfirmPopup({ ...confirmPopup, isOpen: false }),      
     });
   };
 
-  // 스타일 토글 핸들러
-  const toggleStyle = (style: 'is_bold' | 'is_highlighted', value?: number) => {
+  // 서식 지정 핸들러
+  const handleApplyBold = () => {
     setTransactions(prev =>
-      prev.map(t => {
-        if(!t.checked) return t;
-        if(style === 'is_bold'){
-          return {...t, is_bold: t.is_bold === 1 ? 0 : 1};
-        }
-        // is_highlighted 는 추후 구현
-        return t;
-      })
+      prev.map(t =>
+        checkedRows.has(t.id) ? { ...t, is_bold: t.is_bold === 1 ? 0 : 1 } : t
+      )
     );
   };
+  const handleApplyColor = (colorId: number) => {
+    if (!activeStyleType) return;
 
+    const styleKey = `${activeStyleType}_color_id` as const;
+
+    setTransactions(prev =>
+      prev.map(t =>
+        checkedRows.has(t.id) ? { ...t, [styleKey]: colorId } : t
+      )
+    );
+    setColorPopupOpen(false); // 색상 선택 후 팝업 닫기
+  };
+
+  // 스타일 팝업 열기 핸들러
+  const handleOpenColorPopup = (e: React.MouseEvent, type: 'flag' | 'highlight' | 'background') => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setColorPopupPosition({ top: rect.bottom + 5, left: rect.left });
+    setActiveStyleType(type);
+    setColorPopupOpen(true);
+  };
+
+  // 맨 아래로 스크롤 핸들러
   const handleScrollToBottom = () => {
-    // if (tableContainerRef.current) {
-    //   tableContainerRef.current.scrollTo({
-    //     top: tableContainerRef.current.scrollHeight,
-    //     behavior: 'smooth',
-    //   });
-    // }
     const element = tableContainerRef.current;
     if (!element) return;
 
@@ -353,18 +490,28 @@ const Transactions = () => {
   // ******* 체크박스 관련 핸들러 *******
   // 개별 행 체크박스 토글 핸들러
   const handleToggleCheck = (rowId: number | string) => {
-    setTransactions(prev => prev.map(t => t.id === rowId ? { ...t, checked: !t.checked } : t));
+    setCheckedRows(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(rowId)) {
+        newSet.delete(rowId);
+      } else {
+        newSet.add(rowId);
+      }
+      return newSet;
+    });
   };
   // 선택된 행이 하나라도 있는지 여부
-  const hasCheckedRows = useMemo(() => transactions.some(t => t.checked), [transactions]);
+  const hasCheckedRows = checkedRows.size > 0;
   // 전체 선택 체크박스 토글 핸들러
   const handleToggleCheckAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     const isChecked = e.target.checked;
-    // 현재 화면에 보이는 행들만 전체선택/해제 대상으로 함
-    const visibleIds = new Set(processedTransactions.map(t => t.id));
-    setTransactions(prev =>
-      prev.map(t => visibleIds.has(t.id) ? { ...t, checked: isChecked } : t)
-    );
+    if (isChecked) {
+      // 현재 화면에 보이는 행들만 전체선택/해제 대상으로 함
+      const visibleIds = new Set(processedTransactions.map(t => t.id));
+      setCheckedRows(visibleIds);
+    } else {
+      setCheckedRows(new Set());
+    };
   };
 
 
@@ -446,7 +593,13 @@ const Transactions = () => {
   
   const renderCell = (transaction: Transaction, column: keyof Transaction) => {
     const isEditing = editingCell?.rowId === transaction.id && editingCell?.column === column;
-    const commonProps = { onBlur: () => setEditingCell(null), autoFocus: true };
+    // const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
+    //   if (['amount', 'merchant', 'memo'].includes(column)) {
+    //     handleUpdateCell(transaction.id, column, (e.target as HTMLInputElement).value);
+    //   }
+    //   setEditingCell(null);
+    // };
+    // const commonProps = { onBlur: () => handleBlur, autoFocus: true };
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Enter') {
         handleUpdateCell(transaction.id, column, e.currentTarget.value);
@@ -457,6 +610,7 @@ const Transactions = () => {
     };
 
     if (isEditing) {
+      const commonProps = { ref:editingCellRef, autoFocus: true }
       switch (column) {
         case 'transaction_date':
           return (
@@ -470,7 +624,7 @@ const Transactions = () => {
                   }
                 }}
                 dateFormat="yyyy-MM-dd"
-                onBlur={commonProps.onBlur}
+                onBlur={() => setEditingCell(null)}
                 autoFocus={commonProps.autoFocus}
               />
             </td>
@@ -478,7 +632,10 @@ const Transactions = () => {
         case 'account_name':
           return (
             <td className="editing">
-              <select {...commonProps} value={transaction.account_id ?? ''} onChange={(e) => handleUpdateCell(transaction.id, 'account_id', parseInt(e.target.value))}>
+              <select {...commonProps} value={transaction.account_id ?? ''} onChange={(e) => {
+                handleUpdateCell(transaction.id, 'account_id', parseInt(e.target.value));
+                setEditingCell(null);
+              }}>
                 <option value="" disabled>-- 계좌 선택 --</option>
                 {appData.accounts.map(acc => <option key={acc.id} value={acc.id}>{acc.name}</option>)}
               </select>
@@ -487,7 +644,10 @@ const Transactions = () => {
         case 'type':
           return (
             <td className="editing">
-              <select {...commonProps} value={transaction.type} onChange={(e) => handleUpdateCell(transaction.id, 'type', e.target.value)}>
+              <select {...commonProps} value={transaction.type} onChange={(e) => {
+                handleUpdateCell(transaction.id, 'type', e.target.value);
+                setEditingCell(null);
+              }}>
                 <option value="" disabled>-- 선택 --</option>
                 {TRANSACTION_TYPES.map(type => <option key={type} value={type}>{type}</option>)}
               </select>
@@ -510,7 +670,10 @@ const Transactions = () => {
               <select
                 {...commonProps}
                 value={transaction.major_category_name ?? ''}
-                onChange={(e) => handleUpdateCell(transaction.id, 'major_category_name', e.target.value)}
+                onChange={(e) => {
+                  handleUpdateCell(transaction.id, 'major_category_name', e.target.value);
+                  setEditingCell(null);
+                }}
                 disabled={!transaction.type}
               >
                 <option value="" disabled>-- 대분류 --</option>
@@ -569,6 +732,7 @@ const Transactions = () => {
     const cellValue = transaction[column];
     let displayValue: React.ReactNode = cellValue;
     let className = '';
+    const cellId = `cell-${transaction.id}-${column}`;
 
     if (!cellValue && ['account_name', 'major_category_name', 'minor_category_name'].includes(column)) {
       displayValue = <span className="placeholder">-- 선택 --</span>;
@@ -580,9 +744,20 @@ const Transactions = () => {
         displayValue = amount.toLocaleString();
       className = amount >= 0 ? 'amount-income' : 'amount-expense';
       }
+    } else if (column === 'merchant') {
+        const merchantText = transaction.merchant || '--';
+        return(
+          <td id={cellId} onClick={() => setEditingCell({ rowId: transaction.id, column })}>
+          {transaction.highlight_color_id > 0 ? (
+            <span className={`text-highlight-${transaction.highlight_color_id}`}>
+              {merchantText}
+            </span>
+          ):(merchantText)}
+          </td>
+        );
     }
     return (
-      <td className={className} onClick={() => setEditingCell({ rowId: transaction.id, column })}>
+      <td id={cellId} className={className} onClick={() => setEditingCell({ rowId: transaction.id, column })}>
         {displayValue}
       </td>
     );
@@ -614,8 +789,10 @@ const Transactions = () => {
           <button onClick={handleClearAllFilters}><FaFilter /> 전체 필터 해제</button>
           <button onClick={handleScrollToBottom}><FaAngleDoubleDown /> 맨 아래로</button>
           <div className="divider"></div>
-          <button onClick={() => toggleStyle('is_bold')} disabled={!hasCheckedRows}><FaBold /></button>
-          <button onClick={() => alert('구현 예정')} disabled={!hasCheckedRows}><FaHighlighter /></button>
+          <button onClick={handleApplyBold} disabled={!hasCheckedRows} title="굵게"><FaBold /></button>
+          <button onClick={(e) => handleOpenColorPopup(e, 'flag')} disabled={!hasCheckedRows} title="플래그"><FaFlag /></button>
+          <button onClick={(e) => handleOpenColorPopup(e, 'highlight')} disabled={!hasCheckedRows} title="형광펜"><FaHighlighter /></button>
+          <button onClick={(e) => handleOpenColorPopup(e, 'background')} disabled={!hasCheckedRows} title="배경색"><FaFillDrip /></button>
           <div className="divider"></div>
           <button className="primary">내역입력 폼 열기</button>
           <button className="primary">딥러닝 자동입력</button>
@@ -632,7 +809,7 @@ const Transactions = () => {
                   type="checkbox"
                   onChange={handleToggleCheckAll}
                   // 보이는 행이 모두 체크되었을 때만 '전체 선택' 체크박스 활성화
-                  checked={processedTransactions.length > 0 && processedTransactions.every(t => t.checked)}
+                  checked={processedTransactions.length > 0 && processedTransactions.every(t => checkedRows.has(t.id))}
                 />
               </th>
                 {renderHeader('transaction_date', '날짜')}
@@ -647,16 +824,19 @@ const Transactions = () => {
             </thead>
             <tbody>
               {processedTransactions.map((transaction) => {
-                let rowClassName = '';
-                if (transaction.is_bold) rowClassName += ' bold-row';
-                if (transaction.is_highlighted) rowClassName += ` highlighted-row-${transaction.is_highlighted}`;
+                // ✨ 3가지 스타일 클래스를 모두 조합
+                const classNames = [
+                  transaction.is_bold ? 'bold-row' : '',
+                  transaction.flag_color_id > 0 ? `flag-${transaction.flag_color_id}` : '',
+                  transaction.background_color_id > 0 ? `bg-${transaction.background_color_id}` : '',
+                ].filter(Boolean).join(' '); // 빈 문자열을 제거하고 공백으로 합침
                 
                 return(
-                  <tr key={transaction.id} className={rowClassName}>
+                  <tr key={transaction.id} className={classNames.trim()}>
                   <td>
                   <input
                     type="checkbox"
-                    checked={transaction.checked}
+                    checked={checkedRows.has(transaction.id)}
                     onChange={() => handleToggleCheck(transaction.id)}
                   />
                 </td>
@@ -674,7 +854,7 @@ const Transactions = () => {
             </tbody>
           </table>
         </div>
-        {/* ✨ 7. 필터 팝업 조건부 렌더링 */}
+        {/* 필터 팝업 조건부 렌더링 */}
         {activeFilter && (
           <FilterPopup
             columnKey={activeFilter.column}
@@ -683,13 +863,12 @@ const Transactions = () => {
             appliedFilters={filters[activeFilter.column] || []}
             onApply={handleApplyFilter}
             onClose={() => setActiveFilter(null)}
-            // ✨ 10. 새 props 전달
             onSort={handleSort}
             onClearFilter={handleClearColumnFilter}
             position={popupPosition}
           />
         )}
-        {/* ✨ 4. 확인/경고 팝업 조건부 렌더링 */}
+        {/* 확인/경고 팝업 조건부 렌더링 */}
         <ConfirmPopup
           isOpen={confirmPopup.isOpen}
           title={confirmPopup.title}
@@ -698,6 +877,15 @@ const Transactions = () => {
           onCancel={confirmPopup.onCancel}
           type={confirmPopup.type}
         />
+        {/* 하이라이트 팝업 조건부 렌더링 */}
+        {isColorPopupOpen && (
+          <HighlightPopup
+            position={colorPopupPosition}
+            onSelectColor={handleApplyColor}
+            onClose={() => setColorPopupOpen(false)}
+            title={activeStyleType === 'flag' ? 'Flag' : activeStyleType === 'highlight' ? 'Highlight' : 'Background'}
+          />
+        )}
       </div>
     </div>
     </>

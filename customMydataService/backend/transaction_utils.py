@@ -14,7 +14,9 @@ def load_transactions():
             t.merchant,
             t.memo,
             t.is_bold,
-            t.is_highlighted,
+            t.flag_color_id,
+            t.highlight_color_id,
+            t.background_color_id,
             t.account_id,
             a.name AS account_name,
             t.minor_category_uuid,
@@ -37,8 +39,8 @@ def load_transactions():
 
         if first_account and transfer_category:
             cursor.execute("""
-                INSERT INTO transactions (transaction_date, type, amount, merchant, memo, account_id, minor_category_uuid, is_bold, is_highlighted)
-                VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)
+                INSERT INTO transactions (transaction_date, type, amount, merchant, memo, account_id, minor_category_uuid, is_bold, flag_color_id, highlight_color_id, background_color_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0, 0, 0)
             """, (
                 date.today().strftime('%Y-%m-%d'),
                 '이체',
@@ -91,20 +93,22 @@ def save_transactions(transactions_data):
             tx['account_id'],
             tx['minor_category_uuid'],
             tx.get('is_bold', 0),
-            tx.get('is_highlighted', 0)
+            tx.get('flag_color_id', 0),
+            tx.get('highlight_color_id', 0),
+            tx.get('background_color_id', 0)
         )
 
         tx_id = tx.get('id')
         # ID가 문자열(신규)이거나 DB에 없는 ID(복사-붙여넣기 등)이면 INSERT
         if isinstance(tx_id, str) or tx_id not in db_ids:
             cursor.execute(
-                'INSERT INTO transactions (transaction_date, type, amount, merchant, memo, account_id, minor_category_uuid, is_bold, is_highlighted) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                'INSERT INTO transactions (transaction_date, type, amount, merchant, memo, account_id, minor_category_uuid, is_bold, flag_color_id, highlight_color_id, background_color_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
                 params
             )
         # ID가 있으면 UPDATE
         else:
             cursor.execute(
-                'UPDATE transactions SET transaction_date=?, type=?, amount=?, merchant=?, memo=?, account_id=?, minor_category_uuid=?, is_bold=?, is_highlighted=? WHERE id=?',
+                'UPDATE transactions SET transaction_date=?, type=?, amount=?, merchant=?, memo=?, account_id=?, minor_category_uuid=?, is_bold=?, flag_color_id=?, highlight_color_id=?, background_color_id=? WHERE id=?',
                 params + (tx_id,)
             )
 

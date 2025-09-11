@@ -198,18 +198,54 @@ td.editing select option {
   z-index: 10;
 }
 
+/* 행 하이라이트 스타일 */
+@keyframes highlight-error-animation{
+  0% { background-color: rgba(250, 166, 26,  0.9); }
+  100% { background-color: transparent; }
+}
+.highlight-error {
+  animation: highlight-error-animation 3s ease-out;
+}
+
 /* 편집 모드 강조 스타일 */
 .bold-row td{
   font-weight: bold;
 }
-.highlighted-row-1 { background-color: #FFF38A; }
-.highlighted-row-2 { background-color: #AEE4FF; }
-.highlighted-row-3 { background-color: #FFC1D6; }
-.highlighted-row-4 { background-color: #B8F3B8; }
-.highlighted-row-5 { background-color: #FFDDAA; }
-.highlighted-row-6 { background-color: #E0C8FF; }
+[class *= "flag-"] td:first-child {
+  background-repeat: no-repeat;
+  background-position: top 0px, left center;
+  background-size: 20px 100%, 5px 100%;
+}
+.flag-1 td:first-child { background-image: linear-gradient(to right, rgba(117, 126, 138, 0.9), transparent), linear-gradient(to right, #757e8a, #757e8a); }
+.flag-2 td:first-child { background-image: linear-gradient(to right, rgba(237, 66, 69,   0.9), transparent),   linear-gradient(to right, #ed4245, #ed4245); }
+.flag-3 td:first-child { background-image: linear-gradient(to right, rgba(250, 166, 26,  0.9), transparent),  linear-gradient(to right, #faa61a, #faa61a); }
+.flag-4 td:first-child { background-image: linear-gradient(to right, rgba(59, 165, 92,   0.9), transparent),    linear-gradient(to right, #3ba55c, #3ba55c); }
+.flag-5 td:first-child { background-image: linear-gradient(to right, rgba(92, 100, 244,  0.9), transparent),   linear-gradient(to right, #5c64f4, #5c64f4); }
+.flag-6 td:first-child { background-image: linear-gradient(to right, rgba(235, 69, 159,  0.9), transparent),  linear-gradient(to right, #eb459f, #eb459f); }
+
+.bg-1 { background-color: rgba(117, 126, 138, 0.25); } /* 보라/회색 */
+.bg-2 { background-color: rgba(237, 66, 69,   0.25); } /* 핑크/빨강 */
+.bg-3 { background-color: rgba(250, 166, 26,  0.25); } /* 노랑/주황 */
+.bg-4 { background-color: rgba(59, 165, 92,   0.25); } /* 연두 */
+.bg-5 { background-color: rgba(92, 100, 244,  0.25); } /* 하늘/파랑 */
+.bg-6 { background-color: rgba(235, 69, 159,  0.25); } /* 주황/마젠타 */
+
+/* ✨ 텍스트 형광펜 스타일 (최종 제안) */
+.text-highlight-1, .text-highlight-2, .text-highlight-3, .text-highlight-4, .text-highlight-5, .text-highlight-6 {
+  padding: 0.2em 0.4em; /* 형광펜의 상하좌우 여백 */
+  margin: -0.1em -0.3em; /* 여백으로 인해 레이아웃이 밀리는 것을 방지 */
+  border-radius: 6px;
+  color: #222; /* 어두운 텍스트 색상으로 가독성 확보 */
+}
+
+.text-highlight-1 { background-color: #757e8a; } /* 노랑 */
+.text-highlight-2 { background-color: #ed4245; } /* 하늘 */
+.text-highlight-3 { background-color: #faa61a; } /* 핑크 */
+.text-highlight-4 { background-color: #3ba55c; } /* 연두 */
+.text-highlight-5 { background-color: #5c64f4; } /* 주황 */
+.text-highlight-6 { background-color: #eb459f; } /* 보라 */
 
 /* 하이라이트된 행의 텍스트 색상을 어둡게 하여 가독성 확보 */
-[class*="highlighted-row-"] td {
+/* [class*="highlight-row-"] td {
   color: #222;
-}
+} */

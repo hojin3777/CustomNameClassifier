@@ -47,6 +47,11 @@ const ConfirmPopup: React.FC<ConfirmPopupProps> = ({
   return (
     <div className="popup-overlay">
       <div className="popup-box">
+        {title && type !== 'destructive' && (
+          <div className='popup-header-general'>
+            <h4>{title}</h4>
+          </div>
+        )}
         {type === 'destructive' && (
           <div className='popup-header'>
             <h3>{title || '경   고'}</h3>
