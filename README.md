@@ -77,3 +77,9 @@ Classify store names with deeplearning
 - 저장 수행 로직 개선(팝업 분기, 취소 시 하이라이트)
 - 편집중 외부 클릭시 취소되던 문제 개선
 - 팝업에 optional title 추가
+
+### 0913
+- Mapping 메뉴 추가, 관련 DB 신설, Sidebar 링크 추가
+- 딥러닝 출력-카테고리 매핑 UI추가, 드래그 이동 구현
+- 필터 팝업 component 폴더로 이동
+- 거래내역 초기화 오류 수정(app.py - database.py간 함수병 일치)

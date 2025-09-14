@@ -8,8 +8,8 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useDirty } from '../App';
 
 import './Transactions.css';
-import FilterPopup from './FilterPopup'; // ✨ 1. FilterPopup 컴포넌트 import
-import './FilterPopup.css'; // ✨ FilterPopup CSS import
+import FilterPopup from '../components/FilterPopup.tsx'; // ✨ 1. FilterPopup 컴포넌트 import
+// import '../components/FilterPopup.css'; // ✨ FilterPopup CSS import
 import ConfirmPopup from '../components/ConfirmPopup'; // ✨ ConfirmPopup 컴포넌트 import
 import '../components/ConfirmPopup.css'; // ✨ ConfirmPopup CSS import
 import HighlightPopup from '../components/HighlightPopup'; // ✨ HighlightPopup 컴포넌트 import

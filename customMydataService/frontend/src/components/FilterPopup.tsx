@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { FaSortAlphaDown, FaSortAlphaUp, FaFilter, FaSortAmountUp } from 'react-icons/fa';
 import './FilterPopup.css';
-import type { Transaction } from './Transactions'; // ✨ Transaction 타입 import
+import type { Transaction } from '../pages/Transactions'; // ✨ Transaction 타입 import
 
-type FilterPopupProps = {
+type FilterPopupProps<T> = {
   columnKey: string;
   columnName: string;
-  allValues: any[];
-  appliedFilters: any[];
+  allValues: T[];
+  appliedFilters: T[];
   onApply: (columnKey: string, selectedValues: any[]) => void;
   onClose: () => void;
   // ✨ 1. 정렬, 필터해제, 위치 props 추가
@@ -16,7 +16,7 @@ type FilterPopupProps = {
   position: { top: number; left: number };
 };
 
-const FilterPopup: React.FC<FilterPopupProps> = ({
+const FilterPopup = <T extends React.ReactNode>({
   columnKey,
   columnName,
   allValues,
@@ -26,7 +26,7 @@ const FilterPopup: React.FC<FilterPopupProps> = ({
   onSort,
   onClearFilter,
   position,
-}) => {
+}: FilterPopupProps<T>) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedValues, setSelectedValues] = useState<any[]>(appliedFilters);
 

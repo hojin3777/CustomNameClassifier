@@ -214,7 +214,7 @@ td.editing select option {
 [class *= "flag-"] td:first-child {
   background-repeat: no-repeat;
   background-position: top 0px, left center;
-  background-size: 20px 100%, 5px 100%;
+  background-size: 16px 100%, 5px 100%;
 }
 .flag-1 td:first-child { background-image: linear-gradient(to right, rgba(117, 126, 138, 0.9), transparent), linear-gradient(to right, #757e8a, #757e8a); }
 .flag-2 td:first-child { background-image: linear-gradient(to right, rgba(237, 66, 69,   0.9), transparent),   linear-gradient(to right, #ed4245, #ed4245); }

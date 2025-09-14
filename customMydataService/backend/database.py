@@ -72,6 +72,18 @@ def init_db():
         )
     ''')
 
+    # --- 5. 카테고리 매핑 테이블 (category_mappings) ---
+    # 역할: BERT 모델의 출력을 사용자의 소분류에 매핑합니다.
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS category_mappings (
+            bert_output_id INTEGER PRIMARY KEY,
+            bert_output_name TEXT NOT NULL UNIQUE,
+            minor_category_uuid TEXT,
+            FOREIGN KEY (minor_category_uuid) REFERENCES minor_categories (uuid) ON DELETE SET NULL
+        )
+    ''')
+    # ON DELETE SET NULL: 매핑된 소분류가 삭제되면, 이 테이블의 해당 항목은 NULL로 자동 변경됩니다. (매핑 해제 효과)
+
     conn.commit()
     conn.close()
     print(f"Database and tables created successfully created at: {DB_PATH}")

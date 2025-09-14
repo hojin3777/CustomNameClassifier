@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard';
 import Monthly from './pages/Monthly';
 import Transactions from './pages/Transactions';
 import Categories from './pages/Categories';
+import Mapping from './pages/Mapping';
 import { FaBars, FaQuestionCircle, FaCog } from 'react-icons/fa';
 
 // ✨ 1. isDirty 상태를 전역적으로 관리하기 위한 Context 생성
@@ -49,6 +50,7 @@ const AppContent = () => {
                 <li><GuardedNavLink to="/monthly">Monthly</GuardedNavLink></li>
                 <li><GuardedNavLink to="/transactions">Transactions</GuardedNavLink></li>
                 <li><GuardedNavLink to="/categories">Categories</GuardedNavLink></li>
+                <li><GuardedNavLink to="/mapping">Mapping</GuardedNavLink></li>
               </ul>
             </nav>
             <div className="sidebar-footer">
@@ -66,6 +68,7 @@ const AppContent = () => {
           <Route path="/monthly" element={<Monthly />} />
           <Route path="/transactions" element={<Transactions />} />
           <Route path="/categories" element={<Categories />} />
+          <Route path="/mapping" element={<Mapping />} />
         </Routes>
       </main>
     </div>

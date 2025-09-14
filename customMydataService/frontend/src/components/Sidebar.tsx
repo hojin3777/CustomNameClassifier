@@ -7,7 +7,7 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage }) => {
-  const menuItems = ['Dashboard', 'Monthly', 'Transactions', 'Categories'];
+  const menuItems = ['Dashboard', 'Monthly', 'Transactions', 'Categories', 'Mapping'];
 
   return (
     <aside className="sidebar">

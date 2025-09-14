@@ -12,6 +12,7 @@ import database
 import category_utils
 import account_utils
 import transaction_utils
+import mapping_utils
 
 # Flask 앱 초기화
 app = Flask(__name__, static_folder='../frontend/dist', static_url_path='/')
@@ -25,6 +26,7 @@ try:
     database.init_db()
     account_utils.initialize_default_accounts() # 계좌 기본값 채우기
     category_utils.initialize_default_categories() # 카테고리 기본값 채우기
+    mapping_utils.initialize_default_mappings() # 매핑 기본값 채우기
 except Exception as e:
     print(f"ERROR: Database initialization failed - {e}")
 
@@ -108,7 +110,7 @@ def manage_transactions():
 def reset_transactions():
     """거래내역 데이터를 모두 삭제하고 성공 메시지를 반환합니다."""
     try:
-        database.reset_transactions_table()
+        database.reset_all_transactions()
         return jsonify({"message": "Transactions reset successfully"})
     except Exception as e:
         print(f"Error resetting transactions: {e}")
@@ -179,6 +181,40 @@ def get_account_usage():
         return jsonify({"in_use": in_use})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# ------------------- 매핑 API -------------------
+@app.route('/api/mappings', methods=['GET', 'POST'])
+def manage_mappings():
+    """카테고리 매핑 데이터를 조회하거나 업데이트합니다."""
+    if request.method == 'GET':
+        try:
+            mapping_data = mapping_utils.load_mappings()
+            return jsonify(mapping_data)
+        except Exception as e:
+            print(f"Error loading mappings: {e}")
+            return jsonify({"error": "Failed to load mappings"}), 500
+
+    if request.method == 'POST':
+        try:
+            mappings_data = request.get_json()
+            if not isinstance(mappings_data, dict):
+                return jsonify({"error": "Invalid data format, expected a mapping object"}), 400
+            
+            result = mapping_utils.update_all_mappings(mappings_data)
+            return jsonify(result)
+        except Exception as e:
+            print(f"Error updating mapping: {e}")
+            return jsonify({"error": "Failed to update mapping"}), 500
+
+@app.route('/api/mappings/reset', methods=['POST'])
+def reset_mappings():
+    """매핑을 기본값으로 초기화합니다."""
+    try:
+        result = mapping_utils.reset_mappings_to_default()
+        return jsonify(result)
+    except Exception as e:
+        print(f"Error resetting mappings: {e}")
+        return jsonify({"error": "Failed to reset mappings"}), 500
 
 
 # 이 파일이 직접 실행될 때만 서버를 실행
