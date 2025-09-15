@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useDirty } from '../App';
 import { FaPlusCircle, FaPen, FaTrash, FaSave, FaUndo } from 'react-icons/fa';
 import ConfirmPopup from '../components/ConfirmPopup';
+import './Categories.css';
 
 // 타입 정의
 type Account = {id: number | string; name: string};
@@ -265,7 +266,7 @@ const Categories = () => {
       isOpen: true,
       type: 'destructive',
       title: '카테고리 초기화 경고',
-      message: '모든 계좌와 카테고리를 기본값으로 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.',
+      message: '모든 계좌와 카테고리를 기본값으로 초기화하시겠습니까?\n이 작업은 되돌릴 수 없습니다.',
       onConfirm: async () => {
         setAlertInfo({ ...alertInfo, isOpen: false });
         setStatus('Resetting...');

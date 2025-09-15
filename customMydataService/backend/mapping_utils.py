@@ -165,10 +165,13 @@ def reset_mappings_to_default():
     try:
         # 1. 테이블 비우기
         cursor.execute("DELETE FROM category_mappings")
+        cursor.execute("DELETE FROM ocr_corrections")
+        cursor.execute("DELETE FROM sqlite_sequence WHERE name='ocr_corrections'")
+        cursor.execute("DELETE FROM rule_based_mappings")
+        cursor.execute("DELETE FROM sqlite_sequence WHERE name='rule_based_mappings'")
         conn.commit() # DELETE 먼저 커밋
 
         # 2. 초기화 함수 재호출
-        # (initialize_default_mappings는 내부적으로 conn을 열고 닫으므로 별도 트랜잭션으로 처리)
         initialize_default_mappings()
         
         return {"status": "success", "message": "Mappings have been reset to default."}
@@ -179,3 +182,103 @@ def reset_mappings_to_default():
         # initialize_default_mappings에서 conn을 닫았을 수 있으므로 안전하게 처리
         if conn:
             conn.close()
+
+
+# 딥러닝 mapping 외 함수들
+def get_all_ocr_corrections():
+    """OCR 보정 규칙 전체를 조회합니다."""
+    conn = database.get_db_connection()
+    cursor = conn.cursor()
+    rows = cursor.execute("SELECT id, original_text, corrected_text FROM ocr_corrections ORDER BY id").fetchall()
+    conn.close()
+    return [dict(row) for row in rows]
+
+def save_ocr_corrections(corrections_data):
+    """OCR 보정 규칙 저장"""
+    conn = database.get_db_connection()
+    cursor = conn.cursor()
+    try:
+        db_cursor = cursor.execute("SELECT id, original_text, corrected_text FROM ocr_corrections").fetchall()
+        db_corrections = {row['original_text']: {'id': row['id'], 'corrected_text': row['corrected_text']} for row in db_cursor}
+        frontend_corrections = {item['original_text']: item for item in corrections_data if item.get('original_text')}
+        
+        to_insert, to_update, to_delete = [], [], []
+        for original, item in frontend_corrections.items():
+            if original not in db_corrections:
+                to_insert.append((item['original_text'], item['corrected_text']))
+            elif db_corrections[original]['corrected_text'] != item['corrected_text']:
+                to_update.append((item['corrected_text'], db_corrections[original]['id']))
+        for original, item in db_corrections.items():
+            if original not in frontend_corrections:
+                to_delete.append((item['id'],))
+
+        if to_insert:
+            cursor.executemany("INSERT INTO ocr_corrections (original_text, corrected_text) VALUES (?, ?)", to_insert)
+        if to_update:
+            cursor.executemany("UPDATE ocr_corrections SET corrected_text = ? WHERE id = ?", to_update)
+        if to_delete:
+            cursor.executemany("DELETE FROM ocr_corrections WHERE id = ?", to_delete)
+        conn.commit()
+        return {"status": "success", "message": f"Inserted: {len(to_insert)}, Updated: {len(to_update)}, Deleted: {len(to_delete)}"}
+    except Exception as e:
+        conn.rollback()
+        raise e
+    finally:
+        conn.close()
+
+
+def get_all_rule_based_mappings():
+    """상호명-카테고리 Rule-based 매핑 전체를 조회합니다."""
+    conn = database.get_db_connection()
+    cursor = conn.cursor()
+    rows = cursor.execute('''
+        SELECT rbm.id, rbm.merchant_name, rbm.minor_category_uuid, mc.name AS minor_category_name
+        FROM rule_based_mappings rbm
+        LEFT JOIN minor_categories mc ON rbm.minor_category_uuid = mc.uuid
+        ORDER BY rbm.id
+    ''').fetchall()
+    conn.close()
+    return [dict(row) for row in rows]
+
+def save_rule_based_mappings(rules_data):
+    """상호명 기반 매핑 규칙을 저장합니다. (추가/수정/삭제 처리)"""
+    conn = database.get_db_connection()
+    cursor = conn.cursor()
+    try:
+        # DB의 현재 데이터 (merchant_name을 key로 하는 딕셔너리)
+        db_cursor = cursor.execute("SELECT id, merchant_name, minor_category_uuid FROM rule_based_mappings").fetchall()
+        db_rules = {row['merchant_name']: {'id': row['id'], 'uuid': row['minor_category_uuid']} for row in db_cursor}
+
+        # 프론트에서 받은 데이터 (merchant_name을 key로 하는 딕셔너리)
+        frontend_rules = {item['merchant_name']: item for item in rules_data if item.get('merchant_name')}
+
+        to_insert = []
+        to_update = []
+        to_delete = []
+
+        # 추가 또는 수정할 항목 찾기
+        for name, item in frontend_rules.items():
+            if name not in db_rules:
+                to_insert.append((item['merchant_name'], item['minor_category_uuid']))
+            elif db_rules[name]['uuid'] != item['minor_category_uuid']:
+                to_update.append((item['minor_category_uuid'], db_rules[name]['id']))
+
+        # 삭제할 항목 찾기
+        for name, item in db_rules.items():
+            if name not in frontend_rules:
+                to_delete.append((item['id'],))
+
+        if to_insert:
+            cursor.executemany("INSERT INTO rule_based_mappings (merchant_name, minor_category_uuid) VALUES (?, ?)", to_insert)
+        if to_update:
+            cursor.executemany("UPDATE rule_based_mappings SET minor_category_uuid = ? WHERE id = ?", to_update)
+        if to_delete:
+            cursor.executemany("DELETE FROM rule_based_mappings WHERE id = ?", to_delete)
+
+        conn.commit()
+        return {"status": "success", "message": f"Inserted: {len(to_insert)}, Updated: {len(to_update)}, Deleted: {len(to_delete)}"}
+    except Exception as e:
+        conn.rollback()
+        raise e
+    finally:
+        conn.close()

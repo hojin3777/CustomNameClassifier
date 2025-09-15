@@ -9,12 +9,20 @@ import './Mapping.css';
 import DraggableBertOutput from '../components/mapping/DraggableBertOutput';
 import DroppableRow from '../components/mapping/DroppableRow';
 import '../components/mapping/MappingComponents.css';
+import OcrCorrectionPanel, { type OcrCorrection } from '../components/mapping/OcrCorrectionPanel';
+import RuleBasedMappingPanel, { type RuleBasedMapping } from '../components/mapping/RuleBasedMappingPanel';
 
 // API로부터 받을 데이터 타입 정의
 export interface MinorCategory { uuid: string; name: string; }
 export interface MajorCategory { id: number; name: string; minors: MinorCategory[]; }
 export interface BertOutput { id: number; name: string; }
-export interface MappingData { categories: MajorCategory[]; bertOutputs: BertOutput[]; mappings: { [key: string]: string }; }
+export interface MappingData {
+  categories: MajorCategory[];
+  bertOutputs: BertOutput[];
+  mappings: { [key: string]: string };
+  ocrCorrections: OcrCorrection[];
+  ruleBasedMappings: RuleBasedMapping[];
+}
 
 const API_BASE_URL = 'http://localhost:5000';
 
@@ -31,13 +39,6 @@ const MappingPage = () => {
   const dirtyContext = useDirty();
   const isDirty = dirtyContext?.isDirty ?? false;
   const setIsDirty = dirtyContext?.setIsDirty ?? (() => {});
-
-  // Dirty State 감지 로직
-  useEffect(() => {
-    if (loading) return;
-    const isDifferent = JSON.stringify(data?.mappings) !== JSON.stringify(originalData?.mappings);
-    setIsDirty(isDifferent);
-  }, [data, originalData, setIsDirty, loading]);
 
   // 페이지 이탈 방지 로직
   useEffect(() => {
@@ -57,13 +58,30 @@ const MappingPage = () => {
     setLoading(true);
     setStatus('Loading...');
     try {
-      const response = await fetch(`${API_BASE_URL}/api/mappings`);
-      if (!response.ok) throw new Error('Failed to fetch mapping data');
+      const [mappingsRes, ocrRes, rulesRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/api/mappings`),
+        fetch(`${API_BASE_URL}/api/ocr-corrections`),
+        fetch(`${API_BASE_URL}/api/rule-based-mappings`),
+      ]);
+      if (!mappingsRes.ok) throw new Error('Failed to fetch mapping data');
+      if (!ocrRes.ok) throw new Error('Failed to fetch OCR correction data');
+      if (!rulesRes.ok) throw new Error('Failed to fetch rule-based mapping data');
+
+      const mappingsData = await mappingsRes.json();
+      const ocrData = await ocrRes.json();
+      const rulesData = await rulesRes.json();
+
       
-      const apiData: MappingData = await response.json();
-      setData(apiData);
-      setOriginalData(JSON.parse(JSON.stringify(apiData))); // 원본 데이터 설정
+      const combinedData: MappingData = {
+        ...mappingsData,
+        ocrCorrections: ocrData,
+        ruleBasedMappings: rulesData || [],
+      }
+
+      setData(combinedData);
+      setOriginalData(JSON.parse(JSON.stringify(combinedData))); // 원본 데이터 설정
       setStatus('Loaded successfully');
+      setIsDirty(false);
     } catch (err: any) {
       setError(err.message);
       setStatus('Failed to load data');
@@ -77,17 +95,43 @@ const MappingPage = () => {
     fetchData();
   }, []);
 
-  // 저장 핸들러
+  // 저장 핸들러 (통합하도록 개선)
   const handleSave = async () => {
     if (!data || !isDirty) return;
     setStatus('Saving...');
     try {
-      const response = await fetch(`${API_BASE_URL}/api/mappings`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data.mappings),
-      });
-      if (!response.ok) throw new Error('Failed to save mappings');
+      const savePromises = [];
+      if (JSON.stringify(data.mappings) !== JSON.stringify(originalData?.mappings)) {
+        savePromises.push(
+          fetch(`${API_BASE_URL}/api/mappings`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data.mappings),
+          })
+        );
+      }
+      if (JSON.stringify(data.ocrCorrections) !== JSON.stringify(originalData?.ocrCorrections)) {
+        savePromises.push(
+          fetch(`${API_BASE_URL}/api/ocr-corrections`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data.ocrCorrections),
+          })
+        );
+      }
+      if (JSON.stringify(data.ruleBasedMappings) !== JSON.stringify(originalData?.ruleBasedMappings)) {
+        savePromises.push(
+          fetch(`${API_BASE_URL}/api/rule-based-mappings`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data.ruleBasedMappings),
+          })
+        );
+      }
+      const responses = await Promise.all(savePromises);
+      responses.forEach(res => {
+        if (!res.ok) throw new Error(`Failed to save some data: ${res.statusText}`);
+      })
 
       setOriginalData(JSON.parse(JSON.stringify(data))); // 저장 성공 시, 현재 상태를 새 원본으로
       setIsDirty(false);
@@ -162,6 +206,7 @@ const MappingPage = () => {
       }
       return { ...prevData, mappings: newMappings };
     });
+    setIsDirty(true);
   };
 
   // ******* 렌더링 *******
@@ -271,14 +316,29 @@ const MappingPage = () => {
 
         {/* 오른쪽 패널 */}
         <div className="mapping-right-panel">
-          <div className="placeholder-section">
-            <h3>OCR 결과 자동보정</h3>
-            <p>나중에 구현될 영역입니다.</p>
-          </div>
-          <div className="placeholder-section">
-            <h3>상호명 - 카테고리 룰베이스 매핑</h3>
-            <p>나중에 구현될 영역입니다.</p>
-          </div>
+          <OcrCorrectionPanel
+            data={data.ocrCorrections}
+            initialData={originalData?.ocrCorrections || []}
+            onUpdate={(newOcrData) => {
+              setData(prevData => {
+                if (!prevData) return null;
+                return { ...prevData, ocrCorrections: newOcrData };
+              });
+              setIsDirty(true);
+            }}
+          />
+            <RuleBasedMappingPanel
+              data={data.ruleBasedMappings}
+              categories={data.categories}
+              initialData={originalData?.ruleBasedMappings || []}
+              onUpdate={(newRuleData) => {
+                setData(prevData => {
+                  if (!prevData) return null;
+                  return { ...prevData, ruleBasedMappings: newRuleData };
+                });
+                setIsDirty(true);
+              }}
+            />
         </div>
       </div>
       <ConfirmPopup {...confirmPopup} />

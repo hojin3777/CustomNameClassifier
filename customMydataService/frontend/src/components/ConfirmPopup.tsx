@@ -31,6 +31,25 @@ const ConfirmPopup: React.FC<ConfirmPopupProps> = ({
     }
   }, [isOpen, type]);
 
+  // ESC를 누르면 취소 동작
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (type === 'alert') {
+          onConfirm();
+        } else if (onCancel) {
+          onCancel();
+        } else {
+          onConfirm();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, type, onConfirm, onCancel]);
+
+
   if (!isOpen) return null;
 
   const handleConfirm = () => {

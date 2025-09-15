@@ -215,6 +215,53 @@ def reset_mappings():
     except Exception as e:
         print(f"Error resetting mappings: {e}")
         return jsonify({"error": "Failed to reset mappings"}), 500
+    
+# OCR 보정 규칙    
+@app.route('/api/ocr-corrections', methods=['GET', 'POST'])
+def manage_ocr_corrections():
+    """OCR 보정 규칙을 조회하거나 저장합니다."""
+    if request.method == 'GET':
+        try:
+            corrections = mapping_utils.get_all_ocr_corrections()
+            return jsonify(corrections)
+        except Exception as e:
+            print(f"Error loading OCR corrections: {e}")
+            return jsonify({"error": "Failed to load OCR corrections"}), 500
+
+    if request.method == 'POST':
+        try:
+            corrections_data = request.get_json()
+            if not isinstance(corrections_data, list):
+                return jsonify({"error": "Invalid data format, expected a list of correction objects"}), 400
+            
+            updated_corrections = mapping_utils.save_ocr_corrections(corrections_data)
+            return jsonify(updated_corrections)
+        except Exception as e:
+            print(f"Error saving OCR corrections: {e}")
+            return jsonify({"error": "Failed to save OCR corrections"}), 500
+        
+@app.route('/api/rule-based-mappings', methods=['GET', 'POST'])
+def manage_rule_based_mappings():
+    """상호명-카테고리 매핑을 조회하거나 저장합니다."""
+    if request.method == 'GET':
+        try:
+            rules = mapping_utils.get_all_rule_based_mappings()
+            return jsonify(rules)
+        except Exception as e:
+            print(f"Error loading merchant-category mappings: {e}")
+            return jsonify({"error": "Failed to load rule-based mappings"}), 500
+
+    if request.method == 'POST':
+        try:
+            mappings_data = request.get_json()
+            if not isinstance(mappings_data, list):
+                return jsonify({"error": "Invalid data format, expected a list of mapping objects"}), 400
+            
+            updated_mappings = mapping_utils.save_rule_based_mappings(mappings_data)
+            return jsonify(updated_mappings)
+        except Exception as e:
+            print(f"Error saving merchant-category mappings: {e}")
+            return jsonify({"error": "Failed to save merchant-category mappings"}), 500
 
 
 # 이 파일이 직접 실행될 때만 서버를 실행

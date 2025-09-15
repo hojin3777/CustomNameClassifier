@@ -83,6 +83,23 @@ def init_db():
         )
     ''')
     # ON DELETE SET NULL: 매핑된 소분류가 삭제되면, 이 테이블의 해당 항목은 NULL로 자동 변경됩니다. (매핑 해제 효과)
+    # OCR 보정 규칙 테이블
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS ocr_corrections(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            original_text TEXT NOT NULL UNIQUE,
+            corrected_text TEXT NOT NULL
+        )
+    ''')
+    # 상호명-카테고리 Rule-based 매핑 테이블
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS rule_based_mappings(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            merchant_name TEXT NOT NULL UNIQUE,
+            minor_category_uuid TEXT NOT NULL,
+            FOREIGN KEY (minor_category_uuid) REFERENCES minor_categories (uuid) ON DELETE SET NULL
+        )
+    ''')
 
     conn.commit()
     conn.close()

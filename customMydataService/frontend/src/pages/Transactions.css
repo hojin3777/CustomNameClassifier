@@ -15,8 +15,7 @@
   align-items: center;
   padding: 8px 12px;
   gap: 8px;
-  /* ✨ 툴바 배경색을 명시적으로 지정 (테이블 헤더와 통일) */
-  background-color: #2b2d31;
+  background-color: var(--color-bg-content);
   border-radius: 8px;
   border: 1px solid var(--color-border);
 }
@@ -31,15 +30,15 @@
 .transactions-toolbar button {
   background: none;
   border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
   padding: 6px 12px;
   border-radius: 6px;
   cursor: pointer;
 }
 
 .transactions-toolbar button.primary {
-  background-color: var(--color-primary);
-  color: white;
-  border-color: var(--color-primary);
+  background-color: var(--color-bg-app);
+  border-color: white;
 }
 
 /* Table Styles */
@@ -49,25 +48,8 @@
   overflow-y: auto;
   overflow-x: auto;
   position: relative;
-  background-color: var(--color-background-secondary);
   border-radius: 8px;
   border: 1px solid var(--color-border);
-}
-.table-container::-webkit-scrollbar {
-  width: 10px; /* 스크롤바 너비 */
-}
-
-.table-container::-webkit-scrollbar-track {
-  background: var(--background-color-offset); /* 트랙 배경색 */
-}
-
-.table-container::-webkit-scrollbar-thumb {
-  background: #555; /* 스크롤바 색상 */
-  border-radius: 5px; /* 둥근 모서리 */
-}
-
-.table-container::-webkit-scrollbar-thumb:hover {
-  background: #777; /* 호버 시 스크롤바 색상 */
 }
 
 table {
@@ -92,14 +74,14 @@ table {
 
 /* ✨ 2. 헤더 스타일 통합 및 배경색 수정 */
 .table-container thead th {
-  background-color: #2b2d31;
+  background-color: var(--color-bg-content);
   font-weight: 600;
   text-align: center;
   position: sticky;
   position: sticky;
   top: 0;
   z-index: 10;
-  border-bottom: 2px solid var(--border-color-heavy);
+  border-bottom: none;
 }
 
 /* 헤더 컨텐츠 (클릭 영역) */
@@ -113,19 +95,19 @@ table {
   border-radius: 4px;
 }
 .th-content:hover {
-  background-color: var(--color-background-secondary);
+  background-color: var(--color-bg-content);
 }
 .th-content.filtered {
-  color: #3b82f6;
+  color: var(--color-accent-blue);
 }
 .th-content .sort-icon {
   font-size: 1em;
 }
 .th-content .sort-icon.asc {
-  color: #e53e3e;
+  color: var(--color-accent-red);
 }
 .th-content .sort-icon.desc {
-  color: #3b82f6;
+  color: var(--color-accent-blue);
 }
 
 /* 셀 내용 정렬 */
@@ -143,11 +125,11 @@ table {
 
 /* 금액 스타일 */
 td.amount-income {
-  color: #e53e3e;
+  color: var(--color-accent-red);
   font-weight: 500;
 }
 td.amount-expense {
-  color: #3b82f6;
+  color: var(--color-accent-blue);
 }
 
 /* 플레이스홀더 스타일 */
@@ -171,9 +153,9 @@ td.editing .react-datepicker-wrapper {
   height: 100%;
   z-index: 5;
   padding: 0 15px;
-  border: 2px solid var(--color-primary);
+  border: 2px solid white;
   border-radius: 0;
-  background-color: var(--color-background-secondary);
+  background-color: var(--color-bg-content);
   color: var(--color-text-primary);
   font-size: 14px;
   box-sizing: border-box;
@@ -200,7 +182,7 @@ td.editing select option {
 
 /* 행 하이라이트 스타일 */
 @keyframes highlight-error-animation{
-  0% { background-color: rgba(250, 166, 26,  0.9); }
+  0% { background-color: var(--color-highlight-3-transparent9); }
   100% { background-color: transparent; }
 }
 .highlight-error {
@@ -216,36 +198,31 @@ td.editing select option {
   background-position: top 0px, left center;
   background-size: 16px 100%, 5px 100%;
 }
-.flag-1 td:first-child { background-image: linear-gradient(to right, rgba(117, 126, 138, 0.9), transparent), linear-gradient(to right, #757e8a, #757e8a); }
-.flag-2 td:first-child { background-image: linear-gradient(to right, rgba(237, 66, 69,   0.9), transparent),   linear-gradient(to right, #ed4245, #ed4245); }
-.flag-3 td:first-child { background-image: linear-gradient(to right, rgba(250, 166, 26,  0.9), transparent),  linear-gradient(to right, #faa61a, #faa61a); }
-.flag-4 td:first-child { background-image: linear-gradient(to right, rgba(59, 165, 92,   0.9), transparent),    linear-gradient(to right, #3ba55c, #3ba55c); }
-.flag-5 td:first-child { background-image: linear-gradient(to right, rgba(92, 100, 244,  0.9), transparent),   linear-gradient(to right, #5c64f4, #5c64f4); }
-.flag-6 td:first-child { background-image: linear-gradient(to right, rgba(235, 69, 159,  0.9), transparent),  linear-gradient(to right, #eb459f, #eb459f); }
+.flag-1 td:first-child { background-image: linear-gradient(to right, var(--color-highlight-1-transparent9), transparent), linear-gradient(to right, var(--color-highlight-1), var(--color-highlight-1)); }
+.flag-2 td:first-child { background-image: linear-gradient(to right, var(--color-highlight-2-transparent9), transparent), linear-gradient(to right, var(--color-highlight-2), var(--color-highlight-2)); }
+.flag-3 td:first-child { background-image: linear-gradient(to right, var(--color-highlight-3-transparent9), transparent), linear-gradient(to right, var(--color-highlight-3), var(--color-highlight-3)); }
+.flag-4 td:first-child { background-image: linear-gradient(to right, var(--color-highlight-4-transparent9), transparent), linear-gradient(to right, var(--color-highlight-4), var(--color-highlight-4)); }
+.flag-5 td:first-child { background-image: linear-gradient(to right, var(--color-highlight-5-transparent9), transparent), linear-gradient(to right, var(--color-highlight-5), var(--color-highlight-5)); }
+.flag-6 td:first-child { background-image: linear-gradient(to right, var(--color-highlight-6-transparent9), transparent), linear-gradient(to right, var(--color-highlight-6), var(--color-highlight-6)); }
 
-.bg-1 { background-color: rgba(117, 126, 138, 0.25); } /* 보라/회색 */
-.bg-2 { background-color: rgba(237, 66, 69,   0.25); } /* 핑크/빨강 */
-.bg-3 { background-color: rgba(250, 166, 26,  0.25); } /* 노랑/주황 */
-.bg-4 { background-color: rgba(59, 165, 92,   0.25); } /* 연두 */
-.bg-5 { background-color: rgba(92, 100, 244,  0.25); } /* 하늘/파랑 */
-.bg-6 { background-color: rgba(235, 69, 159,  0.25); } /* 주황/마젠타 */
+.bg-1 { background-color: var(--color-highlight-1-transparent25); } /* 보라/회색 */
+.bg-2 { background-color: var(--color-highlight-2-transparent25); } /* 핑크/빨강 */
+.bg-3 { background-color: var(--color-highlight-3-transparent25); } /* 노랑/주황 */
+.bg-4 { background-color: var(--color-highlight-4-transparent25); } /* 연두 */
+.bg-5 { background-color: var(--color-highlight-5-transparent25); } /* 하늘/파랑 */
+.bg-6 { background-color: var(--color-highlight-6-transparent25); } /* 주황/마젠타 */
 
 /* ✨ 텍스트 형광펜 스타일 (최종 제안) */
 .text-highlight-1, .text-highlight-2, .text-highlight-3, .text-highlight-4, .text-highlight-5, .text-highlight-6 {
   padding: 0.2em 0.4em; /* 형광펜의 상하좌우 여백 */
   margin: -0.1em -0.3em; /* 여백으로 인해 레이아웃이 밀리는 것을 방지 */
   border-radius: 6px;
-  color: #222; /* 어두운 텍스트 색상으로 가독성 확보 */
+  color: var(--color-text-inverted); /* 어두운 텍스트 색상으로 가독성 확보 */
 }
 
-.text-highlight-1 { background-color: #757e8a; } /* 노랑 */
-.text-highlight-2 { background-color: #ed4245; } /* 하늘 */
-.text-highlight-3 { background-color: #faa61a; } /* 핑크 */
-.text-highlight-4 { background-color: #3ba55c; } /* 연두 */
-.text-highlight-5 { background-color: #5c64f4; } /* 주황 */
-.text-highlight-6 { background-color: #eb459f; } /* 보라 */
-
-/* 하이라이트된 행의 텍스트 색상을 어둡게 하여 가독성 확보 */
-/* [class*="highlight-row-"] td {
-  color: #222;
-} */
+.text-highlight-1 { background-color: var(--color-highlight-1)} /* 노랑 */
+.text-highlight-2 { background-color: var(--color-highlight-2)} /* 하늘 */
+.text-highlight-3 { background-color: var(--color-highlight-3)} /* 핑크 */
+.text-highlight-4 { background-color: var(--color-highlight-4)} /* 연두 */
+.text-highlight-5 { background-color: var(--color-highlight-5)} /* 주황 */
+.text-highlight-6 { background-color: var(--color-highlight-6)} /* 보라 */

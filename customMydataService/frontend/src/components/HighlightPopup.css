@@ -1,6 +1,6 @@
 .highlight-popup {
   position: absolute;
-  background-color: #2b2d31;
+  background-color: var(--color-bg-app);
   border: 2px solid var(--color-border);
   border-radius: 8px;
   padding: 6px;
@@ -8,7 +8,7 @@
   flex-direction: column;
   gap: 2px;
   z-index: 100;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px var(--color-bg-overlay-light);
 }
 
 .popup-title {
@@ -29,7 +29,7 @@
   padding: 0;
   cursor: pointer;
   margin: 1px 2px;
-  border: 2px solid var(--color-border);
+  border: 2px solid var(--color-interactive);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -40,7 +40,7 @@
 }
 
 .color-swatch-btn:hover {
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 3px solid var(--color-interactive-hover);
 }
 
 .color-swatch {
@@ -52,7 +52,7 @@
 }
 
 .color-swatch.none {
-  border-color: red;
+  border-color: var(--color-accent-red);
   background-color: transparent;
 }
 

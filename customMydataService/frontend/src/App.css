@@ -4,7 +4,7 @@
 .app-container {
   display: flex;
   height: 100vh;
-  background-color: var(--color-bg-primary);
+  background-color: var(--color-bg-app);
   position: relative;
 }
 
@@ -32,7 +32,7 @@
 .sidebar {
   width: 240px;
   height: 100%;
-  background-color: var(--color-bg-secondary);
+  background-color: var(--color-bg-content);
   display: flex;
   flex-direction: column;
   padding: 16px;
@@ -76,7 +76,7 @@
   z-index: 3; /* ✨ 사이드바보다 앞에 있도록 */
 }
 .hamburger-menu:hover {
-  background-color: var(--color-bg-tertiary);
+  background-color: var(--color-bg-header);
 }
 
 /* 사이드바 내부 스타일 */
@@ -97,7 +97,7 @@
   color: var(--color-text-primary);
 }
 .sidebar-nav a.active {
-  background-color: var(--color-bg-tertiary);
+  background-color: var(--color-bg-header);
   color: var(--color-text-primary);
 }
 .sidebar-footer { margin-top: auto; display: flex; justify-content: flex-end; gap: 16px; font-size: 18px; }
@@ -125,7 +125,7 @@
 }
 .main-header h1 { color: var(--color-text-header); font-size: 28px; margin: 0; }
 .content-area { flex-grow: 1; }
-.card { background-color: var(--color-bg-secondary); padding: 12px 12px; border-radius: 8px; border: 1px solid var(--color-border); }
+.card { background-color: var(--color-bg-content); padding: 12px 12px; border-radius: 8px; border: 1px solid var(--color-border); }
 /* --- 메인 콘텐츠 헤더 --- */
 .header-title-group {
   display: flex;
@@ -136,18 +136,16 @@
   display: flex; 
   align-items: center; 
   gap: 12px; 
-  /* ✨ 메시지 위치를 잡기 위해 추가 */
   position: relative;
 }
 .header-actions .icon-button-round.active {
-  color: #007bff; /* 파란색 */
-  border-color: #007bff;
+  color: var(--color-accent-blue);
+  border-color: var(--color-accent-blue);
 }
 .status-text { 
   color: var(--color-text-secondary); 
-  font-size: 14px; 
-  /* ✨ 메시지 위치를 버튼 오른쪽으로 고정 */
-  position: absolute;
+  font-size: 14px;
+  position: absolute;  /* 메시지 위치를 버튼 오른쪽으로 고정 */
   left: 100%;
   margin-left: 12px;
   width: max-content; /* 메시지가 길어져도 줄바꿈되지 않도록 */
@@ -166,7 +164,9 @@
   cursor: pointer;
   transition: background-color 0.2s, color 0.2s;
 }
-.icon-button-round:hover { background-color: var(--color-bg-tertiary); color: var(--color-text-primary); }
+.icon-button-round:hover { background-color: var(--color-bg-header); color: var(--color-text-primary); }
+
+
 
 
 /* --- 페이지별 특화 스타일 --- */
@@ -181,37 +181,37 @@
 .calendar-cell { background-color: var(--color-bg-primary); min-height: 120px; }
 
 /* Transactions */
-.transactions-page { display: flex; flex-direction: column; gap: 16px; }
+/* .transactions-page { display: flex; flex-direction: column; gap: 16px; }
 .transactions-toolbar { display: flex; align-items: center; gap: 8px; padding: 12px; flex-wrap: wrap; }
 .transactions-toolbar button { background-color: var(--color-interactive); color: var(--color-text-primary); border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
-.transactions-toolbar button.primary { background-color: var(--color-text-link); color: white; }
+.transactions-toolbar button.primary { background-color: var(--color-accent-blue); color: white; }
 .transactions-toolbar .divider { width: 1px; height: 20px; background-color: var(--color-border); margin: 0 4px; }
 .table-container { flex-grow: 1; overflow: auto; border: 1px solid var(--color-border); border-radius: 8px; }
 .table-container table { width: 100%; border-collapse: collapse; }
 .table-container th, .table-container td { padding: 12px; text-align: left; border-bottom: 1px solid var(--color-border); }
-.table-container thead th { background-color: var(--color-bg-secondary); position: sticky; top: 0; }
-.table-container td.amount { text-align: right; font-weight: bold; color: var(--color-text-link); }
+.table-container thead th { background-color: var(--color-bg-content); position: sticky; top: 0; }
+.table-container td.amount { text-align: right; font-weight: bold; color: var(--color-accent-blue); } */
 
 /* Categories */
-.categories-page {
+/* .categories-page {
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* 페이지 자체 스크롤 방지 */
+  overflow: hidden; 
 }
 .categories-grid-container {
   flex-grow: 1;
-  overflow-x: auto; /* ✨ 가로 스크롤 컨테이너 */
-  padding-bottom: 16px; /* 스크롤바 공간 확보 */
+  overflow-x: auto; 
+  padding-bottom: 16px; 
 }
 .categories-grid {
-  display: flex; /* ✨ 가로 정렬을 위해 flex 사용 */
+  display: flex; 
   flex-direction: row;
   gap: 8px;
-  min-width: min-content; /* 컨텐츠가 줄어들지 않도록 */
+  min-width: min-content; 
   align-items: stretch;
 }
 .category-column-wrapper {
-  width: 200px; /* 컬럼 너비 고정 */
+  width: 200px; 
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -260,22 +260,22 @@
   align-items: center;
 }
 .category-item .item-actions {
-  display: none; /* 평소엔 숨김 */
+  display: none; 
   gap: 12px;
 }
 .category-item:hover {
   background-color: var(--color-interactive);
 }
 .category-item:hover > span {
-  opacity: 0.3; /* ✨ 텍스트 흐리게 */
+  opacity: 0.3; 
 }
 .category-item:hover .item-actions {
-  display: flex; /* ✨ 호버 시 아이콘 보임 */
+  display: flex; 
   position: absolute;
   right: 12px;
 }
-.action-icon.edit { color: #2dc770; } /* 연두색 */
-.action-icon.delete { color: #f23f42; } /* 빨간색 */
+.action-icon.edit { color: #2dc770; } 
+.action-icon.delete { color: #f23f42; } 
 
 .add-item {
   justify-content: center;
@@ -297,10 +297,10 @@
   border: 2px dashed var(--color-interactive);
   background-color: transparent;
   flex-grow: 1;
-}
+} */
 
 /* ✨ 인라인 편집 스타일 */
-.inline-edit-input {
+/* .inline-edit-input {
   width: 100%;
   padding: 10px 12px;
   background-color: var(--color-bg-primary);
@@ -314,23 +314,23 @@
   font-weight: bold;
   font-size: inherit;
   text-align: center;
-}
+} */
 
 /* ✨ 계좌 구분선 */
-.vertical-divider {
+/* .vertical-divider {
   width: 1px;
   background-color: var(--color-border);
   margin: 0 8px;
-}
+} */
 
 /* ✨ 커스텀 스크롤바 */
-.categories-grid-container::-webkit-scrollbar { height: 12px; }
+/* .categories-grid-container::-webkit-scrollbar { height: 12px; }
 .categories-grid-container::-webkit-scrollbar-track { background: var(--color-bg-tertiary); border-radius: 6px; }
 .categories-grid-container::-webkit-scrollbar-thumb { background: var(--color-interactive); border-radius: 6px; }
-.categories-grid-container::-webkit-scrollbar-thumb:hover { background: #555861; }
+.categories-grid-container::-webkit-scrollbar-thumb:hover { background: #555861; } */
 
 /* ✨ 커스텀 팝업 (Alert) */
-.custom-alert-overlay {
+/* .custom-alert-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -368,4 +368,4 @@
   cursor: pointer;
   font-weight: 500;
 }
-.custom-alert-buttons button.confirm { background-color: var(--color-danger); color: white; }
+.custom-alert-buttons button.confirm { background-color: var(--color-danger); color: white; } */

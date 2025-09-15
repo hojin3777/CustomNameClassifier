@@ -190,7 +190,7 @@ const Transactions = () => {
         isOpen: true,
         type: 'confirm',
         title: '미입력 항목 경고',
-        message: '필수 입력 항목이 비어 있습니다. 해당 행을 제외하고 저장을 진행하시겠습니까?',
+        message: '필수 입력 항목이 비어 있습니다.\n해당 행을 제외하고 저장을 진행하시겠습니까?',
         onConfirm: () => {
           setConfirmPopup(prev => ({ ...prev, isOpen: false }));
           proceedSave();
@@ -282,7 +282,7 @@ const Transactions = () => {
       isOpen: true,
       type: 'destructive',
       title: '거래내역 초기화',
-      message: '모든 거래내역을 삭제하고 초기 상태로 되돌리시겠습니까? 이 작업은 되돌릴 수 없습니다.',
+      message: '모든 거래내역을 삭제하고 초기 상태로 되돌리시겠습니까?\n이 작업은 되돌릴 수 없습니다.',
       onConfirm: async () => {
         setConfirmPopup(prev => ({ ...prev, isOpen: false }));
         setStatus('Resetting...');
