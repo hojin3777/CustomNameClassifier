@@ -8,12 +8,14 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useDirty } from '../App';
 
 import './Transactions.css';
-import FilterPopup from '../components/FilterPopup.tsx'; // ✨ 1. FilterPopup 컴포넌트 import
-// import '../components/FilterPopup.css'; // ✨ FilterPopup CSS import
-import ConfirmPopup from '../components/ConfirmPopup'; // ✨ ConfirmPopup 컴포넌트 import
-import '../components/ConfirmPopup.css'; // ✨ ConfirmPopup CSS import
-import HighlightPopup from '../components/HighlightPopup'; // ✨ HighlightPopup 컴포넌트 import
+import FilterPopup from '../components/FilterPopup.tsx'; // 1. FilterPopup 컴포넌트 import
+// import '../components/FilterPopup.css'; // FilterPopup CSS import
+import ConfirmPopup from '../components/ConfirmPopup'; // ConfirmPopup 컴포넌트 import
+import '../components/ConfirmPopup.css'; // ConfirmPopup CSS import
+import HighlightPopup from '../components/HighlightPopup'; // ighlightPopup 컴포넌트 import
 import '../components/HighlightPopup.css'; // ✨ HighlightPopup CSS import
+import FloatingSelectPopup, { type FloatingSelectHandle, type Opt } from '../components/FloatingSelectPopup';
+import '../components/FloatingSelectPopup.css';
 
 // ******* 타입 정의 *******
 type Account = { id: number; name: string; };
@@ -60,6 +62,7 @@ const Transactions = () => {
 
   const [editingCell, setEditingCell] = useState<{ rowId: number | string; column: keyof Transaction | null } | null>(null);
   const editingCellRef = useRef<any>(null);
+  const floatingSelectRef = useRef<FloatingSelectHandle | null >(null);
   const [filters, setFilters] = useState<{ [key: string]: any[] }>({});
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
   const [activeFilter, setActiveFilter] = useState<{ column: keyof Transaction, name: string } | null>(null);
@@ -94,6 +97,7 @@ const Transactions = () => {
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [editingCell]);
+
   // 외부 클릭 감지하여 편집 완료처리
   useEffect(() => {
     if(!editingCell) return;
@@ -110,6 +114,7 @@ const Transactions = () => {
     document.addEventListener('mousedown', handleOutsideClick);
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, [editingCell]);
+
 
   // ******* dirty 상태 감지 *******
   useEffect(() => {
@@ -632,25 +637,31 @@ const Transactions = () => {
         case 'account_name':
           return (
             <td className="editing">
-              <select {...commonProps} value={transaction.account_id ?? ''} onChange={(e) => {
+              <input {...commonProps} type="text" defaultValue={transaction.account_name ?? ''} onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === 'Escape') setEditingCell(null); 
+              }} />
+              {/* <select {...commonProps} value={transaction.account_id ?? ''} onChange={(e) => {
                 handleUpdateCell(transaction.id, 'account_id', parseInt(e.target.value));
                 setEditingCell(null);
               }}>
                 <option value="" disabled>-- 계좌 선택 --</option>
                 {appData.accounts.map(acc => <option key={acc.id} value={acc.id}>{acc.name}</option>)}
-              </select>
+              </select> */}
             </td>
           );
         case 'type':
           return (
             <td className="editing">
-              <select {...commonProps} value={transaction.type} onChange={(e) => {
+              <input {...commonProps} type="text" defaultValue={transaction.type} onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === 'Escape') setEditingCell(null);
+              }} />
+              {/* <select {...commonProps} value={transaction.type} onChange={(e) => {
                 handleUpdateCell(transaction.id, 'type', e.target.value);
                 setEditingCell(null);
               }}>
                 <option value="" disabled>-- 선택 --</option>
                 {TRANSACTION_TYPES.map(type => <option key={type} value={type}>{type}</option>)}
-              </select>
+              </select> */}
             </td>
           );
         case 'major_category_name': {
@@ -667,7 +678,10 @@ const Transactions = () => {
           }
           return (
             <td className="editing">
-              <select
+              <input {...commonProps} type="text" defaultValue={transaction.major_category_name ?? ''} onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === 'Escape') setEditingCell(null);
+              }} />
+              {/* <select
                 {...commonProps}
                 value={transaction.major_category_name ?? ''}
                 onChange={(e) => {
@@ -678,7 +692,7 @@ const Transactions = () => {
               >
                 <option value="" disabled>-- 대분류 --</option>
                 {availableMajors.map(major => <option key={major.id} value={major.name}>{major.name}</option>)}
-              </select>
+              </select> */}
             </td>
           );
         }
@@ -687,7 +701,10 @@ const Transactions = () => {
           const availableMinors = major ? major.minors : [];
           return (
             <td className="editing">
-              <select
+              <input {...commonProps} type="text" defaultValue={transaction.minor_category_name ?? ''} onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === 'Escape') setEditingCell(null);
+              }} />
+              {/* <select
                 {...commonProps}
                 value={transaction.minor_category_uuid ?? ''}
                 onChange={(e) => {
@@ -697,9 +714,8 @@ const Transactions = () => {
                 disabled={!transaction.major_category_name}
               >
                 <option value="" disabled>-- 소분류 --</option>
-                {/* ✨ 'availableMinors'를 바로 위에서 정의한 'minors'로 수정 */}
                 {availableMinors.map(minor => <option key={minor.uuid} value={minor.uuid}>{minor.name}</option>)}
-              </select>
+              </select> */}
             </td>
           );
         }
@@ -735,7 +751,9 @@ const Transactions = () => {
     const cellId = `cell-${transaction.id}-${column}`;
 
     if (!cellValue && ['account_name', 'major_category_name', 'minor_category_name'].includes(column)) {
-      displayValue = <span className="placeholder">-- 선택 --</span>;
+      const placeholderText = column === 'account_name' ? '-- 계좌 --' :
+        column === 'major_category_name' ? '-- 대분류 --' : '-- 소분류 --';
+      displayValue = <span className="placeholder">{placeholderText}</span>;
     } else if (column === 'amount') {
       const amount = cellValue as number | null;
       if (amount === null) {
@@ -745,7 +763,12 @@ const Transactions = () => {
       className = amount >= 0 ? 'amount-income' : 'amount-expense';
       }
     } else if (column === 'merchant') {
-        const merchantText = transaction.merchant || '--';
+        if (cellValue === '') {
+          displayValue = <span className="placeholder">-- 거래처 --</span>;
+        } else{0.
+          displayValue = cellValue;
+        }
+        const merchantText = displayValue;
         return(
           <td id={cellId} onClick={() => setEditingCell({ rowId: transaction.id, column })}>
           {transaction.highlight_color_id > 0 ? (
@@ -756,8 +779,61 @@ const Transactions = () => {
           </td>
         );
     }
+    const onCellClick = (e: React.MouseEvent) => {
+      if(['account_name', 'type', 'major_category_name', 'minor_category_name'].includes(String(column))) {
+        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+        const pos = { top: rect.bottom + window.scrollY + 2, left: rect.left + window.scrollX, width: rect.width };
+        // 옵션 생성 및 select open 콜백
+        if (column === 'account_name') {
+          const opts: Opt[] = appData.accounts.map(a => ({ value: String(a.id), label: a.name }));
+          floatingSelectRef.current?.open(opts, String(transaction.account_id ?? ''), pos, (v: string) => {
+            handleUpdateCell(transaction.id, 'account_id', v === '' ? null : Number(v));
+          }, '-- 계좌 --');
+          return;
+        }
+        if (column === 'type') {
+          const opts: Opt[] = TRANSACTION_TYPES.map(t => ({ value: t, label: t }));
+          floatingSelectRef.current?.open(opts, transaction.type, pos, (v: string) => {
+            handleUpdateCell(transaction.id, 'type', v);
+            // major/minor 초기화 handled in handleUpdateCell when type changes
+          }, '-- 선택 --');
+          return;
+        }
+        if (column === 'major_category_name') {
+          const INCOME_CATEGORIES = ['고정수입', '유동수입'];
+          const TRANSFER_CATEGORY = '이체분류';
+          const CORE_CATEGORIES = [...INCOME_CATEGORIES, TRANSFER_CATEGORY];
+          let availableMajors: CategoryItem[] = [];
+          if (transaction.type === '수입') {
+            availableMajors = appData.categories.filter(c => INCOME_CATEGORIES.includes(c.name));
+          } else if (transaction.type === '이체') {
+            availableMajors = appData.categories.filter(c => c.name === TRANSFER_CATEGORY);
+          } else if (['고정지출', '반고정지출', '유동지출'].includes(transaction.type)) {
+            availableMajors = appData.categories.filter(c => !CORE_CATEGORIES.includes(c.name));
+          }
+          const opts: Opt[] = availableMajors.map(m => ({ value: m.name, label: m.name }));
+          floatingSelectRef.current?.open(opts, transaction.major_category_name ?? '', pos, (v: string) => {
+            handleUpdateCell(transaction.id, 'major_category_name', v);
+          }, '-- 대분류 --');
+          return;
+        }
+        if (column === 'minor_category_name') {
+          const major = appData.categories.find(c => c.name === transaction.major_category_name);
+          const availableMinors = major ? major.minors : [];
+          const opts: Opt[] = availableMinors.map(m => ({ value: m.uuid, label: m.name }));
+          floatingSelectRef.current?.open(opts, transaction.minor_category_uuid ?? '', pos, (v: string) => {
+            handleUpdateCell(transaction.id, 'minor_category_uuid', v === '' ? null : v);
+          }, '-- 소분류 --');
+          return;
+        }
+      }
+      // 기본 텍스트 편집 동작
+      setEditingCell({ rowId: transaction.id, column });
+    };
+
     return (
-      <td id={cellId} className={className} onClick={() => setEditingCell({ rowId: transaction.id, column })}>
+      // <td id={cellId} className={className} onClick={() => setEditingCell({ rowId: transaction.id, column })}>
+      <td id={cellId} className={className} onClick={onCellClick}>
         {displayValue}
       </td>
     );
@@ -854,6 +930,8 @@ const Transactions = () => {
             </tbody>
           </table>
         </div>
+        {/* 플로팅 셀렉트 컴포넌트 */}
+        <FloatingSelectPopup ref={floatingSelectRef} />
         {/* 필터 팝업 조건부 렌더링 */}
         {activeFilter && (
           <FilterPopup

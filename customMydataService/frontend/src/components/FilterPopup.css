@@ -37,11 +37,12 @@
   align-items: center;
   justify-content: center;
   /* ✨ 아이콘 색상 변경 */
+  background-color: var(--color-interactive);
   color: var(--color-text-secondary);
 }
 
 .filter-popup-header button:hover {
-  background-color: var(--color-bg-header);
+  background-color: var(--color-bg-content);
   color: var(--color-text-primary);
 }
 
@@ -81,7 +82,7 @@
 }
 
 .filter-options-list label:hover {
-  background-color: var(--color-bg-header);
+  background-color: var(--color-bg-content);
 }
 
 .filter-popup-footer {

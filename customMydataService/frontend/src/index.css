@@ -21,6 +21,7 @@
   /******** 인터랙티브 요소 ********/
   --color-border: #404249;             /* 기본 테두리 */
   --color-border-subtle: #4f525a;     /* 좀 더 밝은 테두리 */
+  --color-border-interactive: rgba(92, 100, 244,  0.5);
   --color-interactive: #404249;       /* 버튼, 목록 아이템 */
   --color-interactive-hover: #4f525a; /* 버튼, 목록 아이템 호버 */
   
