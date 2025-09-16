@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { FaSortAlphaDown, FaSortAlphaUp, FaFilter, FaSortAmountUp } from 'react-icons/fa';
 import './FilterPopup.css';
-import type { Transaction } from '../pages/Transactions'; // ✨ Transaction 타입 import
+import type { Transaction } from '../../pages/Transactions'; // ✨ Transaction 타입 import
 
 type FilterPopupProps<T> = {
   columnKey: string;

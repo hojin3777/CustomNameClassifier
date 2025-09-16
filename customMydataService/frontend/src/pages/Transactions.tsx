@@ -4,18 +4,19 @@ import { FaSave, FaUndo, FaTrash,
   FaCaretDown, FaArrowUp, FaArrowDown, FaFilter,
   FaPlus, FaArrowRight, FaAngleDoubleDown } from 'react-icons/fa'; // 각 아이콘 로드
 import DatePicker from 'react-datepicker';
-import "react-datepicker/dist/react-datepicker.css";
 import { useDirty } from '../App';
 
 import './Transactions.css';
-import FilterPopup from '../components/FilterPopup.tsx'; // 1. FilterPopup 컴포넌트 import
+import "react-datepicker/dist/react-datepicker.css";
+import "../components/transactions/DatePickerOverrides.css"; // DatePicker 커스텀 CSS
+import FilterPopup from '../components/transactions/FilterPopup.tsx'; // 1. FilterPopup 컴포넌트 import
 // import '../components/FilterPopup.css'; // FilterPopup CSS import
 import ConfirmPopup from '../components/ConfirmPopup'; // ConfirmPopup 컴포넌트 import
 import '../components/ConfirmPopup.css'; // ConfirmPopup CSS import
-import HighlightPopup from '../components/HighlightPopup'; // ighlightPopup 컴포넌트 import
-import '../components/HighlightPopup.css'; // ✨ HighlightPopup CSS import
-import FloatingSelectPopup, { type FloatingSelectHandle, type Opt } from '../components/FloatingSelectPopup';
-import '../components/FloatingSelectPopup.css';
+import HighlightPopup from '../components/transactions/HighlightPopup'; // ighlightPopup 컴포넌트 import
+import '../components/transactions/HighlightPopup.css'; // ✨ HighlightPopup CSS import
+import FloatingSelectPopup, { type FloatingSelectHandle, type Opt } from '../components/transactions/FloatingSelectPopup';
+import '../components/transactions/FloatingSelectPopup.css';
 
 // ******* 타입 정의 *******
 type Account = { id: number; name: string; };
@@ -384,9 +385,7 @@ const Transactions = () => {
   };
   const handleApplyColor = (colorId: number) => {
     if (!activeStyleType) return;
-
     const styleKey = `${activeStyleType}_color_id` as const;
-
     setTransactions(prev =>
       prev.map(t =>
         checkedRows.has(t.id) ? { ...t, [styleKey]: colorId } : t
@@ -424,14 +423,11 @@ const Transactions = () => {
 
       // 부드러운 시작과 끝을 위한 Easing 함수 적용
       const easeInOutQuad = progress < 0.5 ? 2 * progress * progress : -1 + (4 - 2 * progress) * progress;
-      
       element.scrollTop = start + distance * easeInOutQuad;
-
       if (elapsed < duration) {
         requestAnimationFrame(step); // 애니메이션이 끝나지 않았으면 다음 프레임 요청
       }
     };
-
     requestAnimationFrame(step); // 애니메이션 시작
   };
 
@@ -490,6 +486,13 @@ const Transactions = () => {
       })
     );
   };
+  // 달력 helper
+  const parseYMD = (ymd?: string | null) => {
+    if (!ymd) return null;
+    const parts = ymd.split('-').map(part => parseInt(part, 10));
+    if (parts.length !== 3 || parts.some(isNaN)) return null;
+    return new Date(parts[0], parts[1] - 1, parts[2]);
+  }
 
 
   // ******* 체크박스 관련 핸들러 *******
@@ -624,13 +627,26 @@ const Transactions = () => {
                 selected={new Date(transaction.transaction_date)}
                 onChange={(date: Date | null) => {
                   if (date) {
-                    handleUpdateCell(transaction.id, 'transaction_date', date.toISOString().split('T')[0]);
+                    const y = date.getFullYear();
+                    const m = String(date.getMonth() + 1).padStart(2, '0');
+                    const d = String(date.getDate()).padStart(2, '0');
+                    handleUpdateCell(transaction.id, 'transaction_date', `${y}-${m}-${d}`);
                     setEditingCell(null); // 날짜 선택 후 바로 편집 모드 종료
                   }
                 }}
                 dateFormat="yyyy-MM-dd"
+                onCalendarClose={() => setEditingCell(null)}
+                onClickOutside={() => setEditingCell(null)}
                 onBlur={() => setEditingCell(null)}
                 autoFocus={commonProps.autoFocus}
+                className='dp-input'
+                popperClassName='dp-popper'
+                calendarClassName='dp-calendar'
+                dayClassName={(date) => {
+                  const d = date;
+                  const formatted = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                  return formatted === transaction.transaction_date ? 'dp-day-selected' : '';
+                }}
               />
             </td>
           );

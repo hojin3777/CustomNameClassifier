@@ -1,0 +1,166 @@
+/* react-datepicker 오버라이드: 다크 테마 통일 */
+.dp-popper .react-datepicker {
+  background: var(--color-bg-content);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-subtle);
+  box-shadow: 0 8px 24px var(--color-overlay-medium);
+  border-radius: 8px;
+  padding: 6px;
+  position: relative;
+}
+
+/* 헤더 */
+.dp-popper .react-datepicker__header {
+  position: relative;
+  padding: 8px 44px;
+  height: 44px;
+  box-sizing: border-box;
+
+  background: var(--color-bg-header);
+  border-bottom: 1px solid var(--color-border-subtle);
+  color: var(--color-text-header);
+}
+
+/* 현재 달 표기 */
+.dp-popper .react-datepicker__current-month {
+  margin: 0;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1;
+  color: var(--color-text-header);
+  text-align: center;
+  pointer-events: none;
+  display: block;
+  padding-top: 6px;
+}
+
+/* 요일/일자 텍스트 */
+.dp-popper .react-datepicker__day-name,
+.dp-popper .react-datepicker__day {
+  color: var(--color-text-primary);
+}
+
+/* hover 강조 */
+.dp-popper .react-datepicker__day:hover {
+  background: var(--color-bg-inset);
+  color: var(--color-text-header);
+  border-radius: 6px;
+}
+
+/* 선택된 날짜 스타일 (dayClassName으로도 동일 클래스 부여됨) */
+.dp-popper .react-datepicker__day--selected,
+.dp-day-selected {
+  background: var(--color-highlight-5-transparent5) !important;
+  color: #ffffff !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+}
+
+/* 오늘 강조(선택과 다르게 표현하고 싶으면 수정) */
+.dp-popper .react-datepicker__day--today {
+  border: 1px solid var(--color-border-interactive);
+  border-radius: 6px;
+}
+
+/* 네비게이션 버튼(이전/다음) */
+/* .dp-popper .react-datepicker__navigation {
+  color: var(--color-text-primary);
+  background: transparent;
+  border: none;
+}
+.dp-popper .react-datepicker__navigation--previous {
+  left: 8px;
+}
+.dp-popper .react-datepicker__navigation--next {
+  right: 8px;
+} */
+.dp-popper .react-datepicker__navigation{
+    position: absolute;
+    top : 10px;
+    transform: none !important;
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: var(--color-text-primary);
+    box-sizing: border-box;
+    padding: 0;
+}
+.dp-popper .react-datepicker__navigation--previous { left: 8px; }
+.dp-popper .react-datepicker__navigation--next { right: 8px; }
+.dp-popper .react-datepicker__navigation-icon::before {
+    border-top-color: var(--color-text-primary);
+    border-right-color: var(--color-text-primary);
+    opacity: 0.95;
+}
+.dp-popper .react-datepicker__navigation:hover{
+    background: var(--color-bg-inset);
+    border-color: var(--color-border);
+    box-shadow: 0 4px 12px var(--color-overlay-medium);
+}
+
+/* 기본 triangle 제거(원하면 유지) */
+.dp-popper .react-datepicker__triangle {
+  display: none;
+}
+
+/* input(편집용) 스타일 */
+.dp-input {
+  background: var(--color-bg-inset);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 6px 8px;
+  box-sizing: border-box;
+}
+
+/* focus 시 과한 흰 테두리 제거, subtle 테두리로 통일 */
+.dp-popper:focus-within,
+.dp-input:focus {
+  outline: none;
+  box-shadow: 0 4px 18px var(--color-overlay-medium);
+  border-color: var(--color-border-subtle);
+}
+
+/* 스크롤바 스타일(필요시) */
+.dp-popper .react-datepicker__month-dropdown-container,
+.dp-popper .react-datepicker__year-dropdown-container {
+  color: var(--color-text-primary);
+}
+
+/* 미세 조정: 달력 내부 여백/폰트 크기 */
+.dp-calendar .react-datepicker__month {
+  padding: 6px 4px;
+}
+
+/* 비현행(다른 달) 날짜를 더 어둡게(덜 도드라지게) */
+.dp-popper .react-datepicker__day--outside-month {
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+}
+
+/* 요일 헤더: 일요일 / 토요일 색상 (변수 있으면 사용, 없으면 fallback 색) */
+.dp-popper .react-datepicker__day-name:nth-child(1),
+.dp-popper .react-datepicker__day-name:nth-child(7) {
+  font-weight: 600;
+}
+.dp-popper .react-datepicker__day-name:nth-child(1) { color: var(--color-accent-red); }
+.dp-popper .react-datepicker__day-name:nth-child(7) { color: var(--color-accent-blue); }
+
+/* 날짜 셀: 각 주 칸의 1번째(일)과 7번째(토) 컬럼 색 지정 */
+.dp-popper .react-datepicker__week .react-datepicker__day:nth-child(1) {
+  color: var(--color-accent-red);
+}
+.dp-popper .react-datepicker__week .react-datepicker__day:nth-child(7) {
+  color: var(--color-accent-blue);
+}
+
+/* 비현행 날짜에 hover 효과를 약하게 유지 */
+.dp-popper .react-datepicker__day--outside-month:hover {
+  background: var(--color-bg-overlay-light);
+  color: var(--color-text-primary);
+}
+

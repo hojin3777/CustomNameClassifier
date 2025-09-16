@@ -99,3 +99,5 @@ Classify store names with deeplearning
 
 ### 0916
 - 거래내역 리스트 팝업으로 개선, 스타일 생성
+- 날짜 선택 중 외부 클릭 시 렌더 버그 수정
+- 달력 스타일 테마 통일
