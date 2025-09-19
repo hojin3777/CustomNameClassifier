@@ -1,4 +1,7 @@
 /* react-datepicker 오버라이드: 다크 테마 통일 */
+.dp-popper {
+  z-index: 100; /* 2. 달력이 팝업 위에 표시되도록 z-index 추가 */
+}
 .dp-popper .react-datepicker {
   background: var(--color-bg-content);
   color: var(--color-text-primary);

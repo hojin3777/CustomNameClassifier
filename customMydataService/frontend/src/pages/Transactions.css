@@ -233,3 +233,22 @@ td.editing select:focus{
 .text-highlight-4 { background-color: var(--color-highlight-4)} /* 연두 */
 .text-highlight-5 { background-color: var(--color-highlight-5)} /* 주황 */
 .text-highlight-6 { background-color: var(--color-highlight-6)} /* 보라 */
+
+
+
+.ocr-loading-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: var(--color-bg-overlay-medium);
+  z-index: 4000;
+  display: flex; align-items: center; justify-content: center;
+}
+.ocr-loading-box {
+  background: var(--color-bg-popup-filter);
+  color: var(--color-text-header);
+  border-radius: 12px;
+  padding: 36px 48px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  box-shadow: 0 8px 32px var(--color-bg-overlay-light);
+}

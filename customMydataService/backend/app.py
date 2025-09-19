@@ -4,15 +4,18 @@ import uuid
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from datetime import date
+from werkzeug.utils import secure_filename
 
 # 유틸리티 모듈
 import ocr_service
 import classification_service
 import database
+from database import DB_FOLDER
 import category_utils
 import account_utils
 import transaction_utils
 import mapping_utils
+import pandas as pd
 
 # Flask 앱 초기화
 app = Flask(__name__, static_folder='../frontend/dist', static_url_path='/')
@@ -34,6 +37,10 @@ except Exception as e:
 print("Initializing OCR service...")
 # ★★★ 모델 경로를 실제 best.pt 파일 위치로 수정해야 합니다. ★★★
 OCR_MODEL_PATH = 'C:/code/customOCR/bank_statement_detector/yolov8l_e50_bs8_0828/weights/best.pt'
+UPLOAD_FOLDER = os.path.join(DB_FOLDER, 'uploads')
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 try:
     ocr_service.initialize_predictor(model_path=OCR_MODEL_PATH)
     print("OCR service initialized successfully.")
@@ -115,6 +122,49 @@ def reset_transactions():
     except Exception as e:
         print(f"Error resetting transactions: {e}")
         return jsonify({"error": str(e)}), 500
+
+# 이미지 처리를 위한 API 엔드포인트
+@app.route('/api/ocr/transactions', methods=['POST'])
+def api_ocr_transactions():
+    if 'images' not in request.files:
+        return jsonify({'error': 'No images uploaded'}), 400
+
+    files = request.files.getlist('images')
+    all_results = []
+
+    for file in files:
+        # 1. 이미지 파일을 임시 저장
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.seek(0) # 스트림 위치 초기화
+        file.save(filepath)
+        
+        # 저장된 파일에서 바이트를 다시 읽어 처리
+        with open(filepath, 'rb') as f:
+            image_bytes = f.read()
+
+        transactions = ocr_service.process_image_to_transactions(image_bytes)
+        
+        for tx in transactions:
+            tx['file_name'] = filename
+        
+        all_results.extend(transactions)
+        
+    cleaned_results = [
+        {k: (None if pd.isna(v) else v) for k, v in tx.items()}
+        for tx in all_results
+    ]
+    
+    return jsonify(cleaned_results)
+
+# 1. 저장된 OCR 이미지를 제공하는 엔드포인트 추가
+@app.route('/api/ocr/image/<filename>')
+def get_ocr_image(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+
+
+
 
 # -------------------- 계좌 카테고리 초기화 -------------------
 @app.route('/api/initialize-defaults', methods=['POST'])
@@ -217,7 +267,7 @@ def reset_mappings():
         return jsonify({"error": "Failed to reset mappings"}), 500
     
 # OCR 보정 규칙    
-@app.route('/api/ocr-corrections', methods=['GET', 'POST'])
+@app.route('/api/ocr-corrections', methods=['GET', 'POST', 'PATCH'])
 def manage_ocr_corrections():
     """OCR 보정 규칙을 조회하거나 저장합니다."""
     if request.method == 'GET':
@@ -239,8 +289,18 @@ def manage_ocr_corrections():
         except Exception as e:
             print(f"Error saving OCR corrections: {e}")
             return jsonify({"error": "Failed to save OCR corrections"}), 500
+
+    if request.method == 'PATCH':
+            data = request.get_json()
+            if not data or 'original_text' not in data or 'corrected_text' not in data:
+                return jsonify({'error': 'Invalid data format'}), 400
+            try:
+                mapping_utils.add_ocr_correction(data['original_text'], data['corrected_text'])
+                return jsonify({'message': 'OCR correction added/updated successfully'}), 201
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
         
-@app.route('/api/rule-based-mappings', methods=['GET', 'POST'])
+@app.route('/api/rule-based-mappings', methods=['GET', 'POST', 'PATCH'])
 def manage_rule_based_mappings():
     """상호명-카테고리 매핑을 조회하거나 저장합니다."""
     if request.method == 'GET':
@@ -262,6 +322,16 @@ def manage_rule_based_mappings():
         except Exception as e:
             print(f"Error saving merchant-category mappings: {e}")
             return jsonify({"error": "Failed to save merchant-category mappings"}), 500
+        
+    if request.method == 'PATCH':
+        data = request.get_json()
+        if not data or 'merchant_name' not in data or 'minor_category_uuid' not in data:
+            return jsonify({'error': 'Invalid data format'}), 400
+        try:
+            mapping_utils.add_rule_based_mapping(data['merchant_name'], data['minor_category_uuid'])
+            return jsonify({'message': 'Rule-based mapping added/updated successfully'}), 201
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
 
 
 # 이 파일이 직접 실행될 때만 서버를 실행

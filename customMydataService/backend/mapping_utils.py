@@ -226,6 +226,20 @@ def save_ocr_corrections(corrections_data):
     finally:
         conn.close()
 
+def add_ocr_correction(original_text, corrected_text):
+    """새로운 OCR 보정 규칙 추가"""
+    conn = database.get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("INSERT OR REPLACE INTO ocr_corrections (original_text, corrected_text) VALUES (?, ?)", (original_text, corrected_text))
+        conn.commit()
+        return {"status": "success", "message": "OCR correction added."}
+    except Exception as e:
+        conn.rollback()
+        raise e
+    finally:
+        conn.close()
+
 
 def get_all_rule_based_mappings():
     """상호명-카테고리 Rule-based 매핑 전체를 조회합니다."""
@@ -277,6 +291,20 @@ def save_rule_based_mappings(rules_data):
 
         conn.commit()
         return {"status": "success", "message": f"Inserted: {len(to_insert)}, Updated: {len(to_update)}, Deleted: {len(to_delete)}"}
+    except Exception as e:
+        conn.rollback()
+        raise e
+    finally:
+        conn.close()
+
+def add_rule_based_mapping(merchant_name, minor_category_uuid):
+    """새로운 상호명-카테고리 매핑 규칙 추가"""
+    conn = database.get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("INSERT OR REPLACE INTO rule_based_mappings (merchant_name, minor_category_uuid) VALUES (?, ?)", (merchant_name, minor_category_uuid))
+        conn.commit()
+        return {"status": "success", "message": "Rule-based mapping added."}
     except Exception as e:
         conn.rollback()
         raise e

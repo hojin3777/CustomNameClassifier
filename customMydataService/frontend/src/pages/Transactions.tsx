@@ -17,6 +17,11 @@ import HighlightPopup from '../components/transactions/HighlightPopup'; // ighli
 import '../components/transactions/HighlightPopup.css'; // ✨ HighlightPopup CSS import
 import FloatingSelectPopup, { type FloatingSelectHandle, type Opt } from '../components/transactions/FloatingSelectPopup';
 import '../components/transactions/FloatingSelectPopup.css';
+import OcrImageUploadModal from '../components/transactions/OcrImageUploadModal';
+import '../components/transactions/OcrImageUploadModal.css';
+import OcrPreviewTableModal, {type TransactionRow as OcrPreviewRow} from '../components/transactions/OcrPreviewTableModal';
+
+
 
 // ******* 타입 정의 *******
 type Account = { id: number; name: string; };
@@ -48,6 +53,7 @@ export type Transaction = {
 type Appdata = {
   accounts: Account[];
   categories: CategoryItem[];
+  mappings: { [key: number]: string };
 }
 
 const API_BASE_URL = 'http://localhost:5000'; // 백엔드 API 기본 URL
@@ -59,7 +65,7 @@ const Transactions = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [originalTransactions, setOriginalTransactions] = useState<Transaction[]>([]);
   const [checkedRows, setCheckedRows] = useState<Set<number | string>>(new Set());
-  const [appData, setAppData] = useState<Appdata>({ accounts: [], categories: [] });
+  const [appData, setAppData] = useState<Appdata>({ accounts: [], categories: [], mappings: {} });
 
   const [editingCell, setEditingCell] = useState<{ rowId: number | string; column: keyof Transaction | null } | null>(null);
   const editingCellRef = useRef<any>(null);
@@ -77,6 +83,14 @@ const Transactions = () => {
   const [isColorPopupOpen, setColorPopupOpen] = useState(false);
   const [colorPopupPosition, setColorPopupPosition] = useState({ top: 0, left: 0 });
   const [activeStyleType, setActiveStyleType] = useState<'flag' | 'highlight' | 'background' | null>(null);
+
+  // OCR 이미지 업로드 모달 관련 state
+  const [ocrModalOpen, setOcrModalOpen] = useState(false);
+  const ocrButtonRef = useRef<HTMLButtonElement>(null);
+  const [ocrPreviewRows, setOcrPreviewRows] = useState<any[]>([]);
+  const [ocrPreviewOpen, setOcrPreviewOpen] = useState(false);
+  const [ocrLoading, setOcrLoading] = useState(false);
+  const [ocrLoadingText, setOcrLoadingText] = useState('딥러닝 추출중');
 
   // dirty state
   const dirtyContext = useDirty();
@@ -140,23 +154,26 @@ const Transactions = () => {
   const fetchAllData = async () => {
     setStatus('Loading...');
     try {
-      const [transRes, accRes, catRes] = await Promise.all([
+      const [transRes, accRes, catRes, mapRes] = await Promise.all([
         fetch(`${API_BASE_URL}/api/transactions`),
         fetch(`${API_BASE_URL}/api/accounts`),
         fetch(`${API_BASE_URL}/api/categories`),
+        fetch(`${API_BASE_URL}/api/mappings`),
       ]);
       if (!transRes.ok) throw new Error('거래내역 로딩 실패');
       if (!accRes.ok) throw new Error('계좌 데이터 로딩 실패');
       if (!catRes.ok) throw new Error('카테고리 데이터 로딩 실패');
+      if (!mapRes.ok) throw new Error('매핑 데이터 로딩 실패');
 
       const transData: Transaction[] = await transRes.json();
       const accData: Account[] = await accRes.json();
       const catData: CategoryItem[] = await catRes.json();
+      const mapData: { [key: number]: string } = await mapRes.json();
 
       const processedTrans = transData.map(t => ({ ...t, checked: false }));
       setTransactions(processedTrans);
       setOriginalTransactions(processedTrans);
-      setAppData({ accounts: accData, categories: catData });
+      setAppData({ accounts: accData, categories: catData, mappings: mapData });
       setCheckedRows(new Set());
       setStatus('Loaded successfully');
       setTimeout(() => setStatus(''), 3000);
@@ -524,7 +541,7 @@ const Transactions = () => {
 
 
   // ******* 필터/정렬 관련 핸들러 *******
-  // ✨ 3. 필터 적용 핸들러
+  // 3. 필터 적용 핸들러
   const handleApplyFilter = (columnKey: string, selectedValues: any[]) => {
     setFilters(prev => ({ ...prev, [columnKey]: selectedValues }));
   };
@@ -578,6 +595,62 @@ const Transactions = () => {
     setPopupPosition({ top: rect.bottom + window.scrollY, left: rect.left + window.scrollX });
     setActiveFilter({ column: columnKey, name: title });
   };
+
+
+  // ******* 딥러닝 자동입력 관련 핸들러 *******
+  const handleOcrUpload = async (files: File[]) => {
+    setOcrModalOpen(false);
+    setOcrLoading(true);
+    try {
+      const formData = new FormData();
+      files.forEach(f => formData.append('images', f)); // 반드시 'images'!
+      const res = await fetch(`${API_BASE_URL}/api/ocr/transactions`, {
+        method: 'POST',
+        body: formData,
+      });
+      if (!res.ok) throw new Error('API 요청 실패');
+      const data = await res.json();
+      setOcrPreviewRows(data);
+      setOcrPreviewOpen(true);
+    } catch (e) {
+      alert('OCR 추출에 실패했습니다: ' + (e as Error).message);
+      console.error(e);
+    } finally {
+      setOcrLoading(false);
+    }
+  };
+  // 1. 로딩 애니메이션을 위한 useEffect 추가
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    if (ocrLoading) {
+      let dotCount = 0;
+      interval = setInterval(() => {
+        dotCount = (dotCount + 1) % 4; // 0, 1, 2, 3
+        const dots = '.'.repeat(dotCount);
+        setOcrLoadingText(`딥러닝 추출중${dots}`);
+      }, 400);
+    }
+    return () => clearInterval(interval); // 컴포넌트 언마운트 또는 ocrLoading이 false가 되면 인터벌 정리
+  }, [ocrLoading]);
+
+  // OCR 미리보기 삽입 핸들러
+  const handleOcrInsert = (rowsToInsert: OcrPreviewRow[]) => {
+    const newTransactions = rowsToInsert.map(row => ({
+      ...row,
+      id: `tmp-${crypto.randomUUID()}`, // 메인 테이블용 새 임시 ID
+      checked: false,
+      is_bold: 0,
+      flag_color_id: 0,
+      highlight_color_id: 0,
+      background_color_id: 0,
+      type: row.type as Transaction['type'],
+    }));
+    setTransactions(prev => [...prev, ...newTransactions]);
+    setOcrPreviewOpen(false);
+  };
+
+
+
 
   // ******* 렌더링 헬퍼 함수 *******
   const renderHeader = (columnKey: keyof Transaction, title: string) => {
@@ -866,6 +939,14 @@ const Transactions = () => {
           <div className="header-actions">
             <button className={`icon-button-round ${isDirty ? 'active' : ''}`} onClick={handleSave} title="Save Changes" disabled={!isDirty}><FaSave /></button>
             <button className="icon-button-round" onClick={handleReset} title="초기화"><FaUndo /></button>
+            {ocrLoading && (
+              <div className="ocr-loading-overlay">
+                <div className="ocr-loading-box">
+                  <span>{ocrLoadingText}</span>
+                  {/* 필요시 스피너 아이콘 등 추가 */}
+                </div>
+              </div>
+            )}
             <span className="status-text">{status}</span>
           </div>
         </div>
@@ -887,7 +968,7 @@ const Transactions = () => {
           <button onClick={(e) => handleOpenColorPopup(e, 'background')} disabled={!hasCheckedRows} title="배경색"><FaFillDrip /></button>
           <div className="divider"></div>
           <button className="primary">내역입력 폼 열기</button>
-          <button className="primary">딥러닝 자동입력</button>
+          <button className="primary" ref={ocrButtonRef} onClick={() => setOcrModalOpen(true)}>딥러닝 자동입력</button>
         </div>
 
         {/* 거래내역 테이블 */}
@@ -916,10 +997,11 @@ const Transactions = () => {
             </thead>
             <tbody>
               {processedTransactions.map((transaction) => {
-                // ✨ 3가지 스타일 클래스를 모두 조합
+                // 3가지 스타일 클래스를 모두 조합
                 const classNames = [
                   transaction.is_bold ? 'bold-row' : '',
                   transaction.flag_color_id > 0 ? `flag-${transaction.flag_color_id}` : '',
+                  transaction.highlight_color_id > 0 ? `highlight-${transaction.highlight_color_id}` : '',
                   transaction.background_color_id > 0 ? `bg-${transaction.background_color_id}` : '',
                 ].filter(Boolean).join(' '); // 빈 문자열을 제거하고 공백으로 합침
                 
@@ -946,6 +1028,22 @@ const Transactions = () => {
             </tbody>
           </table>
         </div>
+        {/* OCR 모달 */}
+        <OcrImageUploadModal
+          isOpen={ocrModalOpen}
+          onClose={() => setOcrModalOpen(false)}
+          onUpload={handleOcrUpload}
+          anchorRef={ocrButtonRef}
+        />
+        {/* OCR 미리보기 팝업 */}
+        <OcrPreviewTableModal
+          open={ocrPreviewOpen}
+          rows={ocrPreviewRows}
+          onClose={() => setOcrPreviewOpen(false)}
+          onInsert={handleOcrInsert}
+          appData={appData}
+          TRANSACTION_TYPES={TRANSACTION_TYPES}
+        />
         {/* 플로팅 셀렉트 컴포넌트 */}
         <FloatingSelectPopup ref={floatingSelectRef} />
         {/* 필터 팝업 조건부 렌더링 */}

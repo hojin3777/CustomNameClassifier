@@ -44,10 +44,10 @@ class Predictor:
         self.labels = labels
         self.device = device
         
-    def predict(self, sentence: str) -> str:
+    def predict(self, sentence: str) -> int:
         """한 개의 문장을 입력받아 예측된 카테고리명을 반환합니다."""
         if not isinstance(sentence, str) or not sentence.strip():
-            return "분류 불가"
+            return -1 # 분류 불가에 대해 -1 반환
             
         tokens = self.tokenizer(
             sentence,
@@ -68,8 +68,9 @@ class Predictor:
         output_index = prediction.argmax(dim=1).item()
         
         # pkl 파일의 key가 문자열이므로 str()로 변환
-        result = self.labels.get(str(output_index), "분류 실패")
-        return result
+        # result = self.labels.get(str(output_index), "분류 실패")
+        # return result
+        return output_index # int id 직접 반환
 
 # --- 서비스 초기화 및 예측 함수 ---
 def initialize_classifier():
@@ -105,9 +106,8 @@ def initialize_classifier():
     # 4. 전역 분류기 인스턴스 생성
     classifier = Predictor(model, tokenizer, labels, device)
 
-def classify_merchant_category(merchant_name: str) -> str:
-    """거래처명을 입력받아 업종을 분류합니다."""
+def classify_merchant_category(merchant_name: str) -> int:
+    """거래처명을 입력받아 bert_output_id(int)를 반환"""
     if classifier is None:
         raise Exception("업종 분류기가 초기화되지 않았습니다.")
-    
-    return classifier.predict(merchant_name)
+    return classifier.predict(merchant_name)  # int id 반환

@@ -127,3 +127,42 @@ def reset_all_transactions():
     conn.commit()
     conn.close()
     print("All transactions have been reset.")
+
+def get_ocr_correction(merchant):
+    """OCR 자동보정 테이블에서 보정값을 반환 (없으면 None)"""
+    conn = get_db_connection()
+    cur = conn.execute("SELECT corrected_text FROM ocr_corrections WHERE original_text = ?", (merchant,))
+    row = cur.fetchone()
+    conn.close()
+    return row['corrected_text'] if row else None
+
+def get_rule_based_minor_category_uuid(merchant):
+    """상호명-카테고리 룰매핑 테이블에서 소분류 uuid 반환 (없으면 None)"""
+    conn = get_db_connection()
+    cur = conn.execute("SELECT minor_category_uuid FROM rule_based_mappings WHERE merchant_name = ?", (merchant,))
+    row = cur.fetchone()
+    conn.close()
+    return row['minor_category_uuid'] if row else None
+
+def get_category_names_by_minor_uuid(minor_uuid):
+    """소분류 uuid로 대분류명, 소분류명 반환"""
+    conn = get_db_connection()
+    cur = conn.execute("""
+        SELECT mc.name as major_name, mi.name as minor_name
+        FROM minor_categories mi
+        JOIN major_categories mc ON mi.major_category_id = mc.id
+        WHERE mi.uuid = ?
+    """, (minor_uuid,))
+    row = cur.fetchone()
+    conn.close()
+    if row:
+        return row['major_name'], row['minor_name']
+    return None, None
+
+def get_minor_category_uuid_by_bert_output_id(bert_output_id):
+    """bert_output_id로 소분류 uuid 반환"""
+    conn = get_db_connection()
+    cur = conn.execute("SELECT minor_category_uuid FROM category_mappings WHERE bert_output_id = ?", (bert_output_id,))
+    row = cur.fetchone()
+    conn.close()
+    return row['minor_category_uuid'] if row else None
