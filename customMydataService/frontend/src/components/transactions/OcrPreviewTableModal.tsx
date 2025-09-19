@@ -201,19 +201,46 @@ const OcrPreviewTableModal: React.FC<OcrPreviewTableModalProps> = ({
   // ******************** 삽입 버튼, 팝업 닫기, 셀 강조 애니메이션 ********************
   // 삽입 버튼 클릭 (유효성 검사 추가)
   const handleInsert = () => {
-    for (const row of editedRows) {
-      if (!row.account_id || !row.minor_category_uuid || !row.merchant || row.amount === null) {
-        showNotification('비어있는 셀을 확인하십시오.', 'error');
-        if (!row.account_id) { setHighlightCell([{ rowId: row.id, column: 'account_name' }]); return; }
-        if (!row.minor_category_uuid) { setHighlightCell([{ rowId: row.id, column: 'minor_category_name' }]); return; }
-        if (!row.merchant) { setHighlightCell([{ rowId: row.id, column: 'merchant' }]); return; }
-        if (row.amount === null) { setHighlightCell([{ rowId: row.id, column: 'amount' }]); return; }
-        return;
+    const finalRowsToInsert = editedRows.filter(row => !row.parent_id).map(row => {
+      const children = editedRows.filter(child => child.parent_id === row.id);
+      if (children.length > 0) {
+        const totalAmount = children.reduce((sum, child) => sum + (child.amount || 0), row.amount || 0);
+        const dutchPayMemo = children
+          .map(child => `${child.merchant} ${(child.amount || 0).toLocaleString()}원`)
+          .join(', ') + ' 정산처리';
+        const newMemo = row.memo ? `${dutchPayMemo} | ${row.memo}` : dutchPayMemo;
+        return { ...row, amount: totalAmount, memo: newMemo};
       }
+      return row; // 자식이 없으면 원래 행 그대로 반환
+    });
+
+    const rowsWithEmptyCells = finalRowsToInsert.filter(row => !row.account_id || !row.minor_category_uuid || !row.merchant || row.amount === null);
+    if (rowsWithEmptyCells.length > 0) {
+      const highlights = rowsWithEmptyCells.flatMap(row => {
+        const missingColumns: (keyof TransactionRow)[] = [];
+        if (!row.account_id) missingColumns.push('account_name');
+        if (!row.minor_category_uuid) missingColumns.push('minor_category_name');
+        if (!row.merchant) missingColumns.push('merchant');
+        if (row.amount === null) missingColumns.push('amount');
+        return missingColumns.map(col => ({ rowId: row.id, column: col }));
+      });
+      setHighlightCell(highlights);
+      showNotification('비어있는 셀을 확인하십시오.', 'error');
+      return;
     }
-    onInsert(editedRows);
+    // for (const row of editedRows) {
+    //   if (!row.account_id || !row.minor_category_uuid || !row.merchant || row.amount === null) {
+    //     showNotification('비어있는 셀을 확인하십시오.', 'error');
+    //     if (!row.account_id) { setHighlightCell([{ rowId: row.id, column: 'account_name' }]); return; }
+    //     if (!row.minor_category_uuid) { setHighlightCell([{ rowId: row.id, column: 'minor_category_name' }]); return; }
+    //     if (!row.merchant) { setHighlightCell([{ rowId: row.id, column: 'merchant' }]); return; }
+    //     if (row.amount === null) { setHighlightCell([{ rowId: row.id, column: 'amount' }]); return; }
+    //     return;
+    //   }
+    // }
+    onInsert(finalRowsToInsert);
     setImagePreview(null);
-    onClose(); // 성공 시 닫기
+    handleCloseModal();
   };
 
   const handleCloseModal = () => {
@@ -560,14 +587,14 @@ const OcrPreviewTableModal: React.FC<OcrPreviewTableModalProps> = ({
   // 셀 렌더링 로직
   function renderCell(row: TransactionRow, column: keyof TransactionRow, options?: { isParent?: boolean, totalAmount?: number, isChild?: boolean }) {
     if (column === 'amount' && options?.isParent) {
-      return(
+      return (
         <td className={`align-right ${options.totalAmount! >= 0 ? 'amount-income' : 'amount-expense'}`}>
           <del className='dutch-cancel-amount'>{row.amount?.toLocaleString()}</del>
           <span className="dutch-final-amount"> {options.totalAmount?.toLocaleString()}</span>
         </td>
       );
     }
-    
+
     const cellId = `ocr-cell-${row.id}-${column}`;
     if (column === 'file_name') {
       const content = (
