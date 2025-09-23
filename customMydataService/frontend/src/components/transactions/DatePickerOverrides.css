@@ -42,6 +42,10 @@
 .dp-popper .react-datepicker__day {
   color: var(--color-text-primary);
 }
+.dp-popper .react-datepicker__day-names {
+  font-weight: 600;
+  text-align: center;
+}
 
 /* hover 강조 */
 .dp-popper .react-datepicker__day:hover {

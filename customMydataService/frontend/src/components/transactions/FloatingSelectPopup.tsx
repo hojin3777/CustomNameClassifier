@@ -18,6 +18,7 @@ const FloatingSelectPopup = forwardRef<FloatingSelectHandle, {}>((_props, ref) =
   const callbackRef = useRef<(v: string) => void>(() => {});
   const selectRef = useRef<HTMLSelectElement | null>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
+  const listRef = useRef<HTMLDivElement | null>(null);
 
   useImperativeHandle(ref, () => ({
     open: (opts, currentValue, position, onSelect) => {
@@ -37,6 +38,20 @@ const FloatingSelectPopup = forwardRef<FloatingSelectHandle, {}>((_props, ref) =
       setOpenState(false);
     }
   }), []);
+
+  // 자동 스크롤 로직
+  useEffect(() => {
+    if (openState && listRef.current && value){
+      const selectedItem = listRef.current.querySelector(`[data-value="${value}"]`) as HTMLDivElement;
+      if (selectedItem){
+        selectedItem.scrollIntoView({
+          block: 'center',
+          inline: 'nearest',
+          behavior: 'auto'
+        });
+      }
+    }
+  }, [value, options]);
 
   useEffect(() => {
     const onDocClick = (e: Event) => {
@@ -74,13 +89,14 @@ const FloatingSelectPopup = forwardRef<FloatingSelectHandle, {}>((_props, ref) =
       role="listbox"
       aria-activedescendant={value}
     >
-      <div className="floating-select-list" style={{ maxHeight: dropdownHeight, width: pos.width ?? 160 }}>
-        {options.map((o, idx) => (
+      <div ref={listRef} className="floating-select-list" style={{ maxHeight: dropdownHeight, width: pos.width ?? 160 }}>
+        {options.map((o) => (
           <div
             key={o.value}
+            data-value={o.value}
             role="option"
-            aria-selected={false} /* 이미 선택 강조 제거 */
-            className={`floating-select-item ${o.disabled ? 'disabled' : ''}`}
+            aria-selected={o.value === value}
+            className={`floating-select-item ${o.value === value ? 'selected' : ''} ${o.disabled ? 'disabled' : ''}`}
             onMouseDown={(ev) => {
               ev.preventDefault(); // 포커스 유지/브라우저 기본 동작 방지
               if (o.disabled) return;

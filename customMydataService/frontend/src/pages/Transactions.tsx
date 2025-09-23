@@ -3,7 +3,7 @@ import { FaSave, FaUndo, FaTrash,
   FaBold, FaHighlighter, FaFlag, FaFillDrip,
   FaCaretDown, FaArrowUp, FaArrowDown, FaFilter,
   FaPlus, FaArrowRight, FaAngleDoubleDown } from 'react-icons/fa'; // 각 아이콘 로드
-import DatePicker from 'react-datepicker';
+import DatePicker, { registerLocale } from 'react-datepicker';
 import { useDirty } from '../App';
 
 import './Transactions.css';
@@ -14,19 +14,20 @@ import FilterPopup from '../components/transactions/FilterPopup.tsx'; // 1. Filt
 import ConfirmPopup from '../components/ConfirmPopup'; // ConfirmPopup 컴포넌트 import
 import '../components/ConfirmPopup.css'; // ConfirmPopup CSS import
 import HighlightPopup from '../components/transactions/HighlightPopup'; // ighlightPopup 컴포넌트 import
-import '../components/transactions/HighlightPopup.css'; // ✨ HighlightPopup CSS import
+import '../components/transactions/HighlightPopup.css'; // HighlightPopup CSS import
 import FloatingSelectPopup, { type FloatingSelectHandle, type Opt } from '../components/transactions/FloatingSelectPopup';
 import '../components/transactions/FloatingSelectPopup.css';
 import OcrImageUploadModal from '../components/transactions/OcrImageUploadModal';
 import '../components/transactions/OcrImageUploadModal.css';
 import OcrPreviewTableModal, {type TransactionRow as OcrPreviewRow} from '../components/transactions/OcrPreviewTableModal';
-
-
+import TransactionFormModal from '../components/transactions/TransactionFormModal';
+import { ko } from 'date-fns/locale';
+registerLocale('ko', ko);
 
 // ******* 타입 정의 *******
 type Account = { id: number; name: string; };
 type MinorCategory = { uuid: string; name: string; };
-type CategoryItem = { id: number; name: string; minors: MinorCategory[]; };
+export type CategoryItem = { id: number; name: string; minors: MinorCategory[]; };
 
 // 페이지용 데이터 타입
 export type Transaction = {
@@ -50,7 +51,7 @@ export type Transaction = {
   minor_category_name: string | null;
 };
 
-type Appdata = {
+export type Appdata = {
   accounts: Account[];
   categories: CategoryItem[];
   mappings: { [key: number]: string };
@@ -91,6 +92,9 @@ const Transactions = () => {
   const [ocrPreviewOpen, setOcrPreviewOpen] = useState(false);
   const [ocrLoading, setOcrLoading] = useState(false);
   const [ocrLoadingText, setOcrLoadingText] = useState('딥러닝 추출중');
+
+  // 내역입력 폼 모달 관련 state
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
 
   // dirty state
   const dirtyContext = useDirty();
@@ -448,6 +452,35 @@ const Transactions = () => {
     requestAnimationFrame(step); // 애니메이션 시작
   };
 
+  // 폼 입력 받는 핸들러
+  const handleInsertTransactions = (newTransactions: Partial<Transaction>[]) => {
+    const completeNewTransactions = newTransactions.map(t => {
+      const account = appData.accounts.find(acc => acc.id === t.account_id);
+      const majorCategory = appData.categories.find(cat => cat.name === t.major_category_name);
+      const minorCategory = majorCategory?.minors.find(min => min.uuid === t.minor_category_uuid);
+
+      return {
+        ...t,
+        id: t.id ?? `tmp-${crypto.randomUUID()}`,
+        transaction_date: t.transaction_date || new Date().toDateString().split('T')[0],
+        account_name: account?.name || null,
+        account_id: t.account_id || 0,
+        type: t.type || '유동지출',
+        major_category_name: t.major_category_name || '',
+        minor_category_uuid: t.minor_category_uuid || null,
+        minor_category_name: minorCategory?.name || null,
+        merchant: t.merchant || '',
+        amount: t.amount || 0,
+        memo: t.memo || '',
+        checked: t.checked || false,
+        is_bold: t.is_bold || 0,
+        flag_color_id: t.flag_color_id || 0,
+        highlight_color_id: t.highlight_color_id || 0,
+        background_color_id: t.background_color_id || 0,
+      };
+    }) as Transaction[];
+    setTransactions(prev => [...prev, ...completeNewTransactions]);
+  };
 
   // ******* 셀 업데이트 로직 *******
   const handleUpdateCell = (rowId: number | string, column: keyof Transaction, value: any) => {
@@ -713,6 +746,7 @@ const Transactions = () => {
                 onBlur={() => setEditingCell(null)}
                 autoFocus={commonProps.autoFocus}
                 className='dp-input'
+                locale={ko}
                 popperClassName='dp-popper'
                 calendarClassName='dp-calendar'
                 dayClassName={(date) => {
@@ -967,7 +1001,7 @@ const Transactions = () => {
           <button onClick={(e) => handleOpenColorPopup(e, 'highlight')} disabled={!hasCheckedRows} title="형광펜"><FaHighlighter /></button>
           <button onClick={(e) => handleOpenColorPopup(e, 'background')} disabled={!hasCheckedRows} title="배경색"><FaFillDrip /></button>
           <div className="divider"></div>
-          <button className="primary">내역입력 폼 열기</button>
+          <button className="primary" onClick={() => setIsFormModalOpen(true)}>내역입력 폼 열기</button>
           <button className="primary" ref={ocrButtonRef} onClick={() => setOcrModalOpen(true)}>딥러닝 자동입력</button>
         </div>
 
@@ -1034,6 +1068,14 @@ const Transactions = () => {
           onClose={() => setOcrModalOpen(false)}
           onUpload={handleOcrUpload}
           anchorRef={ocrButtonRef}
+        />
+        {/* 내역입력 폼 모달 */}
+        <TransactionFormModal
+          isOpen={isFormModalOpen}
+          onClose={() => setIsFormModalOpen(false)}
+          onInsert={handleInsertTransactions}
+          appData={appData}
+          allTransactions={originalTransactions}
         />
         {/* OCR 미리보기 팝업 */}
         <OcrPreviewTableModal

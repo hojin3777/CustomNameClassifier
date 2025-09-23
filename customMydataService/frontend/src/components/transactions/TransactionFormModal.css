@@ -1,0 +1,302 @@
+.form-modal-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.form-modal-content {
+  background-color: var(--color-bg-content);
+  border-radius: 8px;
+  border: 2px solid var(--color-border);
+  padding: 12px;
+  width: 460px; /* 너비 조정 */
+  box-shadow: 0px 8px 16px var(--color-bg-overlay);
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+}
+
+.form-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-border);
+  cursor: move;
+}
+
+/* 1. 날짜 선택기 UI 개편 */
+.date-selector {
+  display: flex;
+  flex-grow: 1; /* 헤더 영역 채우기 */
+  align-items: center;
+  gap: 4px;
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+}
+
+.date-selector .calendar-btn {
+  background: var(--color-bg-inset);
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: 6px;
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-size: 1.1rem;
+}
+.date-selector .calendar-btn:hover {
+  background-color: var(--color-interactive-hover);
+  color: var(--color-text-primary);
+}
+
+.date-selector .date-part {
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--color-text-primary);
+  transition: background-color 0.15s;
+  background-color: var(--color-bg-inset);
+}
+.date-selector .date-part:hover {
+  background-color: var(--color-interactive-hover);
+}
+.date-selector .date-part.year { width: 70px; text-align: center; }
+.date-selector .date-part.month,
+.date-selector .date-part.day { width: 50px; text-align: center; }
+
+.date-selector .separator {
+  margin: 0 4px;
+}
+
+.date-selector .weekday {
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: var(--color-bg-inset);
+  color: var(--color-text-primary);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  transition: color 0.2s;
+  padding: 0;
+  line-height: 1;
+}
+.close-btn:hover { color: var(--color-text-primary); }
+
+.form-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.grid-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  height: 340px;
+}
+
+.left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+.left-column .panel:first-child{
+  flex-grow: 1;
+}
+.left-column .panel:last-child{
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.panel label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  padding-left: 4px;
+  color: var(--color-text-primary);
+  font-size: 0.9rem;
+}
+
+/* 2. 리스트 UI 복원 */
+.selectable-list {
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+  background-color: var(--color-bg-inset);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.selectable-list.fixed-height{
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+
+.selectable-list.full-height {
+  height: 100%;
+}
+
+.selectable-list li {
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  color: var(--color-text-secondary);
+  transition: background-color 0.15s, color 0.15s;
+  font-size: 0.85rem;
+}
+
+.selectable-list li:hover {
+  background-color: var(--color-interactive-hover);
+  color: var(--color-text-primary);
+}
+
+.selectable-list li.selected {
+  background-color: var(--color-accent-blue);
+  color: white;
+  font-weight: 600;
+}
+
+.detail-label{
+  font-weight: 600;
+  margin-bottom: 6px;
+  padding-left: 4px;
+  color: var(--color-text-primary);
+  font-size: 0.9rem;
+}
+
+.detail-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.form-group-inline {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.detail-fields input[type="text"] {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-inset);
+  color: var(--color-text-primary);
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+}
+.detail-fields input[type="text"]:focus {
+  outline: none;
+  border-color: var(--color-accent-blue);
+}
+.amount-input{
+  text-align: right;
+  font-weight: bold;
+  padding: 7px 10px !important;
+  font-size: 1rem !important;
+}
+.amount-input.income {
+  color: var(--color-accent-red) !important;
+}
+.amount-input.expense {
+  color: var(--color-accent-blue) !important;
+}
+.label-with-warning{
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.amount-warning{
+  font-size: 0.75rem;
+  color: var(--color-accent-red);
+  font-weight: 500;
+}
+
+.internal-transfer-panel {
+  background-color: var(--color-bg-inset);
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.internal-transfer-panel .selectable-list.horizontal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  height: auto;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.internal-transfer-panel .selectable-list.horizontal li {
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 3px 8px;
+  font-size: 0.85rem;
+}
+
+.form-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border);
+}
+
+.form-modal-footer button {
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+  font-size: 0.9rem;
+}
+
+.form-modal-footer .btn-primary {
+  background-color: var(--color-highlight-5);
+  color: white;
+  border: none;
+}
+.form-modal-footer .btn-primary:hover {
+  background-color: var(--color-highlight-5-transparent7);
+}
+
+.form-modal-footer button:not(.btn-primary) {
+  background-color: var(--color-text-primary);
+  color: var(--color-text-inverted);
+  border: none;
+}
+.form-modal-footer button:not(.btn-primary):hover {
+  background-color: var(--color-text-secondary);
+}

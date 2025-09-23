@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { FaPlus, FaArrowRight, FaTrash } from 'react-icons/fa';
 import './OcrPreviewTableModal.css';
 
 import FloatingSelectPopup, { type FloatingSelectHandle, type Opt } from './FloatingSelectPopup';
@@ -23,7 +24,11 @@ type ImagePreviewState = {
   left: number;
   filename: string;
 };
-type HighlightCell = { rowId: string; column: keyof TransactionRow; };
+type HighlightCell = {
+  rowId: string;
+  column: keyof TransactionRow;
+  type: 'error' | 'sync';
+};
 
 export type TransactionRow = {
   id: string;
@@ -65,6 +70,7 @@ const OcrPreviewTableModal: React.FC<OcrPreviewTableModalProps> = ({
   const [notification, setNotification] = useState<{ message: string; type: NotificationType } | null>(null);
   const [imagePreview, setImagePreview] = useState<ImagePreviewState | null>(null);
   const [selectedDutchSources, setSelectedDutchSources] = useState<string[]>([]); // 더치페이 원본 행 ID 목록
+  const [checkedOcrRows, setCheckedOcrRows] = useState<Set<string>>(new Set()); // OCR 선택된 행 ID 목록
 
   const editingCellRef = useRef<HTMLInputElement>(null);
   const floatingSelectRef = useRef<FloatingSelectHandle | null>(null);
@@ -74,6 +80,7 @@ const OcrPreviewTableModal: React.FC<OcrPreviewTableModalProps> = ({
   useEffect(() => {
     if (!open || !rows || rows.length === 0) {
       setEditedRows([]);
+      setCheckedOcrRows(new Set());
       return;
     }
 
@@ -110,6 +117,7 @@ const OcrPreviewTableModal: React.FC<OcrPreviewTableModalProps> = ({
       return newRow;
     });
     setEditedRows(newRows);
+    setCheckedOcrRows(new Set());
   }, [open, rows, appData.categories]);
 
   // 4. 자동 규칙 생성 및 알림 표시
@@ -132,18 +140,22 @@ const OcrPreviewTableModal: React.FC<OcrPreviewTableModalProps> = ({
       if (column === 'account_id') {
         const acc = appData.accounts.find(a => a.id === value);
         const targetFileName = updatedRow.file_name;
-        const cellsToHighlight: HighlightCell[] = [];
-        newRows = newRows.map(r => {
-          if (r.file_name === targetFileName) {
-            cellsToHighlight.push({ rowId: r.id, column: 'account_name' });
-            return { ...r, account_id: value, account_name: acc ? acc.name : null };
-          }
-          return r;
-        });
-        setHighlightCell(cellsToHighlight);
-        setTimeout(() => setHighlightCell([]), 3000);
-        return newRows;
+        if (targetFileName){
+          const cellsToHighlight: HighlightCell[] = [];
+          newRows = newRows.map(r => {
+            if (r.file_name === targetFileName) {
+              cellsToHighlight.push({ rowId: r.id, column: 'account_name', type: 'sync' });
+              return { ...r, account_id: value, account_name: acc ? acc.name : null };
+            }
+            return r;
+          });
+          setHighlightCell(cellsToHighlight);
+          setTimeout(() => setHighlightCell([]), 3000);
+          return newRows;
+        }
+        updatedRow.account_name = acc ? acc.name : null;
       }
+        
       // 기존 로직
       if (column === 'type' || column === 'major_category_name') {
         if (column === 'type') updatedRow.major_category_name = null;
@@ -155,7 +167,7 @@ const OcrPreviewTableModal: React.FC<OcrPreviewTableModalProps> = ({
           if (minor) {
             updatedRow.minor_category_name = minor.name;
             updatedRow.major_category_name = major.name;
-            if (oldRow.minor_category_uuid !== updatedRow.minor_category_uuid) {
+            if (oldRow.minor_category_uuid !== updatedRow.minor_category_uuid && updatedRow.merchant) {
               fetch(`${API_BASE_URL}/api/rule-based-mappings`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
@@ -222,22 +234,13 @@ const OcrPreviewTableModal: React.FC<OcrPreviewTableModalProps> = ({
         if (!row.minor_category_uuid) missingColumns.push('minor_category_name');
         if (!row.merchant) missingColumns.push('merchant');
         if (row.amount === null) missingColumns.push('amount');
-        return missingColumns.map(col => ({ rowId: row.id, column: col }));
+        return missingColumns.map(col => ({ rowId: row.id, column: col, type: 'error' as const }));
       });
       setHighlightCell(highlights);
       showNotification('비어있는 셀을 확인하십시오.', 'error');
+      setTimeout(() => setHighlightCell([]), 3000);
       return;
     }
-    // for (const row of editedRows) {
-    //   if (!row.account_id || !row.minor_category_uuid || !row.merchant || row.amount === null) {
-    //     showNotification('비어있는 셀을 확인하십시오.', 'error');
-    //     if (!row.account_id) { setHighlightCell([{ rowId: row.id, column: 'account_name' }]); return; }
-    //     if (!row.minor_category_uuid) { setHighlightCell([{ rowId: row.id, column: 'minor_category_name' }]); return; }
-    //     if (!row.merchant) { setHighlightCell([{ rowId: row.id, column: 'merchant' }]); return; }
-    //     if (row.amount === null) { setHighlightCell([{ rowId: row.id, column: 'amount' }]); return; }
-    //     return;
-    //   }
-    // }
     onInsert(finalRowsToInsert);
     setImagePreview(null);
     handleCloseModal();
@@ -297,11 +300,74 @@ const OcrPreviewTableModal: React.FC<OcrPreviewTableModalProps> = ({
     });
   };
 
+  // ********************* 행 추가/삭제 및 체크박스 관련 핸들러 *********************
+  const handleAddRow = () => {
+    const newRow: TransactionRow = {
+      id: `tmp-ocr-${crypto.randomUUID()}`,
+      transaction_date: new Date().toISOString().split('T')[0],
+      type: '유동지출',
+      amount: null,
+      merchant: '',
+      memo: '',
+      account_id: null,
+      account_name: null,
+      minor_category_uuid: null,
+      major_category_name: null,
+      minor_category_name: null,
+      parent_id: null,
+    };
+
+    let lastCheckedIndex = -1;
+    if (checkedOcrRows.size > 0) {
+      const visibleRows = editedRows.filter(r => !r.parent_id);
+      for (let i = visibleRows.length - 1; i >= 0; i--) {
+        if (checkedOcrRows.has(visibleRows[i].id)) {
+          const actualIndex = editedRows.findIndex(r => r.id === visibleRows[i].id);
+          lastCheckedIndex = actualIndex;
+          break;
+        }
+      }
+    }
+
+    setEditedRows(prev => {
+      const newRows = [...prev];
+      if (lastCheckedIndex === -1){
+        newRows.push(newRow);
+      } else {
+        newRows.splice(lastCheckedIndex + 1, 0, newRow);
+      }
+      return newRows;
+    });
+  };
+
+  const handleDeleteRows = () => {
+    if (checkedOcrRows.size === 0) return;
+    setEditedRows(prev => prev.filter(row => !checkedOcrRows.has(row.id)));
+    setCheckedOcrRows(new Set());
+  };
+
+  const handleToggleCheck = (rowId: string) => {
+    setCheckedOcrRows(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(rowId)) newSet.delete(rowId);
+      else newSet.add(rowId);
+      return newSet;
+    });
+  };
+
+  const handleToggleCheckAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setCheckedOcrRows(new Set(editedRows.map(r => r.id)));
+    } else {
+      setCheckedOcrRows(new Set());
+    }
+  };
 
 
 
 
 
+  // 정산기능때문에 function으로 이동
   // ******************** 셀 렌더링 및 편집 관련 ********************
   // 렌더링 로직 (Transactions.tsx와 유사하게)
   // const renderCell = (row: TransactionRow, column: keyof TransactionRow) => {
@@ -471,6 +537,15 @@ const OcrPreviewTableModal: React.FC<OcrPreviewTableModalProps> = ({
       <div className="ocr-preview-modal-bg">
         <div className="ocr-preview-modal" onClick={(e) => e.stopPropagation()}>
           <div className="ocr-preview-header-row">
+            <div className='ocr-modal-toolbar'>
+              <button onClick={handleAddRow}>
+                {checkedOcrRows.size > 0 ? <FaArrowRight /> : <FaPlus />}
+                {checkedOcrRows.size > 0 ? ' 행 삽입' : ' 행 추가'}
+              </button>
+              <button onClick={handleDeleteRows} disabled={checkedOcrRows.size === 0}>
+                <FaTrash /> 행 삭제
+              </button>
+            </div>
             <div className="ocr-preview-title">거래내역 추출결과</div>
             <button className="ocr-preview-close" onClick={handleCloseModal}>×</button>
           </div>
@@ -478,6 +553,13 @@ const OcrPreviewTableModal: React.FC<OcrPreviewTableModalProps> = ({
             <table className="ocr-preview-table">
               <thead>
                 <tr>
+                  <th className="ocr-actions-header">
+                    <input
+                      type="checkbox"
+                      onChange={handleToggleCheckAll}
+                      checked={editedRows.length > 0 && checkedOcrRows.size === editedRows.length}
+                      />
+                  </th>
                   <th>파일명</th>
                   <th>날짜</th>
                   <th>계좌</th>
@@ -503,6 +585,9 @@ const OcrPreviewTableModal: React.FC<OcrPreviewTableModalProps> = ({
                     <React.Fragment key={row.id}>
                       {/* 부모 행 */}
                       <tr className={children.length > 0 ? 'dutch-parent-row' : ''}>
+                        <td>
+                          <input type='checkbox' checked={checkedOcrRows.has(row.id)} onChange={() => handleToggleCheck(row.id)} />
+                        </td>
                         {renderCell(row, 'file_name')}
                         {renderCell(row, 'transaction_date')}
                         {renderCell(row, 'account_name')}
@@ -517,6 +602,9 @@ const OcrPreviewTableModal: React.FC<OcrPreviewTableModalProps> = ({
                       {/* 자식 행 */}
                       {children.map(child => (
                         <tr key={child.id} className="dutch-child-row">
+                          <td>
+                            <input type='checkbox' checked={checkedOcrRows.has(child.id)} onChange={() => handleToggleCheck(child.id)} />
+                          </td>
                           {renderCell(child, 'file_name', { isChild: true })}
                           {renderCell(child, 'transaction_date', { isChild: true })}
                           {renderCell(child, 'account_name', { isChild: true })}
@@ -584,7 +672,10 @@ const OcrPreviewTableModal: React.FC<OcrPreviewTableModalProps> = ({
       </>
     );
   }
-  // 셀 렌더링 로직
+
+
+
+  // 셀 렌더링 로직 - 정산기능 때문에 funciton으로 이동
   function renderCell(row: TransactionRow, column: keyof TransactionRow, options?: { isParent?: boolean, totalAmount?: number, isChild?: boolean }) {
     if (column === 'amount' && options?.isParent) {
       return (
@@ -716,7 +807,7 @@ const OcrPreviewTableModal: React.FC<OcrPreviewTableModalProps> = ({
     let className = '';
     const highlightInfo = highlightCell.find(cell => cell.rowId === row.id && cell.column === column);
     if (highlightInfo) {
-      className = highlightCell.length === 1 ? 'highlight-error' : 'highlight-sync';
+      className = highlightInfo.type === 'error' ? 'highlight-error' : 'highlight-sync';
     }
     if (options?.isChild) {
       className = `${className} dutch-child-content-cell`.trim();

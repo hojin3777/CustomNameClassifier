@@ -35,6 +35,11 @@
     background: var(--color-bg-inset);
     color: var(--color-text-header);
 }
+.floating-select-item.selected {
+  border: 1px solid var(--color-border-interactive);
+  border-radius: 4px; /* 테두리에 맞게 둥근 모서리 추가 */
+  box-sizing: border-box; /* 테두리가 크기에 영향을 주도록 설정 */
+}
 .floating-select-root:focus-within{
     outline: none;
     border: 2px solid var(--color-border-interactive);
