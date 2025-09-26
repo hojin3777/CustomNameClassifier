@@ -12,15 +12,24 @@
   background-color: var(--color-bg-content);
   border-radius: 8px;
   border: 2px solid var(--color-border);
-  padding: 12px;
-  width: 460px; /* 너비 조정 */
+  padding: 0;
   box-shadow: 0px 8px 16px var(--color-bg-overlay);
   position: absolute;
   top: 0;
   left: 0;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   pointer-events: auto;
+  height: 615px;
+}
+
+.main-panel {
+  flex: 0 0 440px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  /* overflow-y: auto; */
 }
 
 .form-modal-header {
@@ -31,6 +40,7 @@
   padding-bottom: 8px;
   border-bottom: 1px solid var(--color-border);
   cursor: move;
+  min-height: 0;
 }
 
 /* 1. 날짜 선택기 UI 개편 */
@@ -102,7 +112,8 @@
 .form-modal-body {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
+  min-height: 0;
 }
 
 .grid-panel {
@@ -110,7 +121,9 @@
   grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
   height: 340px;
+  font-size: 0.85rem;
 }
+
 
 .left-column {
   display: flex;
@@ -193,6 +206,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin-top: 6px;
 }
 
 .form-group {
@@ -203,11 +217,13 @@
 
 .form-group-inline {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1.5fr 1fr;
   gap: 12px;
 }
 
 .detail-fields input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
   padding: 8px 10px;
   border-radius: 6px;
   border: 1px solid var(--color-border);
@@ -219,6 +235,7 @@
 .detail-fields input[type="text"]:focus {
   outline: none;
   border-color: var(--color-accent-blue);
+  color: var(--color-text-primary);
 }
 .amount-input{
   text-align: right;
@@ -241,29 +258,6 @@
   font-size: 0.75rem;
   color: var(--color-accent-red);
   font-weight: 500;
-}
-
-.internal-transfer-panel {
-  background-color: var(--color-bg-inset);
-  padding: 10px;
-  border-radius: 6px;
-}
-
-.internal-transfer-panel .selectable-list.horizontal {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  height: auto;
-  background: none;
-  border: none;
-  padding: 0;
-}
-
-.internal-transfer-panel .selectable-list.horizontal li {
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  padding: 3px 8px;
-  font-size: 0.85rem;
 }
 
 .form-modal-footer {
@@ -299,4 +293,138 @@
 }
 .form-modal-footer button:not(.btn-primary):hover {
   background-color: var(--color-text-secondary);
+}
+
+/* 알림 메시지 스타일 */
+.form-notification {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  width: max-content; /* 내용에 맞게 너비 조절 */
+  background-color: var(--color-highlight-2-transparent25);
+  color: var(--color-text-primary-inverted);
+  padding: 8px 18px;
+  border-radius: 6px;
+  z-index: 10;
+  font-weight: 500;
+  font-size: 0.9em;
+  animation: fadeInOut 3s ease-in-out;
+}
+
+/* 1. OcrPreview와 동일한 키프레임으로 변경 */
+@keyframes fadeInOut {
+  0%, 100% {
+    opacity: 0;
+  }
+  15%, 85% {
+    opacity: 1;
+  }
+}
+
+
+
+
+/* 2. 사이드 패널 스타일 */
+.side-panel {
+  flex: 0 0 200px; /* 고정 너비 */
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-left: 1px solid var(--color-border); /* 세로 구분선 */
+  background-color: var(--color-bg-content); /* 메인과 동일한 배경 */
+}
+
+.side-panel-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.side-panel-section-header label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-text-primary);
+}
+
+.side-panel-section-header .icon-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 0 4px;
+}
+.side-panel-section-header .icon-btn:hover {
+  color: var(--color-text-primary);
+}
+
+.side-panel-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0; /* flex 자식의 스크롤을 위해 */
+}
+.side-panel-section + .side-panel-section.suggestions-section{
+  border-top: 1px solid var(--color-border);
+  padding-top: 8px;
+}
+
+.side-panel-section label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-text-primary);
+}
+
+.side-panel-section input[type="text"] {
+  padding: 6px 8px;
+  font-size: 0.85rem;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-inset);
+  color: var(--color-text-primary);
+}
+
+.suggestions-section {
+  flex-grow: 1; /* 남은 공간 모두 차지 */
+}
+
+.suggestion-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.suggestion-list li {
+  background-color: var(--color-bg-inset);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.suggestion-list li:hover {
+  background-color: var(--color-bg-content);
+  border-color: var(--color-border-interactive);
+}
+
+.suggestion-meta {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.suggestion-merchant {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-top: 2px;
 }

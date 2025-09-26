@@ -95,6 +95,8 @@ const Transactions = () => {
 
   // 내역입력 폼 모달 관련 state
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+  const [insertedCount, setInsertedCount] = useState(0);
+  const [lastInsertedFromFormId, setLastInsertedFromFormId] = useState<number | string | null>(null);
 
   // dirty state
   const dirtyContext = useDirty();
@@ -153,6 +155,21 @@ const Transactions = () => {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [isDirty]);
 
+  // ******* 폼 새 행 추가 이벤트 처리 *******
+  useEffect(() => {
+    if (lastInsertedFromFormId) {
+      const rowElement = document.getElementById(`row-${lastInsertedFromFormId}`);
+      if (rowElement) {
+        rowElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        rowElement.classList.add('highlight-new');
+        setTimeout(() => {
+          rowElement.classList.remove('highlight-new');
+        }, 3000);
+      }
+      setLastInsertedFromFormId(null);
+    }
+  }, [lastInsertedFromFormId]);
+
 
   // ******* 데이터 로딩 *******
   const fetchAllData = async () => {
@@ -181,6 +198,9 @@ const Transactions = () => {
       setCheckedRows(new Set());
       setStatus('Loaded successfully');
       setTimeout(() => setStatus(''), 3000);
+      setTimeout(() => {
+        handleScrollToBottom();
+      }, 200); // 데이터 로딩 후 약간의 지연을 두고 스크롤
     } catch (error) {
       console.error("Data loading failed:", error);
       setStatus("Data loading failed");
@@ -479,7 +499,24 @@ const Transactions = () => {
         background_color_id: t.background_color_id || 0,
       };
     }) as Transaction[];
+    const lastNewId = completeNewTransactions[completeNewTransactions.length - 1].id;
     setTransactions(prev => [...prev, ...completeNewTransactions]);
+    setLastInsertedFromFormId(lastNewId);
+  };
+
+  const handleCloseFormModal = (finalInsertedCount: number) => {
+    setIsFormModalOpen(false);
+    if (finalInsertedCount > 0) {
+      setConfirmPopup({
+        isOpen: true,
+        type: 'alert', // 일반 정보 팝업
+        title: '',
+        message: `${finalInsertedCount}개의 거래내역이 추가되었습니다.`,
+        onConfirm: () => setConfirmPopup(prev => ({ ...prev, isOpen: false })),
+        onCancel: undefined,
+      });
+    }
+    setInsertedCount(0);
   };
 
   // ******* 셀 업데이트 로직 *******
@@ -1040,7 +1077,7 @@ const Transactions = () => {
                 ].filter(Boolean).join(' '); // 빈 문자열을 제거하고 공백으로 합침
                 
                 return(
-                  <tr key={transaction.id} className={classNames.trim()}>
+                  <tr key={transaction.id} id={`row-${transaction.id}`} className={classNames.trim()}>
                   <td>
                   <input
                     type="checkbox"
@@ -1072,10 +1109,12 @@ const Transactions = () => {
         {/* 내역입력 폼 모달 */}
         <TransactionFormModal
           isOpen={isFormModalOpen}
-          onClose={() => setIsFormModalOpen(false)}
+          onClose={handleCloseFormModal}
           onInsert={handleInsertTransactions}
           appData={appData}
           allTransactions={originalTransactions}
+          insertedCount={insertedCount}
+          setInsertedCount={setInsertedCount}
         />
         {/* OCR 미리보기 팝업 */}
         <OcrPreviewTableModal

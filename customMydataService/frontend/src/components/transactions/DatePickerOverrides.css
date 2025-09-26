@@ -113,6 +113,19 @@
 .dp-popper .react-datepicker__triangle {
   display: none;
 }
+.dp-popper .react-datepicker__day--outside-month:hover {
+  background: var(--color-bg-overlay-light);
+  color: var(--color-text-primary);
+}
+
+/* 1. DatePicker가 body의 overflow를 변경하는 것을 방지하여 레이아웃 밀림 현상 해결 */
+body.react-datepicker-ignore-onclickoutside {
+  overflow: auto !important;
+}
+/* 2. 접근성용 tab-loop div가 레이아웃에 영향을 주지 않도록 숨김 처리 */
+.date-selector .react-datepicker__tab-loop {
+  position: absolute;
+}
 
 /* input(편집용) 스타일 */
 .dp-input {

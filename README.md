@@ -135,3 +135,16 @@ Classify store names with deeplearning
 - 그 외 변경사항
     - FloatingSelectPopup에서 선택되어 있는 항목으로 자동 스크롤 및 강조 표시
     - DatePickerOverrides.css에서 요일 행 가운데 정렬 서식 지정 및 한글화
+- 수정필요사항
+    - 딥러닝 자동입력에서 다른ui에서 날짜 생성 시 날짜형식이 통일되지 않음( V )
+
+### 0924
+- 거래내역 폼 고도화
+    - 검색 기능 및 내계좌이체 기능 추가
+    - 확장 패널 UI구성 및 각 기능 연결
+    - 입력 시 거래내역 메뉴에서 스크롤 및 하이라이트 효과 구현, 종료 시 입력한 행의 수 계산
+    - TODO: 달력 팝업 열 때 나머지 요소 밀리는 현상 수정 필요 ( V )
+- 그 외 변경사항
+    - 거래내역 메뉴 초기 진입시 맨 아래로 자동 스크롤
+    - DatePickerOverrides.css 에서 div요소가 gap을 만드는 요소 해결(0924TODO)
+    - ocr_service.py에서 통일된 날짜를 반환하도록 개선 (0923TODO)

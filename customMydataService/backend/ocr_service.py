@@ -7,6 +7,7 @@ import cv2
 import numpy as np
 import re
 from collections import defaultdict
+from datetime import datetime
 import pandas as pd
 import io
 import classification_service
@@ -167,12 +168,41 @@ def structure_transactions_sequentially(predictions):
             return amount
         except (ValueError, TypeError): return None
 
+    def format_date(date_str):
+        if not date_str:
+            return None
+        
+        # "MM월 DD일" 형식 처리
+        match_kor = re.match(r'(\d{1,2})월\s*(\d{1,2})일', date_str.strip())
+        if match_kor:
+            current_year = datetime.now().year
+            month, day = map(int, match_kor.groups())
+            return f"{current_year:04d}-{month:02d}-{day:02d}"
+
+        # 모든 구분자를 '-'로 통일
+        cleaned_str = re.sub(r'[./]', '-', date_str)
+        
+        # YYYY-MM-DD 형식
+        match = re.match(r'(\d{4})-(\d{1,2})-(\d{1,2})', cleaned_str)
+        if match:
+            year, month, day = map(int, match.groups())
+            return f"{year:04d}-{month:02d}-{day:02d}"
+
+        # MM-DD 형식 (연도가 없는 경우)
+        match = re.match(r'(\d{1,2})-(\d{1,2})', cleaned_str)
+        if match:
+            current_year = datetime.now().year
+            month, day = map(int, match.groups())
+            return f"{current_year:04d}-{month:02d}-{day:02d}"
+        
+        return date_str # 매칭되는 형식이 없으면 원본 반환 (예외 처리)
+
     all_transactions = []
-    sorted_predictions = sorted(predictions, key=lambda p: (p['box'][1], p['box'][0]))
+    sorted_predictions = sorted(predictions, key=lambda p: (p['box'][1], p.get('box', [0,0,0,0])[0]))
 
     # 날짜 블록 미리 추출
     date_blocks = [
-        {'text': p['text'], 'box': p['box']}
+        {'text': format_date(p['text']), 'box': p['box']}
         for p in sorted_predictions if p['label'] == 'DATE'
     ]
 
@@ -184,7 +214,7 @@ def structure_transactions_sequentially(predictions):
 
         # 1. 날짜 정보 처리
         if label == 'DATE':
-            last_known_date = text
+            last_known_date = format_date(text)
             if current_transaction and not current_transaction.get('date'):
                 current_transaction['date'] = last_known_date
 

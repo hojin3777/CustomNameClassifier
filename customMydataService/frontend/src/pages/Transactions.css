@@ -72,7 +72,7 @@ table {
   border-right: none;
 }
 
-/* ✨ 2. 헤더 스타일 통합 및 배경색 수정 */
+/* 2. 헤더 스타일 통합 및 배경색 수정 */
 .table-container thead th {
   background-color: var(--color-bg-content);
   font-weight: 600;
@@ -195,6 +195,16 @@ td.editing select:focus{
 .highlight-error {
   animation: highlight-error-animation 3s ease-out;
 }
+
+@keyframes highlight-new-row {
+  from { background-color: var(--color-highlight-5-transparent9); }
+  to { background-color: transparent; }
+}
+
+tr.highlight-new {
+  animation: highlight-new-row 3s ease-out;
+}
+
 
 /* 편집 모드 강조 스타일 */
 .bold-row td{
