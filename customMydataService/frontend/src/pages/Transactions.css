@@ -286,3 +286,36 @@ tr.highlight-new {
   font-weight: bold;
   box-shadow: 0 8px 32px var(--color-bg-overlay-light);
 }
+
+
+/* 엑셀 팝업 스타일 추가 */
+.excel-popup {
+  position: absolute;
+  z-index: 1000;
+  background-color: var(--color-bg-app);
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px var(--color-bg-overlay-light);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.excel-popup button {
+  width: 100%;
+  background: var(--color-bg-content);
+  border: none;
+  color: var(--color-text-primary);
+  padding: 8px 24px 8px 12px;
+  text-align: left;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.excel-popup button:hover {
+  background-color: var(--color-bg-content-hover);
+}

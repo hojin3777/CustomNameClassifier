@@ -101,6 +101,15 @@ def init_db():
         )
     ''')
 
+    # --- 6. 사용자 설정 테이블 (settings) ---
+    # 역할: 사용자의 각종 설정을 key-value 형태로 저장합니다. (대시보드 기간, 테마 등)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS settings (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        )
+    ''')
+
     conn.commit()
     conn.close()
     print(f"Database and tables created successfully created at: {DB_PATH}")

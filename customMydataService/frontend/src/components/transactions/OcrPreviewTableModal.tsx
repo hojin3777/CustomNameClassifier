@@ -5,7 +5,7 @@ import './OcrPreviewTableModal.css';
 import FloatingSelectPopup, { type FloatingSelectHandle, type Opt } from '../FloatingSelectPopup';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import '../transactions/DatePickerOverrides.css'; // DatePicker 커스텀 CSS 재사용
+import './DatePickerOverrides.css'; // DatePicker 커스텀 CSS 재사용
 import ImagePreviewPopup from './ImagePreviewPopup';
 
 // Transactions.tsx와 유사한 타입 정의

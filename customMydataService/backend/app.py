@@ -15,6 +15,7 @@ import category_utils
 import account_utils
 import transaction_utils
 import mapping_utils
+import dashboard_utils
 import pandas as pd
 
 # Flask 앱 초기화
@@ -90,6 +91,26 @@ def process_image_ocr():
         # 실제 운영 환경에서는 더 상세한 로깅이 필요
         print(f"Error during OCR processing: {e}")
         return jsonify({"error": f"An error occurred during image processing: {e}"}), 500
+
+
+# ------------------- 대시보드 통계 API -------------------
+@app.route('/api/statistics/monthly_summary', methods=['GET'])
+def get_monthly_summary():
+    """월별 수입/지출 요약 데이터를 반환합니다."""
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+
+    if not start_date or not end_date:
+        return jsonify({"error": "start_date and end_date parameters are required."}), 400
+
+    try:
+        summary_data = dashboard_utils.get_monthly_summary(start_date, end_date)
+        return jsonify(summary_data)
+    except Exception as e:
+        print(f"Error getting monthly summary: {e}")
+        return jsonify({"error": "Failed to retrieve monthly summary"}), 500
+
+
 
 
 # ------------------- 거래내역 API -------------------
@@ -232,6 +253,8 @@ def get_account_usage():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
+
 # ------------------- 매핑 API -------------------
 @app.route('/api/mappings', methods=['GET', 'POST'])
 def manage_mappings():
@@ -332,6 +355,10 @@ def manage_rule_based_mappings():
             return jsonify({'message': 'Rule-based mapping added/updated successfully'}), 201
         except Exception as e:
             return jsonify({'error': str(e)}), 500
+
+
+
+
 
 
 # 이 파일이 직접 실행될 때만 서버를 실행

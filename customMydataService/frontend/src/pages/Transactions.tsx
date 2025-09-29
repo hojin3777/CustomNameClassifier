@@ -2,11 +2,14 @@ import React, { useState, useEffect, useMemo, useRef } from 'react'; // useRef �
 import { FaSave, FaUndo, FaTrash,
   FaBold, FaHighlighter, FaFlag, FaFillDrip,
   FaCaretDown, FaArrowUp, FaArrowDown, FaFilter,
-  FaPlus, FaArrowRight, FaAngleDoubleDown } from 'react-icons/fa'; // 각 아이콘 로드
+  FaPlus, FaArrowRight, FaAngleDoubleDown,
+  FaFileDownload, FaFileExport, FaFileImport } from 'react-icons/fa'; // 각 아이콘 로드
+import { RiFileExcel2Fill } from 'react-icons/ri';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { useDirty } from '../App';
 
 import './Transactions.css';
+import { downloadTemplate, exportDataToExcel, importDataFromExcel } from '../components/transactions/excelUtils.ts'
 import "react-datepicker/dist/react-datepicker.css";
 import "../components/transactions/DatePickerOverrides.css"; // DatePicker 커스텀 CSS
 import FilterPopup from '../components/transactions/FilterPopup.tsx'; // 1. FilterPopup 컴포넌트 import
@@ -21,6 +24,7 @@ import OcrImageUploadModal from '../components/transactions/OcrImageUploadModal'
 import '../components/transactions/OcrImageUploadModal.css';
 import OcrPreviewTableModal, {type TransactionRow as OcrPreviewRow} from '../components/transactions/OcrPreviewTableModal';
 import TransactionFormModal from '../components/transactions/TransactionFormModal';
+import ExcelImportModal from '../components/transactions/ExcelImportModal';
 import { ko } from 'date-fns/locale';
 registerLocale('ko', ko);
 
@@ -98,6 +102,15 @@ const Transactions = () => {
   const [insertedCount, setInsertedCount] = useState(0);
   const [lastInsertedFromFormId, setLastInsertedFromFormId] = useState<number | string | null>(null);
 
+  // 엑셀 팝업 관련 state
+  const [isExcelPopupOpen, setExcelPopupOpen] = useState(false);
+  const [excelPopupPosition, setExcelPopupPosition] = useState({ top: 0, left: 0 });
+  const excelButtonRef = useRef<HTMLButtonElement>(null);
+  const excelPopupRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isExcelModalOpen, setIsExcelModalOpen] = useState(false);
+  const [excelImportData, setExcelImportData] = useState<any[]>([]);
+
   // dirty state
   const dirtyContext = useDirty();
   const isDirty = dirtyContext?.isDirty ?? false;
@@ -110,6 +123,7 @@ const Transactions = () => {
       if (e.key === 'Escape') {
         setActiveFilter(null);
         setColorPopupOpen(false);
+        setExcelPopupOpen(false);
         if (editingCell) {
           setEditingCell(null);
         }
@@ -349,7 +363,8 @@ const Transactions = () => {
     });
   };
 
-  // ******* 툴박스 관련 핸들러 *******
+
+  // ******************** 툴박스 관련 핸들러 ********************
   // 행 추가 핸들러
   const handleAddRow = () => {
     const newRow: Transaction = {
@@ -380,6 +395,7 @@ const Transactions = () => {
     }
     if (lastCheckedIndex === -1) { // 선택된 행이 없으면 맨 뒤에 추가
       setTransactions(prev => [...prev, newRow]);
+      setTimeout(() => handleScrollToBottom(), 0);
     } else {
       setTransactions(prev => { // 선택된 행 뒤에 추가
         const newTransactions = [...prev];
@@ -519,7 +535,90 @@ const Transactions = () => {
     setInsertedCount(0);
   };
 
-  // ******* 셀 업데이트 로직 *******
+  // 엑셀 팝업 열기 핸들러
+  const handleOpenExcelPopup = (e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setExcelPopupPosition({ top: rect.bottom + 5, left: rect.left });
+    setExcelPopupOpen(true);
+  };
+
+  // 엑셀 팝업 외부 클릭 감지 후 닫기
+    useEffect(() => {
+    if (!isExcelPopupOpen) return;
+
+    const handleOutsideClick = (event: MouseEvent) => {
+      // 팝업 자신, 팝업을 연 버튼을 클릭한게 아니라면 팝업 닫기
+      if (
+        excelPopupRef.current && !excelPopupRef.current.contains(event.target as Node) &&
+        excelButtonRef.current && !excelButtonRef.current.contains(event.target as Node)
+      ) {
+        setExcelPopupOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, [isExcelPopupOpen]);
+
+  // 엑셀 템플릿 다운로드 핸들러
+  const handleDownloadTemplate = async () => {
+    const headers = ['날짜', '계좌', '유형', '대분류', '소분류', '금액', '거래처', '메모'];
+    await downloadTemplate(headers, 'template.xlsx');
+    setExcelPopupOpen(false);
+  };
+  // 불러오기 핸들러
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+    setExcelPopupOpen(false);
+  };
+  // 파일 선택 후 처리 핸들러
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      try {
+        const data = await importDataFromExcel(file);
+        setExcelImportData(data);
+        setIsExcelModalOpen(true);
+      } catch (error) {
+        alert('엑셀 파일을 읽는 중 오류가 발생했습니다.');
+        console.error(error);
+      }
+      // 같은 파일을 다시 선택할 수 있도록 입력 값을 초기화합니다.
+      event.target.value = '';
+    }
+  };
+  // 엑셀 데이터 삽입 핸들러
+  const handleExcelInsert = (rowsToInsert: any[]) => {
+    const newTransactions = rowsToInsert.map(row => ({
+      ...row,
+      checked: false,
+      is_bold: 0,
+      flag_color_id: 0,
+      highlight_color_id: 0,
+      background_color_id: 0,
+    }));
+    setTransactions(prev => [...prev, ...newTransactions]);
+    setLastInsertedFromFormId(newTransactions[newTransactions.length - 1].id); // 마지막 행으로 스크롤
+  };
+  // 내보내기 핸들러
+  const handleExportData = async () => {
+    const headers = {
+      transaction_date: '날짜',
+      account_name: '계좌',
+      type: '유형',
+      major_category_name: '대분류',
+      minor_category_name: '소분류',
+      amount: '금액',
+      merchant: '거래처',
+      memo: '메모',
+    };
+    const today = new Date().toISOString().split('T')[0];
+    await exportDataToExcel(transactions, headers, `transactions_${today}.xlsx`);
+    setExcelPopupOpen(false);
+  };
+
+
+  // ******************** 셀 업데이트 로직 ********************
   const handleUpdateCell = (rowId: number | string, column: keyof Transaction, value: any) => {
     setTransactions(prev =>
       prev.map(row => {
@@ -1040,6 +1139,7 @@ const Transactions = () => {
           <div className="divider"></div>
           <button className="primary" onClick={() => setIsFormModalOpen(true)}>내역입력 폼 열기</button>
           <button className="primary" ref={ocrButtonRef} onClick={() => setOcrModalOpen(true)}>딥러닝 자동입력</button>
+          <button className="primary" ref={excelButtonRef} onClick={handleOpenExcelPopup} title='엑셀 가져오기/내보내기'><RiFileExcel2Fill /></button>
         </div>
 
         {/* 거래내역 테이블 */}
@@ -1159,6 +1259,31 @@ const Transactions = () => {
             title={activeStyleType === 'flag' ? 'Flag' : activeStyleType === 'highlight' ? 'Highlight' : 'Background'}
           />
         )}
+        {/* 엑셀 팝업 조건부 렌더링 */}
+        {isExcelPopupOpen && (
+          <div ref={excelPopupRef} className="excel-popup" style={{ top: excelPopupPosition.top, left: excelPopupPosition.left }}>
+            <button onClick={handleDownloadTemplate}><FaFileDownload /> 엑셀 템플릿 받기</button>
+            <button onClick={handleImportClick}><FaFileImport /> 불러오기</button>
+            <button onClick={handleExportData}><FaFileExport /> 내보내기</button>
+          </div>
+        )}
+        {/* 엑셀 모달 */}
+        <ExcelImportModal
+          open={isExcelModalOpen}
+          importedData={excelImportData}
+          onClose={() => setIsExcelModalOpen(false)}
+          onInsert={handleExcelInsert}
+          appData={appData}
+          TRANSACTION_TYPES={TRANSACTION_TYPES}
+        />
+        {/* 숨겨진 파일 입력 필드 추가 */}
+        <input
+          type="file"
+          ref={fileInputRef}
+          style={{ display: 'none' }}
+          accept=".xlsx, .xls"
+          onChange={handleFileChange}
+        />
       </div>
     </div>
     </>
