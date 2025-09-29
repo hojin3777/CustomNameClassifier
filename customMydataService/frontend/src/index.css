@@ -5,6 +5,7 @@
   /******** 배경색 ********/
   --color-bg-app: #313338;          /* 앱 전체의 가장 바깥 배경 */
   --color-bg-content: #2b2d31;      /* 카드, 테이블, 일반 팝업 등 주요 컨텐츠 영역 */
+  --color-bg-content-hover: #383a40;/* 카드, 테이블, 일반 팝업 등 주요 컨텐츠 영역 호버 */
   --color-bg-header: #1e1f22;       /* 테이블 헤더 등 가장 어두운 배경 */
   --color-bg-popup-filter: #48484e; /* 필터 팝업 전용 배경 */
   --color-bg-inset: #232428;        /* 입력 필드 전용 배경 (팝업 배경과 구분) */
@@ -64,7 +65,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--color-bg-primary);
+  background-color: var(--color-bg-app);
   color: var(--color-text-primary);
 }
 

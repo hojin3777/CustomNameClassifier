@@ -3,8 +3,8 @@ import DatePicker, { registerLocale } from 'react-datepicker';
 import { ko } from 'date-fns/locale'; // 한국어 로케일
 import { FaCalendarAlt } from 'react-icons/fa';
 import type { Transaction, Appdata } from '../../pages/Transactions'; // Transactions.tsx의 타입 import
-import type { FloatingSelectHandle, Opt } from './FloatingSelectPopup';
-import FloatingSelectPopup from './FloatingSelectPopup';
+import type { FloatingSelectHandle, Opt } from '../FloatingSelectPopup';
+import FloatingSelectPopup from '../FloatingSelectPopup';
 import './DatePickerOverrides.css';
 import './TransactionFormModal.css';
 registerLocale('ko', ko);

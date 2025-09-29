@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { FaPlus, FaArrowRight, FaTrash } from 'react-icons/fa';
 import './OcrPreviewTableModal.css';
 
-import FloatingSelectPopup, { type FloatingSelectHandle, type Opt } from './FloatingSelectPopup';
+import FloatingSelectPopup, { type FloatingSelectHandle, type Opt } from '../FloatingSelectPopup';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../transactions/DatePickerOverrides.css'; // DatePicker 커스텀 CSS 재사용

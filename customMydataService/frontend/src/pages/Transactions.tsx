@@ -15,8 +15,8 @@ import ConfirmPopup from '../components/ConfirmPopup'; // ConfirmPopup 컴포넌
 import '../components/ConfirmPopup.css'; // ConfirmPopup CSS import
 import HighlightPopup from '../components/transactions/HighlightPopup'; // ighlightPopup 컴포넌트 import
 import '../components/transactions/HighlightPopup.css'; // HighlightPopup CSS import
-import FloatingSelectPopup, { type FloatingSelectHandle, type Opt } from '../components/transactions/FloatingSelectPopup';
-import '../components/transactions/FloatingSelectPopup.css';
+import FloatingSelectPopup, { type FloatingSelectHandle, type Opt } from '../components/FloatingSelectPopup.tsx';
+import '../components/FloatingSelectPopup.css';
 import OcrImageUploadModal from '../components/transactions/OcrImageUploadModal';
 import '../components/transactions/OcrImageUploadModal.css';
 import OcrPreviewTableModal, {type TransactionRow as OcrPreviewRow} from '../components/transactions/OcrPreviewTableModal';
