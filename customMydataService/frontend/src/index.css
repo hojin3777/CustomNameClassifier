@@ -34,8 +34,6 @@
   --color-accent-warning: #faa61a;  /* 경고 */
 
   /********* 하이라이트 색상 *******/
-  --color-highlight-5-transparent5: rgba(92, 100, 244,  0.5);
-  --color-highlight-5-transparent7: rgba(92, 100, 244,  0.7);
   --color-highlight-1: #757e8a; /* 회색 */
   --color-highlight-2: #ed4245; /* 빨강 */
   --color-highlight-3: #faa61a; /* 주황 */
@@ -54,6 +52,10 @@
   --color-highlight-4-transparent25: rgba(59, 165, 92,   0.25);
   --color-highlight-5-transparent25: rgba(92, 100, 244,  0.25);
   --color-highlight-6-transparent25: rgba(235, 69, 159,  0.25);
+
+  --color-highlight-1-transparent5: rgba(117, 126, 138, 0.5);
+  --color-highlight-5-transparent5: rgba(92, 100, 244,  0.5);
+  --color-highlight-5-transparent7: rgba(92, 100, 244,  0.7);
 }
 
 

@@ -175,3 +175,21 @@ def get_minor_category_uuid_by_bert_output_id(bert_output_id):
     row = cur.fetchone()
     conn.close()
     return row['minor_category_uuid'] if row else None
+
+def get_setting(key):
+    """설정 테이블에서 key에 해당하는 값을 반환 (없으면 None)"""
+    conn = get_db_connection()
+    cur = conn.execute("SELECT value FROM settings WHERE key = ?", (key,))
+    row = cur.fetchone()
+    conn.close()
+    return row['value'] if row else None
+
+def set_setting(key, value):
+    """설정 테이블에 key-value 쌍을 삽입 또는 업데이트합니다."""
+    conn = get_db_connection()
+    conn.execute("""
+        INSERT INTO settings (key, value) VALUES (?, ?)
+        ON CONFLICT(key) DO UPDATE SET value=excluded.value
+    """, (key, value))
+    conn.commit()
+    conn.close()

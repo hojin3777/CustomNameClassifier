@@ -17,6 +17,7 @@
     "@types/recharts": "^1.8.29",
     "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
+    "rc-slider": "^11.1.9",
     "react": "^19.1.1",
     "react-datepicker": "^8.7.0",
     "react-dom": "^19.1.1",

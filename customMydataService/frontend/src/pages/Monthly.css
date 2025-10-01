@@ -39,7 +39,7 @@
   padding: 6px 12px;
   margin-left: 8px;
   border-radius: 6px;
-  background-color: var(--color-bg-inset);
+  background-color: var(--color-bg-header);
   cursor: pointer;
   transition: background-color 0.2s;
   min-width: 60px;
@@ -50,7 +50,7 @@
 }
 
 .month-selector .date-part:hover {
-  background-color: var(--color-interactive-hover);
+  background-color: var(--color-bg-content);
   color: var(--color-text-header);
 }
 

@@ -94,22 +94,77 @@ def process_image_ocr():
 
 
 # ------------------- 대시보드 통계 API -------------------
+@app.route('/api/settings/dashboard_trend_range', methods=['GET', 'POST'])
+def manage_dashboard_trend_range():
+    """대시보드 월별 추이 슬라이더의 기간 설정을 관리합니다."""
+    if request.method == 'GET':
+        try:
+            saved_range = dashboard_utils.get_dashboard_trend_range()
+            return jsonify(saved_range) # 값이 없으면 null 반환
+        except Exception as e:
+            print(f"Error getting dashboard trend range setting: {e}")
+            return jsonify({"error": "Failed to retrieve setting"}), 500
+            
+    if request.method == 'POST':
+        data = request.get_json()
+        if not data or 'range' not in data:
+            return jsonify({"error": "Invalid data format, 'range' key is required."}), 400
+        try:
+            dashboard_utils.set_dashboard_trend_range(data['range'])
+            return jsonify({"message": "Setting saved successfully."})
+        except Exception as e:
+            print(f"Error saving dashboard trend range setting: {e}")
+            return jsonify({"error": "Failed to save setting"}), 500
+        
 @app.route('/api/statistics/monthly_summary', methods=['GET'])
-def get_monthly_summary():
+def get_monthly_summary_route():
     """월별 수입/지출 요약 데이터를 반환합니다."""
-    start_date = request.args.get('start_date')
-    end_date = request.args.get('end_date')
-
-    if not start_date or not end_date:
-        return jsonify({"error": "start_date and end_date parameters are required."}), 400
-
+    start_month = request.args.get('start_month')
+    end_month = request.args.get('end_month')
     try:
-        summary_data = dashboard_utils.get_monthly_summary(start_date, end_date)
+        summary_data = dashboard_utils.get_monthly_summary(start_month, end_month)
         return jsonify(summary_data)
     except Exception as e:
         print(f"Error getting monthly summary: {e}")
         return jsonify({"error": "Failed to retrieve monthly summary"}), 500
 
+@app.route('/api/statistics/available_months', methods=['GET'])
+def get_available_months_route():
+    """거래내역이 있는 모든 월 목록을 반환합니다."""
+    try:
+        months = dashboard_utils.get_available_months()
+        return jsonify(months)
+    except Exception as e:
+        print(f"Error getting available months: {e}")
+        return jsonify({"error": "Failed to retrieve available months"}), 500
+
+@app.route('/api/statistics/type_ratio', methods=['GET'])
+def get_type_ratio_route():
+    """월별 수입/지출 유형 비율을 반환합니다."""
+    year = request.args.get('year', type=int)
+    month = request.args.get('month', type=int)
+    if not year or not month:
+        return jsonify({"error": "year and month parameters are required."}), 400
+    try:
+        ratio_data = dashboard_utils.get_type_ratio(year, month)
+        return jsonify(ratio_data)
+    except Exception as e:
+        print(f"Error getting type ratio: {e}")
+        return jsonify({"error": "Failed to retrieve type ratio"}), 500
+
+@app.route('/api/statistics/category_spending', methods=['GET'])
+def get_category_spending_route():
+    """월별 대분류별 지출 데이터를 반환합니다."""
+    year = request.args.get('year', type=int)
+    month = request.args.get('month', type=int)
+    if not year or not month:
+        return jsonify({"error": "year and month parameters are required."}), 400
+    try:
+        spending_data = dashboard_utils.get_category_spending(year, month)
+        return jsonify(spending_data)
+    except Exception as e:
+        print(f"Error getting category spending: {e}")
+        return jsonify({"error": "Failed to retrieve category spending"}), 500
 
 
 
