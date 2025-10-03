@@ -224,7 +224,7 @@ const MonthlyDetail = ({ selectedYear, selectedMonth }: MonthlyDetailProps) => {
             y={centerY + 8}
             textAnchor="middle"
             dominantBaseline="middle"
-            fill="var(--color-text-primary)"
+            fill="var(--color-text-tertiary)"
             fontSize="10"
             fontWeight="400"
           >

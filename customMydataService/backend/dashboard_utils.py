@@ -152,3 +152,48 @@ def get_account_balances():
     balances = [dict(row) for row in cursor.fetchall()]
     conn.close()
     return balances
+
+def get_category_treemap(year, month):
+    """
+    지정된 월의 대분류-소분류별 지출 비율을 계층 구조로 반환합니다.
+    """
+    conn = database.get_db_connection()
+    query = """
+        SELECT
+            mc.id AS major_id,
+            mc.name AS major_name,
+            mnc.uuid AS minor_uuid,
+            mnc.name AS minor_name,
+            SUM(ABS(t.amount)) as value
+        FROM transactions t
+        JOIN minor_categories mnc ON t.minor_category_uuid = mnc.uuid
+        JOIN major_categories mc ON mnc.major_category_id = mc.id
+        WHERE strftime('%Y', t.transaction_date) = ?
+          AND strftime('%m', t.transaction_date) = ?
+          AND mc.name NOT IN ('고정수입', '유동수입', '이체분류')
+        GROUP BY mc.id, mc.name, mnc.uuid, mnc.name
+        ORDER BY mc.id, value DESC
+    """
+    cursor = conn.execute(query, (str(year), f'{month:02d}'))
+    rows = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+
+    # 계층 구조로 변환
+    major_map = {}
+    for row in rows:
+        major_id = row['major_id']
+        if major_id not in major_map:
+            major_map[major_id] = {
+                'name': row['major_name'],
+                'value': 0,
+                'children': []
+            }
+        major_map[major_id]['children'].append({
+            'name': row['minor_name'],
+            'value': row['value']
+        })
+        major_map[major_id]['value'] += row['value']
+
+    # 최상위 노드 리스트로 변환
+    result = sorted(list(major_map.values()), key=lambda x: x['value'], reverse=True)
+    return result

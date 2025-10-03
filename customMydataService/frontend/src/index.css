@@ -16,6 +16,7 @@
   /******** 텍스트 ********/
   --color-text-primary: #f2f3f5;     /* 가장 일반적인 텍스트 */
   --color-text-secondary: #b5bac1;  /* placeholder, 보조 텍스트, 아이콘 */
+  --color-text-tertiary: #d8dce1;   /* primary와는 구분짓고 싶지만 secondary는 너무 어두울 때 */
   --color-text-header: #ffffff;     /* 강조 헤더 */
   --color-text-inverted: #222222;   /* 밝은 배경 위의 어두운 텍스트 */
 
@@ -46,16 +47,27 @@
   --color-highlight-4-transparent9: rgba(59, 165, 92,   0.9);
   --color-highlight-5-transparent9: rgba(92, 100, 244,  0.9);
   --color-highlight-6-transparent9: rgba(235, 69, 159,  0.9);
+
+  --color-highlight-1-transparent7: rgba(117, 126, 138, 0.7);
+  --color-highlight-2-transparent7: rgba(237, 66, 69,   0.7);
+  --color-highlight-3-transparent7: rgba(250, 166, 26,  0.7);
+  --color-highlight-4-transparent7: rgba(59, 165, 92,   0.7);
+  --color-highlight-5-transparent7: rgba(92, 100, 244,  0.7);
+  --color-highlight-6-transparent7: rgba(235, 69, 159,  0.7);
+
+  --color-highlight-1-transparent5: rgba(117, 126, 138, 0.5);
+  --color-highlight-2-transparent5: rgba(237, 66, 69,   0.5);
+  --color-highlight-3-transparent5: rgba(250, 166, 26,  0.5);
+  --color-highlight-4-transparent5: rgba(59, 165, 92,   0.5);
+  --color-highlight-5-transparent5: rgba(92, 100, 244,  0.5);
+  --color-highlight-6-transparent5: rgba(235, 69, 159,  0.5);
+
   --color-highlight-1-transparent25: rgba(117, 126, 138, 0.25);
   --color-highlight-2-transparent25: rgba(237, 66, 69,   0.25);
   --color-highlight-3-transparent25: rgba(250, 166, 26,  0.25);
   --color-highlight-4-transparent25: rgba(59, 165, 92,   0.25);
   --color-highlight-5-transparent25: rgba(92, 100, 244,  0.25);
   --color-highlight-6-transparent25: rgba(235, 69, 159,  0.25);
-
-  --color-highlight-1-transparent5: rgba(117, 126, 138, 0.5);
-  --color-highlight-5-transparent5: rgba(92, 100, 244,  0.5);
-  --color-highlight-5-transparent7: rgba(92, 100, 244,  0.7);
 }
 
 

@@ -3,6 +3,7 @@ import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import MonthlyTrend from '../components/dashboard/MonthlyTrend';
 import MonthlyDetail from '../components/dashboard/MonthlyDetail';
+import MonthlyTreemap from '../components/dashboard/MonthlyTreemap';
 import ComingSoon from '../components/dashboard/ComingSoon';
 import FloatingSelectPopup, { type FloatingSelectHandle } from '../components/FloatingSelectPopup';
 import './Dashboard.css';
@@ -17,6 +18,7 @@ const Dashboard = () => {
   const floatingSelectRef = useRef<FloatingSelectHandle | null>(null);
   const rangeSelectorRef = useRef<HTMLDivElement | null>(null);
   const rangePopupRef = useRef<HTMLDivElement | null>(null);
+  const prevRangeRef = useRef<[number, number]>(range);
   const sliderContainerRef = useRef<HTMLDivElement | null>(null);
   const [isRangePopupOpen, setIsRangePopupOpen] = useState(false);
   const [rangePopupPos, setRangePopupPos] = useState<{ top: number; left: number; width: number }>({
@@ -67,17 +69,43 @@ const Dashboard = () => {
     return Math.max(intervals * sliderMonthWidth, 320);
   }, [availableMonths.length]);
 
+  // useEffect(() => {
+  //   if (!isRangePopupOpen || !sliderContainerRef.current || availableMonths.length <= 1) return;
+  //   const container = sliderContainerRef.current;
+  //   const rightHandleIndex = range[1];
+  //   const totalIntervals = availableMonths.length - 1;
+  //   const handlePosition = (rightHandleIndex / totalIntervals) * sliderBaseWidth;
+  //   let targetScrollLeft = handlePosition - container.clientWidth / 2;
+  //   const maxScrollLeft = container.scrollWidth - container.clientWidth;
+  //   targetScrollLeft = Math.max(0, Math.min(targetScrollLeft, maxScrollLeft));
+  //   container.scrollLeft = targetScrollLeft;
+  // }, [isRangePopupOpen, range, availableMonths, sliderBaseWidth]);
   useEffect(() => {
+    // 팝업이 열렸을 때만 실행
     if (!isRangePopupOpen || !sliderContainerRef.current || availableMonths.length <= 1) return;
+
     const container = sliderContainerRef.current;
-    const rightHandleIndex = range[1];
     const totalIntervals = availableMonths.length - 1;
-    const handlePosition = (rightHandleIndex / totalIntervals) * sliderBaseWidth;
-    let targetScrollLeft = handlePosition - container.clientWidth / 2;
+
+    // 선택된 범위의 시작과 끝 핸들 위치를 계산합니다.
+    const startHandlePosition = (range[0] / totalIntervals) * sliderBaseWidth;
+    const endHandlePosition = (range[1] / totalIntervals) * sliderBaseWidth;
+    
+    // 선택된 범위의 중앙 위치를 계산합니다.
+    const rangeCenterPosition = (startHandlePosition + endHandlePosition) / 2;
+
+    // 목표 스크롤 위치를 계산하여 범위의 중앙이 컨테이너의 중앙에 오도록 합니다.
+    let targetScrollLeft = rangeCenterPosition - container.clientWidth / 2;
+
+    // 스크롤 위치가 유효한 범위를 벗어나지 않도록 조정합니다.
     const maxScrollLeft = container.scrollWidth - container.clientWidth;
     targetScrollLeft = Math.max(0, Math.min(targetScrollLeft, maxScrollLeft));
+
+    // 계산된 위치로 스크롤합니다.
     container.scrollLeft = targetScrollLeft;
-  }, [isRangePopupOpen, range, availableMonths, sliderBaseWidth]);
+    
+    // 이 useEffect는 팝업이 열리는 순간에만 작동해야 하므로, range를 의존성 배열에서 제거합니다.
+  }, [isRangePopupOpen, availableMonths, sliderBaseWidth]);
 
   // Marks 객체 생성
   const sliderMarks = useMemo(() => {
@@ -143,10 +171,52 @@ const Dashboard = () => {
     return `${formatMonthLabel(availableMonths[clampedStart])} - ${formatMonthLabel(availableMonths[clampedEnd])}`;
   }, [availableMonths, range]);
 
+  // const handleSliderChange = (value: number | number[]) => {
+  //   if (Array.isArray(value)) {
+  //     setRange(value as [number, number]);
+  //   }
+  // };
+
   const handleSliderChange = (value: number | number[]) => {
-    if (Array.isArray(value)) {
-      setRange(value as [number, number]);
+    if (!Array.isArray(value) || !sliderContainerRef.current) return;
+
+    const newRange = value as [number, number];
+    setRange(newRange);
+
+    // --- 자동 스크롤 로직 시작 ---
+    const container = sliderContainerRef.current;
+    const prevRange = prevRangeRef.current;
+
+    // 어떤 핸들이 움직였는지 확인 (왼쪽: 0, 오른쪽: 1)
+    let activeHandleIndex = -1;
+    if (newRange[0] !== prevRange[0]) {
+      activeHandleIndex = newRange[0]; // 왼쪽 핸들
+    } else if (newRange[1] !== prevRange[1]) {
+      activeHandleIndex = newRange[1]; // 오른쪽 핸들
     }
+
+    if (activeHandleIndex !== -1) {
+      const totalIntervals = availableMonths.length - 1;
+      // 핸들의 현재 위치 (px) 계산
+      const handlePosition = (activeHandleIndex / totalIntervals) * sliderBaseWidth;
+      
+      const scrollPadding = 120; // 핸들이 가장자리에 얼마나 가까워졌을 때 스크롤할지 결정하는 여백
+      const currentScrollLeft = container.scrollLeft;
+      const containerWidth = container.clientWidth;
+
+      // 핸들이 왼쪽 화면 밖으로 나갈 때
+      if (handlePosition < currentScrollLeft + scrollPadding) {
+        container.scrollLeft = handlePosition - 1.5 * scrollPadding;
+      }
+      // 핸들이 오른쪽 화면 밖으로 나갈 때
+      else if (handlePosition > currentScrollLeft + containerWidth - scrollPadding) {
+        container.scrollLeft = handlePosition - containerWidth + 1.5 * scrollPadding;
+      }
+    }
+
+    // 현재 range를 다음 비교를 위해 ref에 저장
+    prevRangeRef.current = newRange;
+    // --- 자동 스크롤 로직 끝 ---
   };
 
   const handleSliderChangeComplete = useCallback((value: number | number[]) => {
@@ -365,7 +435,7 @@ const Dashboard = () => {
       <main className="dashboard-content">
         <MonthlyDetail selectedYear={selectedYear} selectedMonth={selectedMonth} />
         <MonthlyTrend months={availableMonths} range={range} />
-        <ComingSoon title="소비 습관 히트맵" />
+        <MonthlyTreemap selectedYear={selectedYear} selectedMonth={selectedMonth} />
         <ComingSoon title="소비 TOP 10" />
       </main>
     </div>

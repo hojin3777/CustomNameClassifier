@@ -172,32 +172,95 @@ const MonthlyTrend: React.FC<MonthlyTrendProps> = ({ months, range }) => {
   };
 
   // CustomTooltip 수정: props 타입을 any로 받고, 내부에서 필요한 타입만 지정
+  // const CustomTooltip = (props: any) => {
+  //   const { active, payload, label } = props;
+  //   if (active && payload && payload.length) {
+  //     const fullDate = payload[0].payload.fullDate;
+  //     const dateLabel = fullDate ? `${fullDate.substring(0, 4)}년 ${fullDate.substring(5)}월` : '';
+  //     const diffPayloadItem = payload.find((p: any) => hiddenItems.includes(p.dataKey) && p.value !== 0);
+  //     const netValuePayload = diffPayloadItem ? [{
+  //       dataKey: '차액',
+  //       name: '차액',
+  //       value: diffPayloadItem.value,
+  //       color: 'var(--color-highlight-1)',
+  //     }] : [];
+  //     const mainPayload = payload.filter((p: any) => itemOrder.includes(p.dataKey));
+  //     const finalPayload = [...mainPayload, ...netValuePayload];
+  //     const sortedPayload = finalPayload.sort((a: any, b: any) => {
+  //       return itemOrder.indexOf(a.dataKey) - itemOrder.indexOf(b.dataKey);
+  //     });
+
+  //     return (
+  //       <div className="custom-tooltip-trend">
+  //         <p className="label">{dateLabel}</p>
+  //         {sortedPayload.map((p: any, index: number) => (
+  //           <p key={`tooltip-item-${index}`} style={{ color: p.color }}>
+  //             {`${p.name}: ${new Intl.NumberFormat('ko-KR').format(Math.abs(p.value))}`}
+  //           </p>
+  //         ))}
+  //       </div>
+  //     );
+  //   }
+  //   return null;
+  // };
+
   const CustomTooltip = (props: any) => {
-    const { active, payload, label } = props;
+    const { active, payload } = props;
     if (active && payload && payload.length) {
-      const fullDate = payload[0].payload.fullDate;
+      const data = payload[0].payload;
+      const fullDate = data.fullDate;
       const dateLabel = fullDate ? `${fullDate.substring(0, 4)}년 ${fullDate.substring(5)}월` : '';
-      const diffPayloadItem = payload.find((p: any) => hiddenItems.includes(p.dataKey) && p.value !== 0);
-      const netValuePayload = diffPayloadItem ? [{
-        dataKey: '차액',
-        name: '차액',
-        value: diffPayloadItem.value,
-        color: 'var(--color-highlight-1)',
-      }] : [];
-      const mainPayload = payload.filter((p: any) => itemOrder.includes(p.dataKey));
-      const finalPayload = [...mainPayload, ...netValuePayload];
-      const sortedPayload = finalPayload.sort((a: any, b: any) => {
-        return itemOrder.indexOf(a.dataKey) - itemOrder.indexOf(b.dataKey);
-      });
+
+      const totalIncome = data.fixed_income + data.variable_income;
+      const totalExpense = Math.abs(data.fixed_expense + data.semi_fixed_expense + data.variable_expense);
+      const difference = totalIncome - totalExpense;
+
+      // 각 항목의 색상을 payload에서 추출하여 맵으로 만듭니다.
+      const colorMap = payload.reduce((acc: any, p: any) => {
+        acc[p.dataKey] = p.fill;
+        return acc;
+      }, {});
 
       return (
         <div className="custom-tooltip-trend">
-          <p className="label">{dateLabel}</p>
-          {sortedPayload.map((p: any, index: number) => (
-            <p key={`tooltip-item-${index}`} style={{ color: p.color }}>
-              {`${p.name}: ${new Intl.NumberFormat('ko-KR').format(Math.abs(p.value))}`}
+          <p className="tooltip-label-trend">{dateLabel}</p>
+          
+          {/* 수입 섹션 */}
+          <div className="tooltip-section-trend">
+            <p className="tooltip-item-trend income">
+              <span>총수입</span><span>{totalIncome.toLocaleString()}원</span>
             </p>
-          ))}
+            <p className="tooltip-item-trend sub-item">
+              <span style={{ color: colorMap.fixed_income }}>&nbsp;&nbsp;├ 고정수입</span><span>{data.fixed_income.toLocaleString()}원</span>
+            </p>
+            <p className="tooltip-item-trend sub-item">
+              <span style={{ color: colorMap.variable_income }}>&nbsp;&nbsp;└ 유동수입</span><span>{data.variable_income.toLocaleString()}원</span>
+            </p>
+          </div>
+
+          {/* 지출 섹션 */}
+          <div className="tooltip-section-trend">
+            <p className="tooltip-item-trend expense">
+              <span>총지출</span><span>{totalExpense.toLocaleString()}원</span>
+            </p>
+            <p className="tooltip-item-trend sub-item">
+              <span style={{ color: colorMap.fixed_expense }}>&nbsp;&nbsp;├ 고정지출</span><span>{Math.abs(data.fixed_expense).toLocaleString()}원</span>
+            </p>
+            <p className="tooltip-item-trend sub-item">
+              <span style={{ color: colorMap.semi_fixed_expense }}>&nbsp;&nbsp;├ 반고정지출</span><span>{Math.abs(data.semi_fixed_expense).toLocaleString()}원</span>
+            </p>
+            <p className="tooltip-item-trend sub-item">
+              <span style={{ color: colorMap.variable_expense }}>&nbsp;&nbsp;└ 유동지출</span><span>{Math.abs(data.variable_expense).toLocaleString()}원</span>
+            </p>
+          </div>
+
+          {/* 차액 섹션 */}
+          <div className="tooltip-section-trend">
+            <p className={`tooltip-item-trend ${difference >= 0 ? 'surplus' : 'deficit'}`}>
+              {difference >= 0 ? (<span>잉여금</span>) : (<span>초과지출</span>)}
+              <span>{difference.toLocaleString()}원</span>
+            </p>
+          </div>
         </div>
       );
     }

@@ -179,6 +179,16 @@ def get_account_balances_route():
     except Exception as e:
         print(f"Error getting account balances: {e}")
         return jsonify({"error": "Failed to retrieve account balances"}), 500
+    
+@app.route('/api/statistics/category_treemap', methods=['GET'])
+def get_category_treemap_route():
+    year = request.args.get('year', type=int)
+    month = request.args.get('month', type=int)
+    try:
+        data = dashboard_utils.get_category_treemap(year, month)
+        return jsonify({"success": True, "data": data})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 
