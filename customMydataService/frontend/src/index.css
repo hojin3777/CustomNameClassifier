@@ -27,8 +27,8 @@
   --color-interactive-hover: #4f525a; /* 버튼, 목록 아이템 호버 */
   
   /********* 강조 색상 ********/
-  --color-accent-blue: #3b82f6;     /* ✨ 정보/지출/저장/내림차순 등 주요 액션 */
-  --color-accent-red: #e53e3e;       /* ✨ 위험/강조/수입/삭제/오름차순 등 */
+  --color-accent-blue: #3b82f6;     /* 정보/지출/저장/내림차순 등 주요 액션 */
+  --color-accent-red: #e53e3e;       /* 위험/강조/수입/삭제/오름차순 등 */
   --color-accent-red-hover: #c53030; /* 강조 빨간색 호버 */
   --color-accent-positive: #2dc770; /* 성공 */
   --color-accent-warning: #faa61a;  /* 경고 */
@@ -73,6 +73,6 @@ body {
 
 /* --- 공통 스크롤바 스타일 --- */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: var(--color-bg-header); } /* ✨ 가장 어두운 배경 사용 */
+::-webkit-scrollbar-track { background: var(--color-bg-header); } /* 가장 어두운 배경 사용 */
 ::-webkit-scrollbar-thumb { background: #48484e; border-radius: 5px; }
 ::-webkit-scrollbar-thumb:hover { background: #4f525a; }

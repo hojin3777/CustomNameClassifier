@@ -365,8 +365,8 @@ const Dashboard = () => {
       <main className="dashboard-content">
         <MonthlyDetail selectedYear={selectedYear} selectedMonth={selectedMonth} />
         <MonthlyTrend months={availableMonths} range={range} />
-        <ComingSoon title="소비 TOP 10" />
         <ComingSoon title="소비 습관 히트맵" />
+        <ComingSoon title="소비 TOP 10" />
       </main>
     </div>
   );

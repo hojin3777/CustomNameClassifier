@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, CartesianGrid, LabelList } from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, LabelList } from 'recharts';
 import './MonthlyDetail.css';
 
+const API_BASE_URL = 'http://localhost:5000';
 // --- 타입 정의 (변경 없음) ---
 interface MonthlySummary {
   fixed_income: number;
@@ -18,6 +19,10 @@ interface CategorySpending {
 interface MonthlyDetailProps {
   selectedYear: number | null;
   selectedMonth: number | null;
+}
+interface AccountBalance {
+  account_name: string;
+  balance: number;
 }
 
 // --- 범례 컴포넌트 (월별 추이와 동일) ---
@@ -90,7 +95,8 @@ const CustomTooltip = ({ active, payload, selectedYear, selectedMonth }: any) =>
         </div>
         <div className="tooltip-section-mdetail">
           <p className={`tooltip-item-mdetail ${difference >= 0 ? 'surplus' : 'deficit'}`}>
-            <span>차액</span><span>{difference.toLocaleString()}원</span>
+            {difference >= 0 ? (<span>잉여금</span>) : (<span>초과지출</span>)}
+            <span>{difference.toLocaleString()}원</span>
           </p>
         </div>
       </div>
@@ -100,8 +106,10 @@ const CustomTooltip = ({ active, payload, selectedYear, selectedMonth }: any) =>
 };
 
 const MonthlyDetail = ({ selectedYear, selectedMonth }: MonthlyDetailProps) => {
+  const [chartData, setChartData] = useState<any[]>([]);
   const [monthlySummary, setMonthlySummary] = useState<MonthlySummary | null>(null);
   const [categorySpending, setCategorySpending] = useState<CategorySpending[]>([]);
+  const [accountBalances, setAccountBalances] = useState<AccountBalance[]>([]);
 
   // --- useEffect 데이터 호출 (변경 없음) ---
   useEffect(() => {
@@ -112,56 +120,153 @@ const MonthlyDetail = ({ selectedYear, selectedMonth }: MonthlyDetailProps) => {
         return;
       }
       try {
-        const summaryResponse = await fetch(
-          `http://localhost:5000/api/statistics/monthly_detail?year=${selectedYear}&month=${selectedMonth}`
-        );
-        if (summaryResponse.ok) setMonthlySummary(await summaryResponse.json());
-        else setMonthlySummary(null);
+        const summaryResponse = await fetch(`${API_BASE_URL}/api/statistics/monthly_detail?year=${selectedYear}&month=${selectedMonth}`);
+        const summaryData = summaryResponse.ok ? await summaryResponse.json() : null;
+        setMonthlySummary(summaryData);
 
-        const categoryResponse = await fetch(
-          `http://localhost:5000/api/statistics/category_spending?year=${selectedYear}&month=${selectedMonth}`
-        );
+        const categoryResponse = await fetch(`${API_BASE_URL}/api/statistics/category_spending?year=${selectedYear}&month=${selectedMonth}`);
         if (categoryResponse.ok) setCategorySpending((await categoryResponse.json()) || []);
         else setCategorySpending([]);
+
+        const balanceResponse = await fetch(`${API_BASE_URL}/api/statistics/account_balances`);
+        if (balanceResponse.ok) setAccountBalances((await balanceResponse.json()) || []);
+        else setAccountBalances([]);
+
+        // 2. summaryData를 직접 사용해서 chartData 생성
+        if (summaryData) {
+          const totalIncome = summaryData.fixed_income + summaryData.variable_income;
+          const totalExpense = summaryData.fixed_expense + summaryData.semi_fixed_expense + summaryData.variable_expense;
+          const difference = totalIncome - totalExpense;
+
+          const newChartData = [
+            {
+              name: '유형',
+              totalIncome,
+              totalExpense,
+              ...summaryData,
+              surplus: difference > 0 ? difference : 0,
+              deficit: difference < 0 ? -difference : 0,
+            },
+          ];
+          setChartData(newChartData);
+        } else {
+          setChartData([]);
+        }
       } catch (error) {
         console.error('Error fetching monthly details:', error);
         setMonthlySummary(null);
         setCategorySpending([]);
+        setAccountBalances([]);
+        setChartData([]);
       }
     };
     fetchMonthlyDetails();
   }, [selectedYear, selectedMonth]);
 
+  const currentData = chartData.length > 0 ? chartData[0] : null;
+  const totalIncome = currentData?.totalIncome || 0;
+  const totalExpense = currentData?.totalExpense || 0;
 
-  // --- 차트 데이터 및 차액 계산 (월별 추이와 동일한 로직) ---
-  const totalIncome = monthlySummary ? monthlySummary.fixed_income + monthlySummary.variable_income : 0;
-  const totalExpense = monthlySummary
-    ? monthlySummary.fixed_expense + monthlySummary.semi_fixed_expense + monthlySummary.variable_expense
-    : 0;
-  const difference = totalIncome - totalExpense;
+  const CustomBarLabel = (props: any) => {
+    const { x, y, width, height, value } = props;
 
-  const chartData = [
-    {
-      name: '유형', // BarChart는 카테고리 축을 위한 name이 필요합니다.
-      ...monthlySummary,
-      surplus: difference > 0 ? difference : 0,
-      deficit: difference < 0 ? -difference : 0,
-    },
-  ];
-
-  // Y축 눈금을 깔끔하게 만들기 위한 도메인 계산
-  const rawMax = Math.max(totalIncome, totalExpense);
-  const maxDomain = rawMax > 0 ? Math.ceil(rawMax / 100000) * 100000 : 100000; // 10만 단위로 올림
-  const formatYAxis = (tick: number) => `${tick / 10000}`;
-  const formatLabel = (value: any) => {
-    if (typeof value !== 'number' || value === 0) {
-      return '';
+    // 안전한 타입 체크
+    if (
+      !value ||
+      typeof value !== 'number' ||
+      !Number.isFinite(value) ||
+      value <= 0 ||
+      typeof x !== 'number' ||
+      typeof y !== 'number' ||
+      typeof width !== 'number' ||
+      typeof height !== 'number' ||
+      !currentData
+    ) {
+      return null;
     }
-    return (value / 10000).toLocaleString(undefined, {
+
+    const dataKey = props.type; // LabelList에서 전달받은 type 사용
+    if (!dataKey || typeof dataKey !== 'string') return null;
+
+    // 비율 계산
+    let percentage = 0;
+    if (dataKey.includes('income') && totalIncome > 0) {
+      percentage = (value / totalIncome) * 100;
+    } else if (dataKey.includes('expense') && totalExpense > 0) {
+      percentage = (value / totalExpense) * 100;
+    }
+
+    // 금액 포맷팅
+    const amount = (value / 10000).toLocaleString(undefined, {
       minimumFractionDigits: 0,
       maximumFractionDigits: 1,
     });
+
+    const centerX = x + width / 2;
+    const centerY = y + height / 2;
+
+    return (
+      <g>
+        <text
+          x={centerX}
+          y={centerY - 4}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          fill="var(--color-text-header)"
+          fontSize="12"
+          fontWeight="500"
+        >
+          {amount}
+        </text>
+        {percentage > 1 && (
+          <text
+            x={centerX}
+            y={centerY + 8}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            fill="var(--color-text-primary)"
+            fontSize="10"
+            fontWeight="400"
+          >
+            ({percentage.toFixed(1)}%)
+          </text>
+        )}
+      </g>
+    );
   };
+
+  // Y축 눈금을 깔끔하게 만들기 위한 도메인 계산
+  const rawMax = Math.max(totalIncome, totalExpense);
+  // const maxDomain = rawMax > 0 ? Math.ceil(rawMax / 100000) * 100000 : 100000; // 10만 단위로 올림
+  const getOptimalTickCount = (rawDomain: number) => {
+    if (rawDomain <= 0) return { maxDomain: 500000, tickCount: 5 }; 
+
+    const domainIn10K = rawDomain / 100000;
+    const possibleSteps = [3, 2, 2.5, 1.5, 5, 1, 10, 15, 20, 25, 50, 100];
+
+    for (const step of possibleSteps) {
+      const adjustedDomain = Math.ceil(domainIn10K / step) * step;
+      const tickCount = adjustedDomain / step + 1;
+
+      if (tickCount >= 7 && tickCount <= 12) { // 조건 범위 조정
+        return {
+          tickCount: Math.round(tickCount),
+          maxDomain: adjustedDomain * 100000
+        };
+      }
+    }
+
+    return {
+      maxDomain: domainIn10K * 100000,
+      tickCount: domainIn10K + 1
+    };
+  };
+  const initialDomain = rawMax > 0 ? Math.ceil(rawMax / 100000) * 100000 : 100000;
+  const { tickCount, maxDomain } = getOptimalTickCount(initialDomain);
+  const formatYAxis = (tick: number) => `${tick / 10000}`;
+
+  // 총지출 계산
+  const totalCategorySpending = categorySpending.reduce((sum, item) => sum + item.value, 0);
 
   return (
     <div className="dashboard-card">
@@ -175,32 +280,36 @@ const MonthlyDetail = ({ selectedYear, selectedMonth }: MonthlyDetailProps) => {
         <div className='chart-area-wrapper'>
           <div className="chart-container-single">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }} barCategoryGap="35%">
+              <BarChart data={chartData} margin={{ top: 5, right: 0, left: -10, bottom: 0 }} barCategoryGap="10%">
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border-subtle)" />
                 <XAxis type="category" dataKey="name" tickLine={false} axisLine={false} tick={false} />
-                <YAxis type="number" domain={[0, maxDomain]} tickFormatter={formatYAxis} tick={{ fill: 'var(--color-text-secondary)' }} tickCount={8} />
-                <Tooltip content={<CustomTooltip selectedYear={selectedYear} selectedMonth={selectedMonth} />} cursor={{ fill: 'var(--color-bg-overlay-light)' }} />
+                <YAxis type="number" domain={[0, maxDomain]} tickFormatter={formatYAxis} tick={{ fill: 'var(--color-text-secondary)' }} tickCount={tickCount} />
+                <Tooltip
+                  content={<CustomTooltip selectedYear={selectedYear} selectedMonth={selectedMonth} />}
+                  cursor={{ fill: 'var(--color-bg-overlay-light)' }}
+                  wrapperStyle={{ zIndex: 1000 }}
+                />
 
                 {/* 수입 막대 그룹 */}
-                <Bar dataKey="fixed_income" name="고정수입" stackId="income" fill="var(--color-highlight-4)" barSize={50}>
-                  <LabelList dataKey="fixed_income" position="center" formatter={formatLabel} fill="#fff" fontSize={12} />
+                <Bar dataKey="fixed_income" name="고정수입" stackId="income" fill="var(--color-highlight-4)">
+                  <LabelList dataKey="fixed_income" content={<CustomBarLabel type="fixed_income" />} />
                 </Bar>
-                <Bar dataKey="variable_income" name="유동수입" stackId="income" fill="var(--color-highlight-5)" barSize={50}>
-                  <LabelList dataKey="variable_income" position="center" formatter={formatLabel} fill="#fff" fontSize={12} />
+                <Bar dataKey="variable_income" name="유동수입" stackId="income" fill="var(--color-highlight-5)">
+                  <LabelList dataKey="variable_income" content={<CustomBarLabel type="variable_income" />} />
                 </Bar>
-                <Bar dataKey="deficit" name="초과지출" stackId="income" fill="var(--color-highlight-1-transparent5)" barSize={50} />
+                <Bar dataKey="deficit" name="초과지출" stackId="income" fill="var(--color-highlight-1-transparent5)" />
 
                 {/* 지출 막대 그룹 */}
-                <Bar dataKey="fixed_expense" name="고정지출" stackId="expense" fill="var(--color-highlight-2)" barSize={50}>
-                  <LabelList dataKey="fixed_expense" position="center" formatter={formatLabel} fill="#fff" fontSize={12} />
+                <Bar dataKey="fixed_expense" name="고정지출" stackId="expense" fill="var(--color-highlight-2)">
+                  <LabelList dataKey="fixed_expense" content={<CustomBarLabel type="fixed_expense" />} />
                 </Bar>
-                <Bar dataKey="semi_fixed_expense" name="반고정지출" stackId="expense" fill="var(--color-highlight-6)" barSize={50}>
-                  <LabelList dataKey="semi_fixed_expense" position="center" formatter={formatLabel} fill="#fff" fontSize={12} />
+                <Bar dataKey="semi_fixed_expense" name="반고정지출" stackId="expense" fill="var(--color-highlight-6)">
+                  <LabelList dataKey="semi_fixed_expense" content={<CustomBarLabel type="semi_fixed_expense" />} />
                 </Bar>
-                <Bar dataKey="variable_expense" name="유동지출" stackId="expense" fill="var(--color-highlight-3)" barSize={50}>
-                  <LabelList dataKey="variable_expense" position="center" formatter={formatLabel} fill="#fff" fontSize={12} />
+                <Bar dataKey="variable_expense" name="유동지출" stackId="expense" fill="var(--color-highlight-3)">
+                  <LabelList dataKey="variable_expense" content={<CustomBarLabel type="variable_expense" />} />
                 </Bar>
-                <Bar dataKey="surplus" name="잉여금" stackId="expense" fill="var(--color-highlight-1-transparent5)" barSize={50} />
+                <Bar dataKey="surplus" name="잉여금" stackId="expense" fill="var(--color-highlight-1-transparent5)" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -215,10 +324,9 @@ const MonthlyDetail = ({ selectedYear, selectedMonth }: MonthlyDetailProps) => {
           ]} chartData={chartData} />
         </div>
 
-
-        {/* 2. 우측: 3열 테이블 영역 */}
-        <div className="table-container">
-          <h4>대분류별 지출</h4>
+        {/* 중앙: 3열 테이블 */}
+        <div className="category-spending-container">
+          <h4 className="category-spending-title">대분류별 지출</h4>
           <div className="category-table-wrapper">
             <table className="category-table">
               <thead>
@@ -230,24 +338,78 @@ const MonthlyDetail = ({ selectedYear, selectedMonth }: MonthlyDetailProps) => {
               </thead>
               <tbody>
                 {categorySpending.length > 0 ? (
-                  categorySpending.map((item, index) => (
-                    <tr key={index}>
-                      <td>{item.name}</td>
-                      <td className="td-amount">{item.value.toLocaleString()}원</td>
+                  <>
+                    {categorySpending.map((item, index) => (
+                      <tr key={index}>
+                        <td>{item.name}</td>
+                        <td className="td-amount">{item.value.toLocaleString()}원</td>
+                        <td className="td-percentage">
+                          <div className="percentage-cell">
+                            <div
+                              className="percentage-bar-fill"
+                              style={{
+                                width: `${item.percentage}%`,
+                                backgroundColor: `var(--color-highlight-${((index + 1) % 6) + 1})`
+                              }}
+                            ></div>
+                            <span className="percentage-text">{item.percentage.toFixed(1)}%</span>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                    <tr className="total-row">
+                      <td className="total-label">계</td>
+                      <td className="td-amount total-amount">{totalCategorySpending.toLocaleString()}원</td>
                       <td className="td-percentage">
-                        <div className="percentage-bar-outer">
-                          <div
-                            className="percentage-bar-inner"
-                            style={{ width: `${item.percentage}%`, backgroundColor: `var(--color-chart-${index + 1})` }}
-                          ></div>
-                        </div>
-                        <span>{item.percentage.toFixed(1)}%</span>
+                        {/* <div className="percentage-cell">
+                          <div className="percentage-bar-fill total-bar" style={{ width: '100%' }}></div>
+                          <span className="percentage-text">100.0%</span>
+                        </div> */}
                       </td>
                     </tr>
-                  ))
+                  </>
                 ) : (
                   <tr>
                     <td colSpan={3} className="no-data-message">해당 월의 지출 내역이 없습니다.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* 우측: 계좌별 잔액 */}
+        <div className="account-balance-container">
+          <h4 className="account-balance-title">계좌잔고</h4>
+          <div className="account-balance-wrapper">
+            <table className="account-balance-table">
+              <thead>
+                <tr>
+                  <th>계좌명</th>
+                  <th>잔액</th>
+                </tr>
+              </thead>
+              <tbody>
+                {accountBalances.length > 0 ? (
+                  <>
+                    {accountBalances.map((account, index) => (
+                      <tr key={index}>
+                        <td>{account.account_name}</td>
+                        <td className="td-balance">
+                          {account.balance === 0 ? '-' : `${account.balance.toLocaleString()}원`}
+                        </td>
+                      </tr>
+                    ))}
+                    <tr className="total-row">
+                      <td className="total-label">계</td>
+                      <td className="td-balance total-balance">
+                        {accountBalances.reduce((sum, acc) => sum + acc.balance, 0).toLocaleString()}원
+                      </td>
+                    </tr>
+                  </>
+                ) : (
+                  <tr>
+                    <td colSpan={2} className="no-data-message">계좌 정보가 없습니다.</td>
                   </tr>
                 )}
               </tbody>

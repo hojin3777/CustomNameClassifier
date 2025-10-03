@@ -64,7 +64,7 @@ def get_available_months():
     return months
 
 def get_monthly_detail_summary(year, month):
-    """지정된 월의 상세 수입/지출 내역을 계산합니다. (기존 get_type_ratio 대체)"""
+    """지정된 월의 상세 수입/지출 내역을 계산합니다."""
     conn = database.get_db_connection()
     month_str = f"{year}-{month:02d}"
     
@@ -112,7 +112,7 @@ def get_category_spending(year, month):
         JOIN major_categories mc ON mnc.major_category_id = mc.id
         WHERE strftime('%Y', t.transaction_date) = ? 
           AND strftime('%m', t.transaction_date) = ?
-          AND t.amount < 0
+          AND mc.name NOT IN ('고정수입', '유동수입', '이체분류')
         GROUP BY mc.id, mc.name
         ORDER BY value DESC
     """
@@ -134,3 +134,21 @@ def get_category_spending(year, month):
     ]
     
     return result
+
+def get_account_balances():
+    """모든 계좌의 잔액을 계산합니다."""
+    conn = database.get_db_connection()
+    query = """
+        SELECT 
+            a.name AS account_name,
+            COALESCE(SUM(t.amount), 0) AS balance
+        FROM accounts a
+        LEFT JOIN transactions t ON a.id = t.account_id
+        WHERE a.name NOT LIKE '(exp)%' AND a.name NOT LIKE '(숨김)%'
+        GROUP BY a.id, a.name, a.display_order
+        ORDER BY a.display_order ASC
+    """
+    cursor = conn.execute(query)
+    balances = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    return balances

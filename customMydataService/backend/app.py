@@ -1,6 +1,7 @@
 import os
 import sqlite3
 import uuid
+import torch
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from datetime import date
@@ -39,10 +40,12 @@ print("Initializing OCR service...")
 # ★★★ 모델 경로를 실제 best.pt 파일 위치로 수정해야 합니다. ★★★
 OCR_MODEL_PATH = 'C:/code/customOCR/bank_statement_detector/yolov8l_e50_bs8_0828/weights/best.pt'
 UPLOAD_FOLDER = os.path.join(DB_FOLDER, 'uploads')
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 try:
+    if device.type == 'cpu': raise EnvironmentError("OCR 모델은 GPU에서만 실행됩니다. CUDA 호환 GPU가 있는지 확인하세요.")
     ocr_service.initialize_predictor(model_path=OCR_MODEL_PATH)
     print("OCR service initialized successfully.")
 except Exception as e:
@@ -51,6 +54,7 @@ except Exception as e:
 # 2. 업종 분류 서비스 초기화
 print("Initializing Classification service...")
 try:
+    if device.type == 'cpu': raise EnvironmentError("분류 모델은 GPU에서만 실행됩니다. CUDA 호환 GPU가 있는지 확인하세요.")
     classification_service.initialize_classifier()
     print("Classification service initialized successfully.")
 except Exception as e:
@@ -165,6 +169,16 @@ def get_category_spending_route():
     except Exception as e:
         print(f"Error getting category spending: {e}")
         return jsonify({"error": "Failed to retrieve category spending"}), 500
+    
+@app.route('/api/statistics/account_balances', methods=['GET'])
+def get_account_balances_route():
+    """계좌별 현재 잔액 데이터 반환(전체 기간 기준)"""
+    try:
+        balances = dashboard_utils.get_account_balances()
+        return jsonify(balances)
+    except Exception as e:
+        print(f"Error getting account balances: {e}")
+        return jsonify({"error": "Failed to retrieve account balances"}), 500
 
 
 

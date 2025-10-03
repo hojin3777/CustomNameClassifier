@@ -338,7 +338,7 @@ const MonthlyTrend: React.FC<MonthlyTrendProps> = ({ months, range }) => {
                 data={chartData}
                 stackOffset='sign'
                 margin={{ top: 8, right: 8, left: 0, bottom: 24 }}
-                maxBarSize={36}
+                maxBarSize={42}
               >
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border-subtle)" />
                 {/* <XAxis dataKey="month" tick={{ fill: 'var(--color-text-primary)'}}/> */}
