@@ -138,19 +138,19 @@ def get_available_months_route():
         print(f"Error getting available months: {e}")
         return jsonify({"error": "Failed to retrieve available months"}), 500
 
-@app.route('/api/statistics/type_ratio', methods=['GET'])
-def get_type_ratio_route():
-    """월별 수입/지출 유형 비율을 반환합니다."""
+@app.route('/api/statistics/monthly_detail', methods=['GET'])
+def get_monthly_detail_route():
+    """월별 상세 분석 데이터(수입/지출 유형별 합계)를 반환합니다."""
     year = request.args.get('year', type=int)
     month = request.args.get('month', type=int)
     if not year or not month:
         return jsonify({"error": "year and month parameters are required."}), 400
     try:
-        ratio_data = dashboard_utils.get_type_ratio(year, month)
-        return jsonify(ratio_data)
+        summary_data = dashboard_utils.get_monthly_detail_summary(year, month)
+        return jsonify(summary_data)
     except Exception as e:
-        print(f"Error getting type ratio: {e}")
-        return jsonify({"error": "Failed to retrieve type ratio"}), 500
+        print(f"Error getting monthly detail summary: {e}")
+        return jsonify({"error": "Failed to retrieve monthly detail summary"}), 500
 
 @app.route('/api/statistics/category_spending', methods=['GET'])
 def get_category_spending_route():

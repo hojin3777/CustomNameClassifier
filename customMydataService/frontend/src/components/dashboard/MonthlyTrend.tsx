@@ -191,7 +191,7 @@ const MonthlyTrend: React.FC<MonthlyTrendProps> = ({ months, range }) => {
       });
 
       return (
-        <div className="custom-tooltip">
+        <div className="custom-tooltip-trend">
           <p className="label">{dateLabel}</p>
           {sortedPayload.map((p: any, index: number) => (
             <p key={`tooltip-item-${index}`} style={{ color: p.color }}>

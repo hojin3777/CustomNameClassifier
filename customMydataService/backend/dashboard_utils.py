@@ -63,30 +63,42 @@ def get_available_months():
     conn.close()
     return months
 
-def get_type_ratio(year, month):
-    """지정된 월의 수입/지출 유형별 비율을 계산합니다."""
+def get_monthly_detail_summary(year, month):
+    """지정된 월의 상세 수입/지출 내역을 계산합니다. (기존 get_type_ratio 대체)"""
     conn = database.get_db_connection()
+    month_str = f"{year}-{month:02d}"
+    
     query = """
         SELECT
-            type,
-            SUM(ABS(amount)) as value
-        FROM transactions
-        WHERE strftime('%Y', transaction_date) = ? AND strftime('%m', transaction_date) = ?
-        AND type IS NOT NULL AND type != ''
-        GROUP BY type
+            SUM(CASE WHEN mc.name = '고정수입' THEN t.amount ELSE 0 END) AS fixed_income,
+            SUM(CASE WHEN mc.name = '유동수입' THEN t.amount ELSE 0 END) AS variable_income,
+            SUM(CASE WHEN t.type = '고정지출' THEN ABS(t.amount) ELSE 0 END) AS fixed_expense,
+            SUM(CASE WHEN t.type = '반고정지출' THEN ABS(t.amount) ELSE 0 END) AS semi_fixed_expense,
+            SUM(CASE WHEN t.type = '유동지출' THEN ABS(t.amount) ELSE 0 END) AS variable_expense
+        FROM transactions t
+        LEFT JOIN minor_categories mnc ON t.minor_category_uuid = mnc.uuid
+        LEFT JOIN major_categories mc ON mnc.major_category_id = mc.id
+        WHERE strftime('%Y-%m', t.transaction_date) = ?
     """
     
-    cursor = conn.execute(query, (str(year), f'{month:02d}'))
-    rows = cursor.fetchall()
+    cursor = conn.execute(query, (month_str,))
+    # fetchone()은 결과가 없을 때 None을 반환할 수 있으므로, 기본값을 설정합니다.
+    row = cursor.fetchone()
     conn.close()
 
-    income_types = ['고정수입', '유동수입']
-    expense_types = ['고정지출', '반고정지출', '유동지출']
-    
-    income_data = [{'name': row['type'], 'value': row['value']} for row in rows if row['type'] in income_types]
-    expense_data = [{'name': row['type'], 'value': row['value']} for row in rows if row['type'] in expense_types]
-
-    return {'income': income_data, 'expense': expense_data}
+    if row and any(row):
+        summary = dict(row)
+    else:
+        # 해당 월에 데이터가 전혀 없을 경우 0으로 채워진 기본 구조를 반환합니다.
+        summary = {
+            "fixed_income": 0,
+            "variable_income": 0,
+            "fixed_expense": 0,
+            "semi_fixed_expense": 0,
+            "variable_expense": 0
+        }
+        
+    return summary
 
 def get_category_spending(year, month):
     """지정된 월의 대분류별 지출을 계산합니다."""
