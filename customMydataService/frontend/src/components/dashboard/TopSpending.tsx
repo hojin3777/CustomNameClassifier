@@ -1,0 +1,274 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, LabelList, CartesianGrid } from 'recharts';
+import './TopSpending.css';
+
+const API_BASE_URL = 'http://localhost:5000';
+
+// --- 타입 정의 ---
+interface TopSpendingItem {
+  name: string;
+  value: number;
+}
+
+interface TopSpendingData {
+  by_amount: TopSpendingItem[];
+  by_frequency: TopSpendingItem[];
+}
+
+interface TopSpendingProps {
+  months: string[];
+  range: [number, number];
+}
+
+// --- 커스텀 툴팁 컴포넌트 ---
+const CustomTooltip = ({ active, payload, label, viewMode, monthCount, amountData, frequencyData }: any) => {
+  if (active && payload && payload.length) {
+    const { dataKey, value, fill } = payload[0];
+    const isAmount = dataKey === 'amount_value';
+    const data = isAmount ? amountData : frequencyData;
+    const rank = data.findIndex((item: any) => item.name === label) + 1;
+    const solidColor = fill.replace('-transparent9', '');
+    if (!data) return null;
+
+    const rawValue = Math.abs(value);
+    const displayValue = viewMode === 'average' ? rawValue / monthCount : rawValue;
+
+    let tooltipLabel = isAmount ? '지출액' : '지출 횟수';
+    let tooltipValue = '';
+
+    if (viewMode === 'average') {
+      tooltipValue = displayValue.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    } else {
+      tooltipValue = displayValue.toLocaleString(undefined, { maximumFractionDigits: 0 });
+    }
+    
+    tooltipValue += isAmount ? '원' : '회';
+
+    return (
+      <div className="custom-tooltip-top-spending">
+        <p className="tooltip-label-top-spending" style={{ color: solidColor }}>
+          {`${rank}위 ${label}`}
+        </p>
+        <p className="tooltip-item-top-spending">
+          <span>{tooltipLabel}</span>
+          <span>{tooltipValue}</span>
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
+
+
+const TopSpending: React.FC<TopSpendingProps> = ({ months, range }) => {
+  const [data, setData] = useState<TopSpendingData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<'total' | 'average'>('total');
+
+  // ******************** 데이터 로드 ********************
+  useEffect(() => {
+    const fetchData = async () => {
+      if (months.length === 0) {
+        setData(null);
+        setIsLoading(false);
+        return;
+      }
+      const [startIndex, endIndex] = range;
+      const startMonth = months[startIndex];
+      const endMonth = months[endIndex];
+      if (!startMonth || !endMonth) return;
+
+      try {
+        setIsLoading(true);
+        const response = await fetch(
+          `${API_BASE_URL}/api/statistics/top_spending?start_month=${startMonth}&end_month=${endMonth}`
+        );
+        const result: TopSpendingData = await response.json();
+        setData(result);
+      } catch (error) {
+        console.error('Error fetching top spending data:', error);
+        setData(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, [months, range]);
+
+  // ******************** 차트 데이터 가공 ********************
+  const monthCount = useMemo(() => {
+    return range[1] - range[0] + 1;
+  }, [range]);
+
+  const amountChartData = useMemo(() => {
+    if (!data?.by_amount) return [];
+    return data.by_amount.map(item => ({ name: item.name, amount_value: item.value }));
+  }, [data]);
+
+  const frequencyChartData = useMemo(() => {
+    if (!data?.by_frequency) return [];
+    return data.by_frequency.map(item => ({ name: item.name, frequency_value: item.value }));
+  }, [data]);
+
+  // 기간 표시 텍스트 생성
+  const rangeText = useMemo(() => {
+    if (months.length > 0 && range[1] < months.length) {
+      const start = months[range[0]];
+      const end = months[range[1]];
+      return `${start.substring(0, 4)}년 ${parseInt(start.substring(5), 10)}월 ~ ${end.substring(0, 4)}년 ${parseInt(end.substring(5), 10)}월`;
+    }
+    return '';
+  }, [months, range]);
+
+  const generateVerticalCoordinates = (props : { width: number, offset?: { left?: number, right?: number}}, chartType: 'amount' | 'frequency' ) => {
+    const { width, offset } = props;
+    const sectionCount = width > 350 ? 10 : 5;
+
+    if (chartType === 'amount') {
+      const yAxisWidth = offset?.right || 0;
+      const plotAreaWidth = width - yAxisWidth;
+      const interval = plotAreaWidth / sectionCount;
+      return Array.from({ length: sectionCount - 1 }, (_, i) => interval * (i + 1));
+    }
+
+    if (chartType === 'frequency') {
+      const yAxisWidth = offset?.left || 0;
+      const plotAreaWidth = width - yAxisWidth;
+      const interval = plotAreaWidth / sectionCount;
+      return Array.from({ length: sectionCount - 1 }, (_, i) => yAxisWidth + interval * (i + 1));
+    }
+    return [];
+  };
+
+  const handleToogleViewMode = () => setViewMode(prev => (prev === 'total' ? 'average' : 'total'));
+  const formatValue = (value: any, isAmount: boolean = false) => {
+    const rawValue = Math.abs(value);
+    const displayValue = viewMode === 'average' ? rawValue / monthCount : rawValue;
+    if (viewMode === 'average') {
+      return displayValue.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 1});
+    }
+    return displayValue.toLocaleString(undefined, {maximumFractionDigits: 0});
+  }
+
+  // ******************** 렌더링 ********************
+  return (
+    <div className="dashboard-card">
+      <div className="dashboard-card-header">
+        <h3 className="dashboard-card-title">기간 내 소비 TOP 10
+          <span
+            className="dashboard-cart-title subtle"
+            style={{ color: viewMode === 'total' ? 'var(--color-highlight-5)' : 'var(--color-highlight-4)' }}>
+            {viewMode === 'total' ? ` (${monthCount}개월 합산)` : ` (${monthCount}개월 평균)`}
+          </span>
+          <label className="switch top-spending-switch">
+            <input type="checkbox" onChange={handleToogleViewMode} checked={viewMode === 'average'} />
+            <span className="slider round"></span>
+          </label>
+        </h3>
+        <span className="dashboard-card-subtitle">{rangeText}</span>
+        
+      </div>
+      <div className="dashboard-card-content top-spending-content">
+        {isLoading ? (
+          <div className="top-spending-loading">데이터를 불러오는 중입니다...</div>
+        ) : !data || (amountChartData.length === 0 && frequencyChartData.length === 0) ? (
+          <div className="top-spending-no-data">표시할 데이터가 없습니다.</div>
+        ) : (
+          <>
+            <div className="top-spending-header">
+              <div>지출액</div>
+              <div>카테고리</div>
+              <div>지출 횟수</div>
+            </div>
+            <div className='top-spending-chart-wrapper'>
+              {/* --- 중앙 구분선 ---  */}
+              <div className='center-divider'></div>
+              <div className="top-spending-chart-container">
+              {/* 왼쪽 차트: 지출액 */}
+              <div className="chart-half left">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={amountChartData} layout="vertical" margin={{ top: 0, right: -5, left: 65, bottom: -15 }} barCategoryGap="30%">
+                    <CartesianGrid
+                      vertical={true}
+                      horizontal={false}
+                      verticalCoordinatesGenerator={(props) => generateVerticalCoordinates(props, 'amount')}
+                      stroke='var(--color-border-subtle)'
+                      strokeDasharray="3 3"/>
+                    <XAxis type="number" reversed={true} hide/>
+                    <YAxis
+                      type="category"
+                      dataKey="name"
+                      orientation="right"
+                      axisLine={true}
+                      tickLine={false}
+                      width={100}
+                      tick={{ fill: 'var(--color-text-primary)', fontSize: 14 }}
+                    />
+                    <Tooltip
+                      content={<CustomTooltip
+                        viewMode={viewMode}
+                        monthCount={monthCount}
+                        amountData={amountChartData}
+                      />} cursor={{ fill: 'var(--color-bg-overlay-light)' }} />
+                    <Bar dataKey="amount_value" fill="var(--color-highlight-5-transparent9)">
+                      <LabelList
+                        dataKey="amount_value"
+                        position="right"
+                        formatter={(value: any) => formatValue(value, true)}
+                        fill="var(--color-text-primary)"
+                        fontSize={12}
+                      />
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              
+              {/* 오른쪽 차트: 지출 횟수 */}
+              <div className="chart-half right">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={frequencyChartData} layout="vertical" margin={{ top: 0, right: 10, left: -5, bottom: -15 }} barCategoryGap="30%">
+                    <CartesianGrid
+                      vertical={true}
+                      horizontal={false}
+                      verticalCoordinatesGenerator={(props) => generateVerticalCoordinates(props, 'frequency')}
+                      stroke='var(--color-border-subtle)'
+                      strokeDasharray="3 3"/>
+                    <XAxis type="number" hide tickCount={9} tick={{ fill: 'var(--color-border-subtle)' }}/>
+                    <YAxis
+                      type="category"
+                      dataKey="name"
+                      orientation="left"
+                      axisLine={true}
+                      tickLine={false}
+                      width={100}
+                      tick={{ fill: 'var(--color-text-primary)', fontSize: 14 }}
+                    />
+                    <Tooltip
+                      content={<CustomTooltip
+                        viewMode={viewMode}
+                        monthCount={monthCount}
+                        frequencyData={frequencyChartData}
+                      />} cursor={{ fill: 'var(--color-bg-overlay-light)' }} />
+                    <Bar dataKey="frequency_value" fill="var(--color-highlight-4-transparent9)">
+                      <LabelList
+                        dataKey="frequency_value"
+                        position="right"
+                        formatter={(value: any) => `${formatValue(value)}회`}
+                        fill="var(--color-text-primary)"
+                        fontSize={12}
+                      />
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default TopSpending;

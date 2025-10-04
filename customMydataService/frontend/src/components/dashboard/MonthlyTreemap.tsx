@@ -239,7 +239,7 @@ const MonthlyTreemap: React.FC<MonthlyTreemapProps> = ({ selectedYear, selectedM
         <div className="dashboard-card-content" >
           <ResponsiveContainer width="100%" height="100%">
             <Treemap
-              data={data}
+              data={data as any}
               dataKey="size"
               stroke="var(--color-border)"
               fill="var(--color-highlight-1)"

@@ -68,7 +68,7 @@ def get_monthly_detail_summary(year, month):
     conn = database.get_db_connection()
     month_str = f"{year}-{month:02d}"
     
-    query = """
+    query = """--sql
         SELECT
             SUM(CASE WHEN mc.name = '고정수입' THEN t.amount ELSE 0 END) AS fixed_income,
             SUM(CASE WHEN mc.name = '유동수입' THEN t.amount ELSE 0 END) AS variable_income,
@@ -103,7 +103,7 @@ def get_monthly_detail_summary(year, month):
 def get_category_spending(year, month):
     """지정된 월의 대분류별 지출을 계산합니다."""
     conn = database.get_db_connection()
-    query = """
+    query = """--sql
         SELECT
             mc.name,
             SUM(ABS(t.amount)) as value
@@ -197,3 +197,51 @@ def get_category_treemap(year, month):
     # 최상위 노드 리스트로 변환
     result = sorted(list(major_map.values()), key=lambda x: x['value'], reverse=True)
     return result
+
+def get_top_spending_categories(start_month_str, end_month_str):
+    """
+    지정된 기간 동안 지출액 기준 및 지출 빈도 기준 상위 10개 소분류를 반환합니다.
+    """
+    conn = database.get_db_connection()
+    params = (start_month_str, end_month_str)
+    
+    # 1. 지출액 기준 TOP 10
+    query_by_amount = """
+        SELECT
+            mnc.name,
+            SUM(ABS(t.amount)) as value
+        FROM transactions t
+        JOIN minor_categories mnc ON t.minor_category_uuid = mnc.uuid
+        JOIN major_categories mc ON mnc.major_category_id = mc.id
+        WHERE strftime('%Y-%m', t.transaction_date) BETWEEN ? AND ?
+          AND mc.name NOT IN ('고정수입', '유동수입', '이체분류')
+        GROUP BY mnc.uuid, mnc.name
+        ORDER BY value DESC
+        LIMIT 10
+    """
+    cursor_amount = conn.execute(query_by_amount, params)
+    top_by_amount = [dict(row) for row in cursor_amount.fetchall()]
+
+    # 2. 지출 빈도 기준 TOP 10
+    query_by_frequency = """
+        SELECT
+            mnc.name,
+            COUNT(t.id) as value
+        FROM transactions t
+        JOIN minor_categories mnc ON t.minor_category_uuid = mnc.uuid
+        JOIN major_categories mc ON mnc.major_category_id = mc.id
+        WHERE strftime('%Y-%m', t.transaction_date) BETWEEN ? AND ?
+          AND mc.name NOT IN ('고정수입', '유동수입', '이체분류')
+        GROUP BY mnc.uuid, mnc.name
+        ORDER BY value DESC
+        LIMIT 10
+    """
+    cursor_frequency = conn.execute(query_by_frequency, params)
+    top_by_frequency = [dict(row) for row in cursor_frequency.fetchall()]
+
+    conn.close()
+    
+    return {
+        "by_amount": top_by_amount,
+        "by_frequency": top_by_frequency
+    }

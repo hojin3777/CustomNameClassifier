@@ -59,8 +59,9 @@ try:
     print("Classification service initialized successfully.")
 except Exception as e:
     print(f"ERROR: Classification service initialization failed - {e}")
-# -----------------------------------------
 
+
+# -----------------------------------------
 # 기본 API 엔드포인트 정의
 @app.route('/')
 def home():
@@ -95,6 +96,8 @@ def process_image_ocr():
         # 실제 운영 환경에서는 더 상세한 로깅이 필요
         print(f"Error during OCR processing: {e}")
         return jsonify({"error": f"An error occurred during image processing: {e}"}), 500
+
+
 
 
 # ------------------- 대시보드 통계 API -------------------
@@ -182,6 +185,7 @@ def get_account_balances_route():
     
 @app.route('/api/statistics/category_treemap', methods=['GET'])
 def get_category_treemap_route():
+    """트리맵 데이터 반환 (대분류-소분류별 지출 비율)"""
     year = request.args.get('year', type=int)
     month = request.args.get('month', type=int)
     try:
@@ -189,6 +193,20 @@ def get_category_treemap_route():
         return jsonify({"success": True, "data": data})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/statistics/top_spending', methods=['GET'])
+def get_top_spending_route():
+    """기간 내 지출액/빈도수 기준 TOP 10 소분류 데이터를 반환합니다."""
+    start_month = request.args.get('start_month')
+    end_month = request.args.get('end_month')
+    if not start_month or not end_month:
+        return jsonify({"error": "start_month and end_month parameters are required."}), 400
+    try:
+        top_spending_data = dashboard_utils.get_top_spending_categories(start_month, end_month)
+        return jsonify(top_spending_data)
+    except Exception as e:
+        print(f"Error getting top spending categories: {e}")
+        return jsonify({"error": "Failed to retrieve top spending categories"}), 500
 
 
 
