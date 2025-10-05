@@ -200,16 +200,15 @@ def get_category_treemap(year, month):
 
 def get_top_spending_categories(start_month_str, end_month_str):
     """
-    지정된 기간 동안 지출액 기준 및 지출 빈도 기준 상위 10개 소분류를 반환합니다.
+    지정된 기간 동안 지출액 기준 및 지출 빈도 기준 상위 10개 소분류와
+    각 소분류에 대한 상위 10개 거래처 상세 내역을 반환합니다.
     """
     conn = database.get_db_connection()
     params = (start_month_str, end_month_str)
     
-    # 1. 지출액 기준 TOP 10
-    query_by_amount = """
-        SELECT
-            mnc.name,
-            SUM(ABS(t.amount)) as value
+    # 1. 지출액 기준 TOP 10 소분류 UUID 조회
+    query_top_amount_categories = """--sql
+        SELECT mnc.uuid, mnc.name, SUM(ABS(t.amount)) as value
         FROM transactions t
         JOIN minor_categories mnc ON t.minor_category_uuid = mnc.uuid
         JOIN major_categories mc ON mnc.major_category_id = mc.id
@@ -219,14 +218,11 @@ def get_top_spending_categories(start_month_str, end_month_str):
         ORDER BY value DESC
         LIMIT 10
     """
-    cursor_amount = conn.execute(query_by_amount, params)
-    top_by_amount = [dict(row) for row in cursor_amount.fetchall()]
+    top_amount_categories = conn.execute(query_top_amount_categories, params).fetchall()
 
-    # 2. 지출 빈도 기준 TOP 10
-    query_by_frequency = """
-        SELECT
-            mnc.name,
-            COUNT(t.id) as value
+    # 2. 지출 빈도 기준 TOP 10 소분류 UUID 조회
+    query_top_freq_categories = """--sql
+        SELECT mnc.uuid, mnc.name, COUNT(t.id) as value
         FROM transactions t
         JOIN minor_categories mnc ON t.minor_category_uuid = mnc.uuid
         JOIN major_categories mc ON mnc.major_category_id = mc.id
@@ -236,8 +232,52 @@ def get_top_spending_categories(start_month_str, end_month_str):
         ORDER BY value DESC
         LIMIT 10
     """
-    cursor_frequency = conn.execute(query_by_frequency, params)
-    top_by_frequency = [dict(row) for row in cursor_frequency.fetchall()]
+    top_freq_categories = conn.execute(query_top_freq_categories, params).fetchall()
+
+    # 3. 각 카테고리별 상세 내역 조회 및 결과 조합
+    top_by_amount = []
+    for category in top_amount_categories:
+        details_query = """--sql
+            SELECT merchant as name, SUM(ABS(amount)) as value, COUNT(id) as count
+            FROM transactions
+            WHERE minor_category_uuid = ? AND strftime('%Y-%m', transaction_date) BETWEEN ? AND ?
+            GROUP BY merchant
+            ORDER BY value DESC
+            LIMIT 10
+        """
+        details_cursor = conn.execute(details_query, (category['uuid'], start_month_str, end_month_str))
+        details = [dict(row) for row in details_cursor.fetchall()]
+
+        total_count_query = "SELECT COUNT(DISTINCT merchant) FROM transactions WHERE minor_category_uuid = ? AND strftime('%Y-%m', transaction_date) BETWEEN ? AND ?"
+        total_count = conn.execute(total_count_query, (category['uuid'], start_month_str, end_month_str)).fetchone()[0]
+        
+        top_by_amount.append({
+            "name": category['name'],
+            "value": category['value'],
+            "details": {"items": details, "total_count": total_count}
+        })
+
+    top_by_frequency = []
+    for category in top_freq_categories:
+        details_query = """--sql
+            SELECT merchant as name, COUNT(id) as value
+            FROM transactions
+            WHERE minor_category_uuid = ? AND strftime('%Y-%m', transaction_date) BETWEEN ? AND ?
+            GROUP BY merchant
+            ORDER BY value DESC
+            LIMIT 10
+        """
+        details_cursor = conn.execute(details_query, (category['uuid'], start_month_str, end_month_str))
+        details = [dict(row) for row in details_cursor.fetchall()]
+
+        total_count_query = "SELECT COUNT(DISTINCT merchant) FROM transactions WHERE minor_category_uuid = ? AND strftime('%Y-%m', transaction_date) BETWEEN ? AND ?"
+        total_count = conn.execute(total_count_query, (category['uuid'], start_month_str, end_month_str)).fetchone()[0]
+
+        top_by_frequency.append({
+            "name": category['name'],
+            "value": category['value'],
+            "details": {"items": details, "total_count": total_count}
+        })
 
     conn.close()
     

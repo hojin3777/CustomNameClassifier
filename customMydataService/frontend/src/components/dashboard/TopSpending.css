@@ -142,7 +142,9 @@ input:checked + .slider:before {
   stroke-opacity: 0.7;
 }
 
-/* 툴팁 스타일 (변경 없음) */
+
+
+/* 툴팁 스타일 */
 .custom-tooltip-top-spending {
   background-color: var(--color-bg-content);
   opacity: 0.98;
@@ -150,12 +152,13 @@ input:checked + .slider:before {
   border-radius: 4px;
   padding: 0px 12px 12px 12px;
   box-shadow: 0 2px 8px var(--color-bg-overlay-light);
+  min-width: 160px;
 }
 
 .tooltip-label-top-spending {
   font-weight: bold;
   margin-bottom: 8px;
-  color: var(--color-text-primary);
+  /* color: var(--color-text-primary); */
 }
 
 .tooltip-item-top-spending {
@@ -163,5 +166,66 @@ input:checked + .slider:before {
   justify-content: space-between;
   gap: 16px;
   margin: 0;
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary);
 }
+
+.tooltip-divider-top-spending {
+  border-top: 1px solid var(--color-border-subtle);
+  margin: 8px 0;
+}
+
+.tooltip-details-list-top-spending {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 220px; /* 툴팁이 너무 길어지는 것을 방지 */
+  overflow-y: auto;
+}
+
+.tooltip-detail-item-top-spending {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  font-size: 13px;
+  color: var(--color-text-primary);
+}
+
+.tooltip-detail-item-top-spending span:first-child {
+  color: var(--color-text-primary);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tooltip-remaining-count-top-spending {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin: 4px 0 0;
+  text-align: right;
+}
+
+/* 하이라이트 스타일 */
+.top-spending-highlight {
+  display: inline-block;
+  font-size: 14px;
+  padding: 0.1em 0.4em;
+  margin: 0em -0.7em;
+  border-radius: 6px;
+  color: var(--color-text-inverted);
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.top-spending-highlight.color-1 { background-color: var(--color-highlight-1)} /* 노랑 */
+.top-spending-highlight.color-2 { background-color: var(--color-highlight-2)} /* 하늘 */
+.top-spending-highlight.color-3 { background-color: var(--color-highlight-3)} /* 핑크 */
+.top-spending-highlight.color-4 { background-color: var(--color-highlight-4)} /* 연두 */
+.top-spending-highlight.color-5 { background-color: var(--color-highlight-5)} /* 주황 */
+.top-spending-highlight.color-6 { background-color: var(--color-highlight-6)} /* 보라 */
+.top-spending-highlight.color-1-transparent7 { background-color: var(--color-highlight-1-transparent7)}
+.top-spending-highlight.color-2-transparent7 { background-color: var(--color-highlight-2-transparent7)}
+.top-spending-highlight.color-3-transparent7 { background-color: var(--color-highlight-3-transparent7)}
+.top-spending-highlight.color-4-transparent7 { background-color: var(--color-highlight-4-transparent7)}
+.top-spending-highlight.color-5-transparent7 { background-color: var(--color-highlight-5-transparent7)}
+.top-spending-highlight.color-6-transparent7 { background-color: var(--color-highlight-6-transparent7)}

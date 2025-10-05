@@ -5,6 +5,22 @@ import './TopSpending.css';
 const API_BASE_URL = 'http://localhost:5000';
 
 // --- 타입 정의 ---
+interface TopSpendingDetailItem {
+  name: string;
+  value: number;
+}
+
+interface TopSpendingDetails {
+  items: TopSpendingDetailItem[];
+  total_count: number;
+}
+
+interface TopSpendingItem {
+  name: string;
+  value: number;
+  details?: TopSpendingDetails;
+}
+
 interface TopSpendingItem {
   name: string;
   value: number;
@@ -23,7 +39,7 @@ interface TopSpendingProps {
 // --- 커스텀 툴팁 컴포넌트 ---
 const CustomTooltip = ({ active, payload, label, viewMode, monthCount, amountData, frequencyData }: any) => {
   if (active && payload && payload.length) {
-    const { dataKey, value, fill } = payload[0];
+    const { dataKey, value, fill, payload: itemPayload } = payload[0];
     const isAmount = dataKey === 'amount_value';
     const data = isAmount ? amountData : frequencyData;
     const rank = data.findIndex((item: any) => item.name === label) + 1;
@@ -37,12 +53,17 @@ const CustomTooltip = ({ active, payload, label, viewMode, monthCount, amountDat
     let tooltipValue = '';
 
     if (viewMode === 'average') {
-      tooltipValue = displayValue.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+      tooltipLabel = `월 평균 ${tooltipLabel}`;
+      tooltipValue = displayValue.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 1 });
     } else {
+      tooltipLabel = `총 ${tooltipLabel}`;
       tooltipValue = displayValue.toLocaleString(undefined, { maximumFractionDigits: 0 });
     }
     
     tooltipValue += isAmount ? '원' : '회';
+
+    const details = itemPayload.details;
+    const remainingCount = details ? details.total_count - details.items.length : 0;
 
     return (
       <div className="custom-tooltip-top-spending">
@@ -53,10 +74,70 @@ const CustomTooltip = ({ active, payload, label, viewMode, monthCount, amountDat
           <span>{tooltipLabel}</span>
           <span>{tooltipValue}</span>
         </p>
+        {details && details.items.length > 0 && (
+          <>
+            <div className="tooltip-divider-top-spending"></div>
+            <div className="tooltip-details-list-top-spending">
+              {details.items.map((item: TopSpendingDetailItem, index: number) => {
+                const detailValue = viewMode === 'average' ? (item.value / monthCount) : item.value;
+                let formattedDetailValue = '';
+                if (viewMode === 'average') {
+                  formattedDetailValue = detailValue.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 1 });
+                } else {
+                  formattedDetailValue = detailValue.toLocaleString(undefined, { maximumFractionDigits: 0 });
+                }
+                return (
+                  <div key={index} className="tooltip-detail-item-top-spending">
+                    <span>{item.name}</span>
+                    <span>{`${formattedDetailValue}${isAmount ? '원' : '회'}`}</span>
+                  </div>
+                );
+              })}
+              </div>
+              {remainingCount > 0 && (
+                <p className="tooltip-remaining-count-top-spending">
+                  (...외 {remainingCount} 건)
+                </p>
+              )}
+          </>
+        )}
       </div>
     );
   }
   return null;
+};
+
+// 커스텀 Y축 틱 컴포넌트
+const CustomizedYAxisTick = (props: any) => {
+  const { x, y, payload, commonCategories, colorMap, orientation } = props;
+  const categoryName = payload.value;
+  const isCommon = commonCategories.has(categoryName);
+
+  if (isCommon) {
+    const colorClass = colorMap.get(categoryName);
+    // SVG의 <text> 요소 안에서는 직접 HTML/CSS 클래스를 적용할 수 없으므로,
+    // <foreignObject>를 사용해 HTML 컨텐츠를 렌더링합니다.
+    const isLeftChart = orientation === 'left';
+    const foreignObjectX = isLeftChart ? -105 : 5; // Y축 위치에 따라 조정
+    const textAlign = isLeftChart ? 'right' : 'left';
+    return (
+      <g transform={`translate(${x},${y})`}>
+        <foreignObject x={foreignObjectX} y={-11} width="100" height="24" style={{ textAlign, overflow: 'visible' }}>
+          <div style={{ display: 'inline-block' }}>
+            <span className={colorClass}>{categoryName}</span>
+          </div>
+        </foreignObject>
+      </g>
+    );
+  }
+
+  // 공통 카테고리가 아닐 경우 기본 텍스트 렌더링
+  const textAnchor = orientation === 'left' ? 'end' : 'start';
+  return (
+    <text x={x} y={y} dy={4} textAnchor={textAnchor} fill="var(--color-text-primary)" fontSize={14}>
+      {categoryName}
+    </text>
+  );
 };
 
 
@@ -102,12 +183,34 @@ const TopSpending: React.FC<TopSpendingProps> = ({ months, range }) => {
 
   const amountChartData = useMemo(() => {
     if (!data?.by_amount) return [];
-    return data.by_amount.map(item => ({ name: item.name, amount_value: item.value }));
+    return data.by_amount.map(item => ({ name: item.name, amount_value: item.value, details: item.details }));
   }, [data]);
 
   const frequencyChartData = useMemo(() => {
     if (!data?.by_frequency) return [];
-    return data.by_frequency.map(item => ({ name: item.name, frequency_value: item.value }));
+    return data.by_frequency.map(item => ({ name: item.name, frequency_value: item.value, details: item.details }));
+  }, [data]);
+
+  // 공통 카테고리 및 색상 매핑
+  const { commonCategories, colorMap } = useMemo(() => {
+    if (!data?.by_amount || !data?.by_frequency) {
+      return { commonCategories: new Set(), colorMap: new Map() };
+    }
+    const amountNames = new Set(data.by_amount.map(d => d.name));
+    const frequencyNames = new Set(data.by_frequency.map(d => d.name));
+    const common = new Set([...amountNames].filter(name => frequencyNames.has(name)));
+
+    const map = new Map<string, string>();
+    // MonthlyTreemap.tsx의 색상 순서 참조 (2->6, 1)
+    const colorOrder = [2, 3, 4, 5, 6, 1, "2-transparent7", "3-transparent7", "4-transparent7", "5-transparent7", "6-transparent7", "1-transparent7"]; 
+    let colorIndex = 0;
+    common.forEach(name => {
+      const colorId = colorOrder[colorIndex % colorOrder.length];
+      map.set(name, `top-spending-highlight color-${colorId}`);
+      colorIndex++;
+    });
+
+    return { commonCategories: common, colorMap: map };
   }, [data]);
 
   // 기간 표시 텍스트 생성
@@ -187,7 +290,7 @@ const TopSpending: React.FC<TopSpendingProps> = ({ months, range }) => {
               {/* 왼쪽 차트: 지출액 */}
               <div className="chart-half left">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={amountChartData} layout="vertical" margin={{ top: 0, right: -5, left: 65, bottom: -15 }} barCategoryGap="30%">
+                  <BarChart data={amountChartData} layout="vertical" margin={{ top: -5, right: -5, left: 65, bottom: -10 }} barCategoryGap="30%">
                     <CartesianGrid
                       vertical={true}
                       horizontal={false}
@@ -202,7 +305,9 @@ const TopSpending: React.FC<TopSpendingProps> = ({ months, range }) => {
                       axisLine={true}
                       tickLine={false}
                       width={100}
-                      tick={{ fill: 'var(--color-text-primary)', fontSize: 14 }}
+                      // tick={{ fill: 'var(--color-text-primary)', fontSize: 14 }}
+                      tick={<CustomizedYAxisTick commonCategories={commonCategories} colorMap={colorMap} orientation="right"/>}
+                      interval={0}
                     />
                     <Tooltip
                       content={<CustomTooltip
@@ -226,7 +331,7 @@ const TopSpending: React.FC<TopSpendingProps> = ({ months, range }) => {
               {/* 오른쪽 차트: 지출 횟수 */}
               <div className="chart-half right">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={frequencyChartData} layout="vertical" margin={{ top: 0, right: 10, left: -5, bottom: -15 }} barCategoryGap="30%">
+                  <BarChart data={frequencyChartData} layout="vertical" margin={{ top: -5, right: 10, left: -5, bottom: -10 }} barCategoryGap="30%">
                     <CartesianGrid
                       vertical={true}
                       horizontal={false}
@@ -241,7 +346,9 @@ const TopSpending: React.FC<TopSpendingProps> = ({ months, range }) => {
                       axisLine={true}
                       tickLine={false}
                       width={100}
-                      tick={{ fill: 'var(--color-text-primary)', fontSize: 14 }}
+                      // tick={{ fill: 'var(--color-text-primary)', fontSize: 14 }}
+                      tick={<CustomizedYAxisTick commonCategories={commonCategories} colorMap={colorMap} orientation="left"/>}
+                      interval={0}
                     />
                     <Tooltip
                       content={<CustomTooltip
