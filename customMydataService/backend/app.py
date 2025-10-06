@@ -208,6 +208,31 @@ def get_top_spending_route():
         print(f"Error getting top spending categories: {e}")
         return jsonify({"error": "Failed to retrieve top spending categories"}), 500
 
+# 예산 조회 API
+@app.route('/api/budgets', methods=['GET'])
+def api_get_budgets():
+    budgets = dashboard_utils.get_all_budgets()
+    return jsonify(budgets)
+
+# 예산 추가/수정/삭제 API
+@app.route('/api/budgets', methods=['POST'])
+def api_add_budget():
+    data = request.json
+    result = dashboard_utils.add_budget(data)
+    return jsonify(result)
+
+@app.route('/api/budgets/<int:budget_id>', methods=['PUT'])
+def api_update_budget(budget_id):
+    data = request.json
+    result = dashboard_utils.update_budget(budget_id, data)
+    return jsonify(result)
+
+@app.route('/api/budgets/<int:budget_id>', methods=['DELETE'])
+def api_delete_budget(budget_id):
+    result = dashboard_utils.delete_budget(budget_id)
+    return jsonify(result)
+
+
 
 
 # ------------------- 거래내역 API -------------------

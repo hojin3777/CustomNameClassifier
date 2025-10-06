@@ -18,7 +18,7 @@
   --color-text-secondary: #b5bac1;  /* placeholder, 보조 텍스트, 아이콘 */
   --color-text-tertiary: #d8dce1;   /* primary와는 구분짓고 싶지만 secondary는 너무 어두울 때 */
   --color-text-header: #ffffff;     /* 강조 헤더 */
-  --color-text-inverted: #222222;   /* 밝은 배경 위의 어두운 텍스트 */
+  --color-text-inverted: #222224;   /* 밝은 배경 위의 어두운 텍스트 */
 
   /******** 인터랙티브 요소 ********/
   --color-border: #404249;             /* 기본 테두리 */

@@ -5,6 +5,7 @@ import MonthlyTrend from '../components/dashboard/MonthlyTrend';
 import MonthlyDetail from '../components/dashboard/MonthlyDetail';
 import MonthlyTreemap from '../components/dashboard/MonthlyTreemap';
 import TopSpending from '../components/dashboard/TopSpending';
+import BudgetManagement from '../components/dashboard/BudgetManagement';
 import ComingSoon from '../components/dashboard/ComingSoon';
 import FloatingSelectPopup, { type FloatingSelectHandle } from '../components/FloatingSelectPopup';
 import './Dashboard.css';
@@ -438,7 +439,7 @@ const Dashboard = () => {
         <MonthlyTrend months={availableMonths} range={range} />
         <MonthlyTreemap selectedYear={selectedYear} selectedMonth={selectedMonth} />
         <TopSpending months={availableMonths} range={range} />
-        <ComingSoon title="소비 습관 히트맵" />
+        <BudgetManagement selectedYear={selectedYear} selectedMonth={selectedMonth} />
         <ComingSoon title="고정비 관리" />
         <ComingSoon title="카테고리 심층 분석" />
         <ComingSoon title="이상 지출 탐지" />

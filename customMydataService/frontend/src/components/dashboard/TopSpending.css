@@ -209,7 +209,7 @@ input:checked + .slider:before {
 .top-spending-highlight {
   display: inline-block;
   font-size: 14px;
-  padding: 0.1em 0.4em;
+  padding: 0.12em 0.4em 0.08em 0.4em;
   margin: 0em -0.7em;
   border-radius: 6px;
   color: var(--color-text-inverted);
@@ -217,13 +217,13 @@ input:checked + .slider:before {
   line-height: 1.4;
 }
 
-.top-spending-highlight.color-1 { background-color: var(--color-highlight-1)} /* 노랑 */
-.top-spending-highlight.color-2 { background-color: var(--color-highlight-2)} /* 하늘 */
-.top-spending-highlight.color-3 { background-color: var(--color-highlight-3)} /* 핑크 */
-.top-spending-highlight.color-4 { background-color: var(--color-highlight-4)} /* 연두 */
-.top-spending-highlight.color-5 { background-color: var(--color-highlight-5)} /* 주황 */
-.top-spending-highlight.color-6 { background-color: var(--color-highlight-6)} /* 보라 */
-.top-spending-highlight.color-1-transparent7 { background-color: var(--color-highlight-1-transparent7)}
+/* .top-spending-highlight.color-1 { background-color: var(--color-highlight-1)} */
+.top-spending-highlight.color-2 { background-color: var(--color-highlight-2)}
+.top-spending-highlight.color-3 { background-color: var(--color-highlight-3)}
+.top-spending-highlight.color-4 { background-color: var(--color-highlight-4)}
+.top-spending-highlight.color-5 { background-color: var(--color-highlight-5)}
+.top-spending-highlight.color-6 { background-color: var(--color-highlight-6)}
+/* .top-spending-highlight.color-1-transparent7 { background-color: var(--color-highlight-1-transparent7)} */
 .top-spending-highlight.color-2-transparent7 { background-color: var(--color-highlight-2-transparent7)}
 .top-spending-highlight.color-3-transparent7 { background-color: var(--color-highlight-3-transparent7)}
 .top-spending-highlight.color-4-transparent7 { background-color: var(--color-highlight-4-transparent7)}

@@ -285,3 +285,59 @@ def get_top_spending_categories(start_month_str, end_month_str):
         "by_amount": top_by_amount,
         "by_frequency": top_by_frequency
     }
+
+def get_all_budgets():
+    """모든 예산 설정을 조회 (지출액 집계 없음)"""
+    conn = database.get_db_connection()
+    query = """--sql
+        SELECT
+            b.id,
+            b.budget_type,
+            b.target_id,
+            b.amount,
+            CASE
+                WHEN b.budget_type = 'major' THEN mc.name
+                WHEN b.budget_type = 'minor' THEN mnc.name
+            END as target_name,
+            COALESCE(mnc.major_category_id, CAST(b.target_id AS INTEGER)) as major_category_id,
+            CASE
+                WHEN b.budget_type = 'major' THEN mc.name
+                WHEN b.budget_type = 'minor' THEN mc_of_mnc.name
+            END as major_category_name
+        FROM budgets b
+        LEFT JOIN major_categories mc ON b.budget_type = 'major' AND b.target_id = CAST(mc.id AS TEXT)
+        LEFT JOIN minor_categories mnc ON b.budget_type = 'minor' AND b.target_id = mnc.uuid
+        LEFT JOIN major_categories mc_of_mnc ON mnc.major_category_id = mc_of_mnc.id
+    """
+    budgets = [dict(row) for row in conn.execute(query).fetchall()]
+    conn.close()
+    return budgets
+
+def add_budget(data):
+    conn = database.get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO budgets (budget_type, target_id, amount) VALUES (?, ?, ?)",
+        (data['budget_type'], data['target_id'], data['amount'])
+    )
+    conn.commit()
+    new_id = cursor.lastrowid
+    conn.close()
+    return {'id': new_id, **data}
+
+def update_budget(budget_id, data):
+    conn = database.get_db_connection()
+    conn.execute(
+        "UPDATE budgets SET budget_type = ?, target_id = ?, amount = ? WHERE id = ?",
+        (data['budget_type'], data['target_id'], data['amount'], budget_id)
+    )
+    conn.commit()
+    conn.close()
+    return {'id': budget_id, **data}
+
+def delete_budget(budget_id):
+    conn = database.get_db_connection()
+    conn.execute("DELETE FROM budgets WHERE id = ?", (budget_id,))
+    conn.commit()
+    conn.close()
+    return {'message': 'Budget deleted successfully'}

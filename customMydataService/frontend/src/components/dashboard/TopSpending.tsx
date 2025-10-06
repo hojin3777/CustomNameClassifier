@@ -202,7 +202,7 @@ const TopSpending: React.FC<TopSpendingProps> = ({ months, range }) => {
 
     const map = new Map<string, string>();
     // MonthlyTreemap.tsx의 색상 순서 참조 (2->6, 1)
-    const colorOrder = [2, 3, 4, 5, 6, 1, "2-transparent7", "3-transparent7", "4-transparent7", "5-transparent7", "6-transparent7", "1-transparent7"]; 
+    const colorOrder = [2, 3, 4, 5, 6, "2-transparent7", "3-transparent7", "4-transparent7", "5-transparent7", "6-transparent7"]; 
     let colorIndex = 0;
     common.forEach(name => {
       const colorId = colorOrder[colorIndex % colorOrder.length];
@@ -290,7 +290,7 @@ const TopSpending: React.FC<TopSpendingProps> = ({ months, range }) => {
               {/* 왼쪽 차트: 지출액 */}
               <div className="chart-half left">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={amountChartData} layout="vertical" margin={{ top: -5, right: -5, left: 65, bottom: -10 }} barCategoryGap="30%">
+                  <BarChart data={amountChartData} layout="vertical" margin={{ top: -5, right: 0, left: 65, bottom: -10 }} barCategoryGap="30%">
                     <CartesianGrid
                       vertical={true}
                       horizontal={false}
@@ -331,7 +331,7 @@ const TopSpending: React.FC<TopSpendingProps> = ({ months, range }) => {
               {/* 오른쪽 차트: 지출 횟수 */}
               <div className="chart-half right">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={frequencyChartData} layout="vertical" margin={{ top: -5, right: 10, left: -5, bottom: -10 }} barCategoryGap="30%">
+                  <BarChart data={frequencyChartData} layout="vertical" margin={{ top: -5, right: 10, left: 0, bottom: -10 }} barCategoryGap="30%">
                     <CartesianGrid
                       vertical={true}
                       horizontal={false}

@@ -110,6 +110,18 @@ def init_db():
         )
     ''')
 
+    # --- 7. 예산 테이블 (budgets) ---
+    # 역할: 사용자가 설정한 예산 정보를 저장합니다.
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS budgets (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            budget_type TEXT NOT NULL CHECK(budget_type IN ('major', 'minor')),
+            target_id TEXT NOT NULL,
+            amount INTEGER NOT NULL,
+            UNIQUE(budget_type, target_id)
+        )
+    ''')
+
     conn.commit()
     conn.close()
     print(f"Database and tables created successfully created at: {DB_PATH}")
