@@ -43,6 +43,8 @@ const ConfirmPopup: React.FC<ConfirmPopupProps> = ({
         } else {
           onConfirm();
         }
+      } else if (e.key === 'Enter' && type === 'confirm') {
+        onConfirm();
       }
     };
     window.addEventListener('keydown', handleKeyDown);

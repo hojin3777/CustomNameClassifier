@@ -1,7 +1,12 @@
 import React, { useState, useRef, useImperativeHandle, forwardRef, useEffect } from 'react';
 import './FloatingSelectPopup.css';
 
-export type Opt = { value: string; label: string; disabled?: boolean };
+export type Opt = {
+  value: string;
+  label: string;
+  disabled?: boolean
+  unrecommended?: boolean;
+};
 export type FloatingSelectHandle = {
   open: (opts: Opt[], currentValue: string, pos: { top: number; left: number; width?: number }, onSelect: (v: string) => void, placeholder?: string) => void;
   close: () => void;
@@ -96,7 +101,7 @@ const FloatingSelectPopup = forwardRef<FloatingSelectHandle, {}>((_props, ref) =
             data-value={o.value}
             role="option"
             aria-selected={o.value === value}
-            className={`floating-select-item ${o.value === value ? 'selected' : ''} ${o.disabled ? 'disabled' : ''}`}
+            className={`floating-select-item ${o.value === value ? 'selected' : ''} ${o.disabled ? 'disabled' : ''} ${o.unrecommended ? 'unrecommended' : ''}`}
             onMouseDown={(ev) => {
               ev.preventDefault(); // 포커스 유지/브라우저 기본 동작 방지
               if (o.disabled) return;

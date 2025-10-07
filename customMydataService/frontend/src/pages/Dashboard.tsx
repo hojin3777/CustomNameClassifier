@@ -6,6 +6,7 @@ import MonthlyDetail from '../components/dashboard/MonthlyDetail';
 import MonthlyTreemap from '../components/dashboard/MonthlyTreemap';
 import TopSpending from '../components/dashboard/TopSpending';
 import BudgetManagement from '../components/dashboard/BudgetManagement';
+import FixedExpenseManagement from '../components/dashboard/FixedExpenseManagement';
 import ComingSoon from '../components/dashboard/ComingSoon';
 import FloatingSelectPopup, { type FloatingSelectHandle } from '../components/FloatingSelectPopup';
 import './Dashboard.css';
@@ -23,6 +24,7 @@ const Dashboard = () => {
   const prevRangeRef = useRef<[number, number]>(range);
   const sliderContainerRef = useRef<HTMLDivElement | null>(null);
   const [isRangePopupOpen, setIsRangePopupOpen] = useState(false);
+  const [isFixedExpensePopupOpen, setIsFixedExpensePopupOpen] = useState(false);
   const [rangePopupPos, setRangePopupPos] = useState<{ top: number; left: number; width: number }>({
     top: 0,
     left: 0,
@@ -51,9 +53,29 @@ const Dashboard = () => {
             setRange([defaultStartIndex, defaultEndIndex]);
           }
 
-          const [yearStr, monthStr] = months[months.length - 1].split('-');
-          setSelectedYear(parseInt(yearStr, 10));
-          setSelectedMonth(parseInt(monthStr, 10));
+          const selectedDataResponse = await fetch(`${API_BASE_URL}/api/settings/dashboard_selected_date`);
+          const savedDate: { year: number; month: number } | null = await selectedDataResponse.json();
+          if (savedDate && savedDate.year && savedDate.month) {
+            const dateExists = months.some(m => {
+              const [y, mo] = m.split('-');
+              return parseInt(y, 10) === savedDate.year && parseInt(mo, 10) === savedDate.month;
+            });
+
+            if (dateExists) {
+              setSelectedYear(savedDate.year);
+              setSelectedMonth(savedDate.month);
+              return;
+            } else {
+              const [yearStr, monthStr] = months[months.length - 1].split('-');
+              setSelectedYear(parseInt(yearStr, 10));
+              setSelectedMonth(parseInt(monthStr, 10));
+            }
+          } else {
+            // 저장된 값이 없으면 가장 최근 월로 설정
+            const [yearStr, monthStr] = months[months.length - 1].split('-');
+            setSelectedYear(parseInt(yearStr, 10));
+            setSelectedMonth(parseInt(monthStr, 10));
+          }
         }
       } catch (error) {
         console.error('Error fetching available months:', error);
@@ -71,17 +93,6 @@ const Dashboard = () => {
     return Math.max(intervals * sliderMonthWidth, 320);
   }, [availableMonths.length]);
 
-  // useEffect(() => {
-  //   if (!isRangePopupOpen || !sliderContainerRef.current || availableMonths.length <= 1) return;
-  //   const container = sliderContainerRef.current;
-  //   const rightHandleIndex = range[1];
-  //   const totalIntervals = availableMonths.length - 1;
-  //   const handlePosition = (rightHandleIndex / totalIntervals) * sliderBaseWidth;
-  //   let targetScrollLeft = handlePosition - container.clientWidth / 2;
-  //   const maxScrollLeft = container.scrollWidth - container.clientWidth;
-  //   targetScrollLeft = Math.max(0, Math.min(targetScrollLeft, maxScrollLeft));
-  //   container.scrollLeft = targetScrollLeft;
-  // }, [isRangePopupOpen, range, availableMonths, sliderBaseWidth]);
   useEffect(() => {
     // 팝업이 열렸을 때만 실행
     if (!isRangePopupOpen || !sliderContainerRef.current || availableMonths.length <= 1) return;
@@ -92,7 +103,7 @@ const Dashboard = () => {
     // 선택된 범위의 시작과 끝 핸들 위치를 계산합니다.
     const startHandlePosition = (range[0] / totalIntervals) * sliderBaseWidth;
     const endHandlePosition = (range[1] / totalIntervals) * sliderBaseWidth;
-    
+
     // 선택된 범위의 중앙 위치를 계산합니다.
     const rangeCenterPosition = (startHandlePosition + endHandlePosition) / 2;
 
@@ -105,7 +116,7 @@ const Dashboard = () => {
 
     // 계산된 위치로 스크롤합니다.
     container.scrollLeft = targetScrollLeft;
-    
+
     // 이 useEffect는 팝업이 열리는 순간에만 작동해야 하므로, range를 의존성 배열에서 제거합니다.
   }, [isRangePopupOpen, availableMonths, sliderBaseWidth]);
 
@@ -173,11 +184,6 @@ const Dashboard = () => {
     return `${formatMonthLabel(availableMonths[clampedStart])} - ${formatMonthLabel(availableMonths[clampedEnd])}`;
   }, [availableMonths, range]);
 
-  // const handleSliderChange = (value: number | number[]) => {
-  //   if (Array.isArray(value)) {
-  //     setRange(value as [number, number]);
-  //   }
-  // };
 
   const handleSliderChange = (value: number | number[]) => {
     if (!Array.isArray(value) || !sliderContainerRef.current) return;
@@ -201,7 +207,7 @@ const Dashboard = () => {
       const totalIntervals = availableMonths.length - 1;
       // 핸들의 현재 위치 (px) 계산
       const handlePosition = (activeHandleIndex / totalIntervals) * sliderBaseWidth;
-      
+
       const scrollPadding = 120; // 핸들이 가장자리에 얼마나 가까워졌을 때 스크롤할지 결정하는 여백
       const currentScrollLeft = container.scrollLeft;
       const containerWidth = container.clientWidth;
@@ -238,6 +244,13 @@ const Dashboard = () => {
     }
   }, [availableMonths]);
 
+  const saveSelectedDate = useCallback((year: number | null, month: number | null) => {
+    fetch(`${API_BASE_URL}/api/settings/dashboard_selected_date`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ year, month }),
+    }).catch(error => console.error('Failed to save selected date setting:', error));
+  }, []);
 
   // 팝업 관련 로직
   const openFloatingSelect = (target: HTMLElement, type: 'year' | 'month') => {
@@ -254,7 +267,9 @@ const Dashboard = () => {
         const monthsInYear = availableMonths.filter(month => month.startsWith(`${value}-`));
         if (monthsInYear.length > 0) {
           const lastMonth = monthsInYear[monthsInYear.length - 1];
-          setSelectedMonth(parseInt(lastMonth.substring(5), 10));
+          const newMonth = parseInt(lastMonth.substring(5), 10);
+          setSelectedMonth(newMonth);
+          saveSelectedDate(newYear, newMonth);
         } else {
           setSelectedMonth(null);
         }
@@ -267,7 +282,9 @@ const Dashboard = () => {
       }));
       const currentValue = selectedMonth ? selectedMonth.toString() : '';
       floatingSelectRef.current?.open(options, currentValue, position, value => {
-        setSelectedMonth(parseInt(value, 10));
+        const newMonth = parseInt(value, 10);
+        setSelectedMonth(newMonth);
+        saveSelectedDate(selectedYear, newMonth);
       });
     }
   };
@@ -314,22 +331,51 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    if (!isRangePopupOpen) return;
+    if (!isRangePopupOpen && !isFixedExpensePopupOpen) return;
 
     const handleOutsideInteraction = (event: Event) => {
-      if (!rangePopupRef.current || !rangeSelectorRef.current) return;
-      const target = event.target;
-      const isNodeTarget = target instanceof Node;
-      const clickedInsidePopup = isNodeTarget ? rangePopupRef.current.contains(target) : false;
-      const clickedSelector = isNodeTarget ? rangeSelectorRef.current.contains(target) : false;
-      if (!clickedInsidePopup && !clickedSelector) {
-        setIsRangePopupOpen(false);
+      //   if (!rangePopupRef.current || !rangeSelectorRef.current) return;
+      //   const target = event.target;
+      //   const isNodeTarget = target instanceof Node;
+      //   const clickedInsidePopup = isNodeTarget ? rangePopupRef.current.contains(target) : false;
+      //   const clickedSelector = isNodeTarget ? rangeSelectorRef.current.contains(target) : false;
+      //   if (!clickedInsidePopup && !clickedSelector) {
+      //     setIsRangePopupOpen(false);
+      //   }
+      // };
+      if (isRangePopupOpen && rangePopupRef.current && rangeSelectorRef.current) {
+        const target = event.target;
+        const isNodeTarget = target instanceof Node;
+        const clickedInsidePopup = isNodeTarget ? rangePopupRef.current.contains(target) : false;
+        const clickedSelector = isNodeTarget ? rangeSelectorRef.current.contains(target) : false;
+        if (!clickedInsidePopup && !clickedSelector) {
+          setIsRangePopupOpen(false);
+        }
+      }
+
+      // Fixed Expense 팝업 처리
+      if (isFixedExpensePopupOpen && event.type === 'scroll') {
+        const target = event.target as Node | null;
+        const fixedExpensePopupBody = document.querySelector('.detail-popup-body-fexpense');
+
+        // 팝업 내부 스크롤은 무시
+        if (fixedExpensePopupBody && (target === fixedExpensePopupBody || (target && fixedExpensePopupBody.contains(target)))) {
+          return;
+        }
+
+        // 팝업 외부 스크롤 시 팝업 닫기
+        setIsFixedExpensePopupOpen(false);
       }
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        setIsRangePopupOpen(false);
+        if (isRangePopupOpen) {
+          setIsRangePopupOpen(false);
+        }
+        if (isFixedExpensePopupOpen) {
+          setIsFixedExpensePopupOpen(false);
+        }
       }
     };
 
@@ -344,7 +390,7 @@ const Dashboard = () => {
       window.removeEventListener('resize', handleOutsideInteraction);
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isRangePopupOpen]);
+  }, [isRangePopupOpen, isFixedExpensePopupOpen]);
 
   return (
     <div className="dashboard-page">
@@ -437,10 +483,10 @@ const Dashboard = () => {
       <main className="dashboard-content">
         <MonthlyDetail selectedYear={selectedYear} selectedMonth={selectedMonth} />
         <MonthlyTrend months={availableMonths} range={range} />
-        <MonthlyTreemap selectedYear={selectedYear} selectedMonth={selectedMonth} />
-        <TopSpending months={availableMonths} range={range} />
         <BudgetManagement selectedYear={selectedYear} selectedMonth={selectedMonth} />
-        <ComingSoon title="고정비 관리" />
+        <TopSpending months={availableMonths} range={range} />
+        <MonthlyTreemap selectedYear={selectedYear} selectedMonth={selectedMonth} />
+        <FixedExpenseManagement months={availableMonths} range={range} onPopupStateChange={setIsFixedExpensePopupOpen} isPopupOpen={isFixedExpensePopupOpen} />
         <ComingSoon title="카테고리 심층 분석" />
         <ComingSoon title="이상 지출 탐지" />
         <ComingSoon title="Coming soon" />

@@ -21,6 +21,29 @@ def set_dashboard_trend_range(range_list):
         range_str = f"{range_list[0]},{range_list[1]}"
         database.set_setting('dashboard_trend_range', range_str)
 
+def get_dashboard_selected_date():
+    """데이터베이스에서 저장된 대시보드 선택 년/월 설정을 불러옵니다."""
+    date_str = database.get_setting('dashboard_selected_date')
+    if date_str:
+        try:
+            import json
+            # '{"year": 2025, "month": 7}' 같은 JSON 문자열을 파싱
+            date_dict = json.loads(date_str)
+            if 'year' in date_dict and 'month' in date_dict:
+                return date_dict
+        except Exception:
+            return None
+    return None
+
+def set_dashboard_selected_date(year, month):
+    """대시보드 선택 년/월 설정을 데이터베이스에 저장합니다."""
+    import json
+    if year is not None and month is not None:
+        # {'year': 2025, 'month': 7}을 JSON 문자열로 변환
+        date_str = json.dumps({'year': year, 'month': month})
+        database.set_setting('dashboard_selected_date', date_str)
+    
+
 def get_monthly_summary(start_month_str=None, end_month_str=None):
     """
     지정된 기간 동안의 월별 상세 수입/지출을 계산합니다.
@@ -341,3 +364,147 @@ def delete_budget(budget_id):
     conn.commit()
     conn.close()
     return {'message': 'Budget deleted successfully'}
+
+def get_fixed_expenses(start_month_str, end_month_str):
+    """
+    지정된 기간 동안의 고정비(고정지출) 내역을 분석하여 반환합니다.
+    
+    반환 데이터 구조:
+    - merchant: 거래처명
+    - category: "{대분류}-{소분류}" 형태
+    - major_category: 대분류명
+    - minor_category: 소분류명
+    - day_range: 평균 출금일 (단일 값 또는 "22일 ~ 24일" 형태)
+    - amount_range: 평균 지출액 (단일 값 또는 "30,000원 ~ 34,000원" 형태)
+    - amount_min: 최소 금액 (증감 계산용)
+    - amount_max: 최대 금액 (증감 계산용)
+    - trend: "up" | "down" | "same" | "none" (증감 상태)
+    - recent_months: [bool, bool, bool] (최근 3개월 거래 여부)
+    - transaction_details: [{"date": "YYYY-MM-DD", "amount": 금액}, ...]
+    - total_count: 전체 거래 횟수
+    - avg_count_per_month: 월평균 거래 횟수
+    """
+    conn = database.get_db_connection()
+    
+    # ***** 1. 전체 기간의 고정지출 데이터 조회 *****
+    query_all = """--sql
+        SELECT
+            t.merchant,
+            mc.name as major_category,
+            mnc.name as minor_category,
+            strftime('%d', t.transaction_date) as day,
+            strftime('%Y-%m', t.transaction_date) as month,
+            ABS(t.amount) as amount,
+            t.transaction_date as date
+        FROM transactions t
+        JOIN minor_categories mnc ON t.minor_category_uuid = mnc.uuid
+        JOIN major_categories mc ON mnc.major_category_id = mc.id
+        WHERE t.type = '고정지출'
+          AND strftime('%Y-%m', t.transaction_date) BETWEEN ? AND ?
+          AND mc.name NOT IN ('고정수입', '유동수입', '이체분류')
+        ORDER BY t.merchant, mc.name, mnc.name, t.transaction_date
+    """
+    
+    rows = [dict(row) for row in conn.execute(query_all, (start_month_str, end_month_str)).fetchall()]
+    conn.close()
+    
+    # ***** 2. 거래처명-카테고리 조합으로 그룹화 *****
+    grouped = {}
+    for row in rows:
+        key = f"{row['merchant']}|{row['major_category']}|{row['minor_category']}"
+        if key not in grouped:
+            grouped[key] = {
+                'merchant': row['merchant'],
+                'major_category': row['major_category'],
+                'minor_category': row['minor_category'],
+                'transactions': []
+            }
+        grouped[key]['transactions'].append({
+            'date': row['date'],
+            'day': int(row['day']),
+            'month': row['month'],
+            'amount': row['amount']
+        })
+    
+    # ***** 3. 2개월 이상 출현한 항목만 필터링 *****
+    result = []
+    for key, data in grouped.items():
+        unique_months = set(tx['month'] for tx in data['transactions'])
+        if len(unique_months) < 2:
+            continue  # 2개월 미만 제외
+        
+        # ***** 4. 출금일 범위 계산 *****
+        days = [tx['day'] for tx in data['transactions']]
+        day_min, day_max = min(days), max(days)
+        if day_min == day_max:
+            day_range = f"{day_min}일"
+        else:
+            day_range = f"{day_min}일 ~ {day_max}일"
+        
+        # ***** 5. 지출액 범위 계산 *****
+        amounts = [tx['amount'] for tx in data['transactions']]
+        amount_min, amount_max = min(amounts), max(amounts)
+        if amount_min == amount_max:
+            amount_range = f"{amount_min:,}원"
+        else:
+            amount_range = f"{amount_min:,}원 ~ {amount_max:,}원"
+        
+        # ***** 6. 증감 계산 (마지막 2개월 비교) *****
+        sorted_months = sorted(unique_months, reverse=True)
+        trend = "none"
+        if len(sorted_months) >= 2:
+            last_month = sorted_months[0]
+            prev_month = sorted_months[1]
+            
+            last_month_txs = [tx for tx in data['transactions'] if tx['month'] == last_month]
+            prev_month_txs = [tx for tx in data['transactions'] if tx['month'] == prev_month]
+            
+            if last_month_txs and prev_month_txs:
+                last_avg = sum(tx['amount'] for tx in last_month_txs) / len(last_month_txs)
+                prev_avg = sum(tx['amount'] for tx in prev_month_txs) / len(prev_month_txs)
+                
+                if last_avg > prev_avg:
+                    trend = "up"
+                elif last_avg < prev_avg:
+                    trend = "down"
+                else:
+                    trend = "same"
+        
+        # ***** 7. 최근 3개월 거래 여부 계산 *****
+        recent_3_months = sorted_months[:3] if len(sorted_months) >= 3 else sorted_months
+        # 부족한 개월 수만큼 None으로 채움 (왼쪽부터)
+        while len(recent_3_months) < 3:
+            recent_3_months.insert(0, None)
+        
+        recent_months = [month in unique_months if month else False for month in recent_3_months]
+        
+        # ***** 8. 거래 상세 내역 *****
+        transaction_details = [
+            {"date": tx['date'], "amount": tx['amount']}
+            for tx in sorted(data['transactions'], key=lambda x: x['date'])
+        ]
+        
+        # ***** 9. 전체 거래 횟수 및 월평균 계산 *****
+        total_count = len(data['transactions'])
+        avg_count_per_month = round(total_count / len(unique_months), 1)
+        
+        result.append({
+            'merchant': data['merchant'],
+            'category': f"{data['major_category']}-{data['minor_category']}",
+            'major_category': data['major_category'],
+            'minor_category': data['minor_category'],
+            'day_range': day_range,
+            'amount_range': amount_range,
+            'amount_min': amount_min,
+            'amount_max': amount_max,
+            'trend': trend,
+            'recent_months': recent_months,
+            'transaction_details': transaction_details,
+            'total_count': total_count,
+            'avg_count_per_month': avg_count_per_month
+        })
+    
+    # ***** 10. 평균 출금일 빠른 순으로 정렬 *****
+    result.sort(key=lambda x: int(x['day_range'].split('일')[0]))
+    
+    return result

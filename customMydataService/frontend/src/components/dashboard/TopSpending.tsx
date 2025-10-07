@@ -315,7 +315,7 @@ const TopSpending: React.FC<TopSpendingProps> = ({ months, range }) => {
                         monthCount={monthCount}
                         amountData={amountChartData}
                       />} cursor={{ fill: 'var(--color-bg-overlay-light)' }} />
-                    <Bar dataKey="amount_value" fill="var(--color-highlight-5-transparent9)">
+                    <Bar dataKey="amount_value" fill="var(--color-highlight-5-transparent9)" isAnimationActive={false}>
                       <LabelList
                         dataKey="amount_value"
                         position="right"
@@ -356,7 +356,7 @@ const TopSpending: React.FC<TopSpendingProps> = ({ months, range }) => {
                         monthCount={monthCount}
                         frequencyData={frequencyChartData}
                       />} cursor={{ fill: 'var(--color-bg-overlay-light)' }} />
-                    <Bar dataKey="frequency_value" fill="var(--color-highlight-4-transparent9)">
+                    <Bar dataKey="frequency_value" fill="var(--color-highlight-4-transparent9)" isAnimationActive={false}>
                       <LabelList
                         dataKey="frequency_value"
                         position="right"

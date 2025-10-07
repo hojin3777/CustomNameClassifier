@@ -116,6 +116,10 @@
     cursor: pointer;
 }
 
+.amount-cell-mbudget.editing-mbudget {
+    padding: 0 !important;
+}
+
 .amount-value-mbudget {
     transition: opacity 0.2s;
 }
@@ -129,9 +133,15 @@
     display: none;
     gap: 12px;
     position: absolute;
-    right: 12px;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
     top: 50%;
     transform: translateY(-50%);
+    background-color: var(--color-bg-content-hover);
+    opacity: 0.8;
+    border-radius: 4px;
 }
 
 .amount-cell-mbudget:hover .cell-actions-mbudget {
@@ -140,7 +150,7 @@
 
 .action-icon-mbudget {
     cursor: pointer;
-    font-size: 14px;
+    font-size: 16px;
     transition: transform 0.2s;
 }
 
@@ -159,6 +169,7 @@
 /* 편집 input */
 .edit-input-mbudget {
     width: 100%;
+    height: 100%;
     padding: 8px 12px;
     background-color: var(--color-bg-inset);
     border: 1px solid var(--color-border-interactive);

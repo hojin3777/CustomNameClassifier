@@ -123,6 +123,28 @@ def manage_dashboard_trend_range():
             print(f"Error saving dashboard trend range setting: {e}")
             return jsonify({"error": "Failed to save setting"}), 500
         
+@app.route('/api/settings/dashboard_selected_date', methods=['GET', 'POST'])
+def manage_dashboard_selected_date():
+    """대시보드 선택 년/월 설정을 관리합니다."""
+    if request.method == 'GET':
+        try:
+            saved_date = dashboard_utils.get_dashboard_selected_date()
+            return jsonify(saved_date)  # 값이 없으면 null 반환
+        except Exception as e:
+            print(f"Error getting dashboard selected date setting: {e}")
+            return jsonify({"error": "Failed to retrieve setting"}), 500
+            
+    if request.method == 'POST':
+        data = request.get_json()
+        if not data or 'year' not in data or 'month' not in data:
+            return jsonify({"error": "Invalid data format, 'year' and 'month' keys are required."}), 400
+        try:
+            dashboard_utils.set_dashboard_selected_date(data['year'], data['month'])
+            return jsonify({"message": "Setting saved successfully."})
+        except Exception as e:
+            print(f"Error saving dashboard selected date setting: {e}")
+            return jsonify({"error": "Failed to save setting"}), 500
+        
 @app.route('/api/statistics/monthly_summary', methods=['GET'])
 def get_monthly_summary_route():
     """월별 수입/지출 요약 데이터를 반환합니다."""
@@ -231,6 +253,24 @@ def api_update_budget(budget_id):
 def api_delete_budget(budget_id):
     result = dashboard_utils.delete_budget(budget_id)
     return jsonify(result)
+
+# ****** 고정비 관리 API ******
+@app.route('/api/statistics/fixed_expenses', methods=['GET'])
+def get_fixed_expenses_api():
+    """고정비(고정지출) 내역을 반환합니다."""
+    start_month = request.args.get('start_month')
+    end_month = request.args.get('end_month')
+    
+    if not start_month or not end_month:
+        return jsonify({"error": "start_month and end_month are required"}), 400
+    
+    try:
+        data = dashboard_utils.get_fixed_expenses(start_month, end_month)
+        return jsonify(data)
+    except Exception as e:
+        print(f"Error in get_fixed_expenses_api: {e}")
+        return jsonify({"error": "Failed to fetch fixed expenses"}), 500
+
 
 
 
