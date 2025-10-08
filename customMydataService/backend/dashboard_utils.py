@@ -176,6 +176,95 @@ def get_account_balances():
     conn.close()
     return balances
 
+def get_account_balances_monthly():
+    """
+    전체 기간의 월별 계좌 잔액 추이를 반환합니다.
+    각 달의 말일 기준 누적 잔액을 계산합니다.
+    
+    반환 구조:
+    [
+        {
+            "month": "2024-08",
+            "accounts": [
+                {"account_id": 1, "account_name": "국민ONE", "balance": 1235532},
+                {"account_id": 2, "account_name": "토스뱅크", "balance": -50000},
+                ...
+            ],
+            "total": 1185532  # 해당 월 전체 계좌 합계
+        },
+        ...
+    ]
+    """
+    conn = database.get_db_connection()
+    cursor = conn.cursor()
+    
+    # 모든 계좌 목록 가져오기
+    cursor.execute("""--sql
+        SELECT id, name, display_order
+        FROM accounts
+        WHERE name NOT LIKE '(exp)%' AND name NOT LIKE '(숨김)%'
+        ORDER BY display_order
+    """)
+    accounts = cursor.fetchall()
+    
+    # 거래내역이 있는 모든 월 목록 가져오기
+    cursor.execute("""--sql
+        SELECT DISTINCT strftime('%Y-%m', transaction_date) as month
+        FROM transactions
+        ORDER BY month
+    """)
+    months = [row['month'] for row in cursor.fetchall()]
+    
+    result = []
+    
+    for month in months:
+        # 해당 월 말일까지의 각 계좌별 누적 잔액 계산
+        month_data = {
+            "month": month,
+            "accounts": [],
+            "total": 0
+        }
+        
+        for account in accounts:
+            account_id = account['id']
+            account_name = account['name']
+            
+            # 해당 월 말일까지의 수입 합계
+            cursor.execute("""--sql
+                SELECT COALESCE(SUM(amount), 0) as income
+                FROM transactions
+                WHERE account_id = ?
+                AND strftime('%Y-%m', transaction_date) <= ?
+                AND amount > 0
+            """, (account_id, month))
+            income = cursor.fetchone()['income']
+            
+            # 해당 월 말일까지의 지출 합계 (음수이므로 절댓값)
+            cursor.execute("""--sql
+                SELECT COALESCE(SUM(ABS(amount)), 0) as expense
+                FROM transactions
+                WHERE account_id = ?
+                AND strftime('%Y-%m', transaction_date) <= ?
+                AND amount < 0
+            """, (account_id, month))
+            expense = cursor.fetchone()['expense']
+            
+            # 누적 잔액 = 수입 - 지출
+            balance = income - expense
+            
+            month_data["accounts"].append({
+                "account_id": account_id,
+                "account_name": account_name,
+                "balance": balance
+            })
+            
+            month_data["total"] += balance
+        
+        result.append(month_data)
+    
+    conn.close()
+    return result
+
 def get_category_treemap(year, month):
     """
     지정된 월의 대분류-소분류별 지출 비율을 계층 구조로 반환합니다.

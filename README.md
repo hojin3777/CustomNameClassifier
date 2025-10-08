@@ -248,6 +248,16 @@ Classify store names with deeplearning
         - 관련 백엔드 API 신설 및 대시보드 페이지 수정
 
 
+### 1008
+- 자산 포트폴리오 카드 신설
+    - 파이차트 / 영역차트 탭으로 구성
+    - 파이차트 및 표로 구성된 자산 비율 및 금액 표시(근데 너무 애매함....없앨까)
+    - 누적 영역 차트로 자산 변화 표시 및 툴팁으로 매 달 디테일 표시
+    - Brush 활용하여 그래프 확대 및 스크롤 지원
+- TODO 해결:
+    - TODO: https://recharts.org/en-US/examples/BarChartWithMultiXAxis 를 보면 X축을 두개로 만들 수 있던데 월별 추이에 적용 가능한지 검토 ( V ) : 새 계산 방식 적용하여 이중 X축 스타일로 개선
+
 - TODO: 대분류별 지출 비율에서 만든 로딩스타일 딥러닝 대기에 추가 ( -- ) 
-- TODO: https://recharts.org/en-US/examples/BarChartWithMultiXAxis 를 보면 X축을 두개로 만들 수 있던데 월별 추이에 적용 가능한지 검토 ( -- )
+
 - TODO(remind): 거래내역 메뉴에서 0원이 입력된 경우 NULL로 롤백 ( -- )
+- TODO: 필터 기능 강화: 날짜는 기간으로도 설정이 가능하게, 필터링 시 현재 화면이 있는 것들로만 체크가 가능하도록 리스트 재구성

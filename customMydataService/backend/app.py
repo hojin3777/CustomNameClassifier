@@ -205,6 +205,15 @@ def get_account_balances_route():
         print(f"Error getting account balances: {e}")
         return jsonify({"error": "Failed to retrieve account balances"}), 500
     
+@app.route('/api/statistics/asset_portfolio_monthly', methods=['GET'])
+def asset_portfolio_monthly():
+    """전체 기간의 월별 계좌 잔액 추이 반환"""
+    try:
+        data = dashboard_utils.get_account_balances_monthly()
+        return jsonify(data), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
 @app.route('/api/statistics/category_treemap', methods=['GET'])
 def get_category_treemap_route():
     """트리맵 데이터 반환 (대분류-소분류별 지출 비율)"""

@@ -25,6 +25,7 @@ const MonthlyTrend: React.FC<MonthlyTrendProps> = ({ months, range }) => {
   const [isLoading, setIsLoading] = useState(true);
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
+  const [pixelsPerTick, setPixelsPerTick] = useState<number>(20);
   const [xAxisInterval, setXAxisInterval] = useState(0);
 
   const itemOrder: string[] = [
@@ -42,7 +43,7 @@ const MonthlyTrend: React.FC<MonthlyTrendProps> = ({ months, range }) => {
       if (entries && entries.length > 0) {
         setContainerWidth(entries[0].contentRect.width);
       }
-  });
+    });
     if (chartContainerRef.current) {
       observer.observe(chartContainerRef.current);
     }
@@ -141,13 +142,13 @@ const MonthlyTrend: React.FC<MonthlyTrendProps> = ({ months, range }) => {
       if (total === 0) return null;
       labelText = `${Math.round(total / 10000)}`;
       finalY = y;
-      dy = height-4; // 거기서 살짝 위로
+      dy = height - 4; // 거기서 살짝 위로
     } else if (type === 'expense_with_surplus') {
       if (data.surplus === 0) return null;
       total = data.fixed_expense + data.semi_fixed_expense + data.variable_expense;
       if (total === 0) return null;
       labelText = `-${Math.round(Math.abs(total) / 10000)}`;
-      finalY = y+height;
+      finalY = y + height;
       dy = 12; // 거기서 살짝 아래로
     } else if (type === 'expense_without_surplus') {
       if (data.surplus !== 0) return null;
@@ -171,39 +172,6 @@ const MonthlyTrend: React.FC<MonthlyTrendProps> = ({ months, range }) => {
     );
   };
 
-  // CustomTooltip 수정: props 타입을 any로 받고, 내부에서 필요한 타입만 지정
-  // const CustomTooltip = (props: any) => {
-  //   const { active, payload, label } = props;
-  //   if (active && payload && payload.length) {
-  //     const fullDate = payload[0].payload.fullDate;
-  //     const dateLabel = fullDate ? `${fullDate.substring(0, 4)}년 ${fullDate.substring(5)}월` : '';
-  //     const diffPayloadItem = payload.find((p: any) => hiddenItems.includes(p.dataKey) && p.value !== 0);
-  //     const netValuePayload = diffPayloadItem ? [{
-  //       dataKey: '차액',
-  //       name: '차액',
-  //       value: diffPayloadItem.value,
-  //       color: 'var(--color-highlight-1)',
-  //     }] : [];
-  //     const mainPayload = payload.filter((p: any) => itemOrder.includes(p.dataKey));
-  //     const finalPayload = [...mainPayload, ...netValuePayload];
-  //     const sortedPayload = finalPayload.sort((a: any, b: any) => {
-  //       return itemOrder.indexOf(a.dataKey) - itemOrder.indexOf(b.dataKey);
-  //     });
-
-  //     return (
-  //       <div className="custom-tooltip-trend">
-  //         <p className="label">{dateLabel}</p>
-  //         {sortedPayload.map((p: any, index: number) => (
-  //           <p key={`tooltip-item-${index}`} style={{ color: p.color }}>
-  //             {`${p.name}: ${new Intl.NumberFormat('ko-KR').format(Math.abs(p.value))}`}
-  //           </p>
-  //         ))}
-  //       </div>
-  //     );
-  //   }
-  //   return null;
-  // };
-
   const CustomTooltip = (props: any) => {
     const { active, payload } = props;
     if (active && payload && payload.length) {
@@ -224,7 +192,7 @@ const MonthlyTrend: React.FC<MonthlyTrendProps> = ({ months, range }) => {
       return (
         <div className="custom-tooltip-trend">
           <p className="tooltip-label-trend">{dateLabel}</p>
-          
+
           {/* 수입 섹션 */}
           <div className="tooltip-section-trend">
             <p className="tooltip-item-trend income">
@@ -316,6 +284,7 @@ const MonthlyTrend: React.FC<MonthlyTrendProps> = ({ months, range }) => {
         setContainerWidth(newWidth);
         if (chartData.length === 0 || newWidth === 0) return;
         const pixelsPerTick = newWidth / chartData.length;
+        setPixelsPerTick(pixelsPerTick);
         let newInterval = 0;
         if (pixelsPerTick < 15) {
           newInterval = 3;
@@ -337,7 +306,7 @@ const MonthlyTrend: React.FC<MonthlyTrendProps> = ({ months, range }) => {
       }
     };
     // 3. 의존성 배열에 chartData를 추가하여, 데이터가 변경될 때도 이 로직이 재평가되도록 합니다.
-  }, [chartData]); 
+  }, [chartData]);
 
   const CustomXAxisTick = (props: any) => {
     const { x, y, payload, interval } = props;
@@ -348,14 +317,12 @@ const MonthlyTrend: React.FC<MonthlyTrendProps> = ({ months, range }) => {
     if (!dataEntry) return null;
     const month = dataEntry.month;
     const fullDate = dataEntry.fullDate;
-    
+
     if (month === '01' && fullDate) {
       const year = fullDate.substring(0, 4);
       return (
         <g transform={`translate(${x},${y})`}>
           <text x={0} y={12} textAnchor="middle" fill="var(--color-text-primary)" fontSize={14}>{month}</text>
-          <line x1={0} y1={16} x2={0} y2={32} stroke="var(--color-border-subtle)" />
-          <text x={24} y={28} textAnchor="middle" fill="var(--color-text-secondary)" fontSize={12}>{year}</text>
         </g>
       );
     }
@@ -368,6 +335,106 @@ const MonthlyTrend: React.FC<MonthlyTrendProps> = ({ months, range }) => {
     }
     return null;
   };
+
+  // ****** 이중 X축 방식으로 변경 ******
+  // // 월 표시 formatter
+  // const monthTickFormatter = (tick: string) => {
+  //   return tick; // "01", "02" 등 그대로 표시
+  // };
+
+  // 년도 표시 (이중 축)
+  const renderYearTick = (tickProps: any) => {
+    const { x, y, payload, index } = tickProps;
+    const dataEntry = chartData[payload.index];
+    if (!dataEntry) return null;
+
+    const fullDate = dataEntry.fullDate; // "2024-01"
+    const currentYear = fullDate ? fullDate.substring(0, 4) : '';
+
+    // 해당 년도의 시작/끝 인덱스 찾기
+    let yearStartIndex = -1;
+    let yearEndIndex = -1;
+
+    for (let i = 0; i < chartData.length; i++) {
+      const dataYear = chartData[i].fullDate ? chartData[i].fullDate.substring(0, 4) : '';
+      if (dataYear === currentYear) {
+        if (yearStartIndex === -1) yearStartIndex = i;
+        yearEndIndex = i;
+      }
+    }
+
+    // 중간 위치 계산 (실제 측정된 간격 사용)
+    const middleIndex = (yearStartIndex + yearEndIndex) / 2;
+    const middleX = x + ((middleIndex - index) * pixelsPerTick);
+
+    // 첫 데이터이거나 마지막 데이터면 끝 구분선만 표시
+    if (index === 0 || index === chartData.length - 1) {
+      return (
+        <g>
+          {index === 0 && (
+            <>
+              <text x={middleX} y={y - 2} textAnchor="middle" fill="var(--color-text-secondary)" fontSize={12}>
+                {currentYear}
+              </text>
+              <line
+                x1={x - pixelsPerTick / 2 + 3}
+                y1={y - 2}
+                x2={x - pixelsPerTick / 2 + 3}
+                y2={y - 38}
+                stroke="var(--color-border-subtle)"
+                strokeDasharray={"3 3"}
+                strokeWidth={2} />
+            </>
+          )}
+          {index === chartData.length - 1 && (
+            <line
+              x1={x + pixelsPerTick / 2 - 3}
+              y1={y - 2}
+              x2={x + pixelsPerTick / 2 - 3}
+              y2={y - 38}
+              stroke="var(--color-border-subtle)"
+              strokeDasharray={"3 3"}
+              strokeWidth={2} />
+          )}
+        </g>
+      );
+    }
+
+    // 현재 데이터가 해당 년도의 첫 번째가 아니면 년도 label 표시 안함
+    if (index !== yearStartIndex) {
+      return null;
+    }
+
+    const showDivider = index > 0;
+
+    return (
+      <g>
+        {/* 구분선 (12월-1월 사이) */}
+        {showDivider && (
+          <line
+            x1={x - pixelsPerTick / 2 + 1}
+            y1={y - 2}
+            x2={x - pixelsPerTick / 2 + 1}
+            y2={y - 38}
+            stroke="var(--color-border-subtle)"
+            strokeDasharray={"3 3"}
+            strokeWidth={2}
+          />
+        )}
+        {/* 년도 텍스트 (해당 년도 구간 중간) */}
+        <text
+          x={middleX - pixelsPerTick / 4}
+          y={y - 2}
+          textAnchor="middle"
+          fill="var(--color-text-secondary)"
+          fontSize={12}
+        >
+          {currentYear}
+        </text>
+      </g>
+    );
+  };
+
 
   const formatMonthLabel = (monthStr?: string) => {
     if (!monthStr) return '';
@@ -405,7 +472,22 @@ const MonthlyTrend: React.FC<MonthlyTrendProps> = ({ months, range }) => {
               >
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border-subtle)" />
                 {/* <XAxis dataKey="month" tick={{ fill: 'var(--color-text-primary)'}}/> */}
-                <XAxis dataKey="month" tick={<CustomXAxisTick interval={xAxisInterval}/>} interval={0} />
+                <XAxis dataKey="month" tick={<CustomXAxisTick interval={xAxisInterval} />} interval={0} />
+                {/* <XAxis
+                  dataKey="month"
+                  tickFormatter={monthTickFormatter}
+                  tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
+                  interval={xAxisInterval}
+                /> */}
+                <XAxis
+                  dataKey="month"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={renderYearTick as any}
+                  interval={0}
+                  height={1}
+                  xAxisId="year"
+                />
                 <YAxis tickFormatter={formatYAxis} tickCount={9} tick={{ fill: 'var(--color-text-secondary)' }} />
                 <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--color-bg-overlay-light)' }} />
                 <Legend content={<CustomLegend />} />
@@ -421,7 +503,7 @@ const MonthlyTrend: React.FC<MonthlyTrendProps> = ({ months, range }) => {
                 <Bar dataKey="variable_expense" name="유동지출" stackId="a" fill="var(--color-highlight-3)">
                   <LabelList dataKey="variable_expense" content={<CustomBarLabel type="expense_without_surplus" />} />
                 </Bar>
-                
+
                 {/* 3. 차액 막대에 레이블을 연결합니다. */}
                 <Bar dataKey="deficit" name="초과지출" stackId="a" fill="var(--color-highlight-1-transparent5)">
                   {/* 초과지출이 있을 때 -> 총지출 레이블 표시 */}

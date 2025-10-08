@@ -1,0 +1,195 @@
+/* ==================== 카드 헤더 ==================== */
+.header-left-aportfolio {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* ==================== 탭 버튼 ==================== */
+.tab-buttons-aportfolio {
+    display: flex;
+    gap: 0;
+    /* border: 1px solid var(--color-border); */
+    /* border-radius: 6px; */
+    overflow: hidden;
+}
+
+.tab-button-aportfolio {
+    background-color: var(--color-bg-content);
+    border: none;
+    border-right: 1px dashed var(--color-border);
+    padding: 0px 8px;
+    height: 100%;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-secondary);
+}
+
+.tab-button-aportfolio:last-child {
+    border-right: none;
+}
+
+.tab-button-aportfolio:hover {
+    background-color: var(--color-bg-content-hover);
+}
+
+.tab-button-aportfolio.active {
+    background-color: var(--color-bg-content);
+    color: var(--color-text-header);
+}
+
+.tab-button-aportfolio svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* ==================== 카드 콘텐츠 ==================== */
+
+.loading-message-aportfolio {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+}
+
+/* ==================== 도넛 차트 탭 ==================== */
+.donut-tab-container-aportfolio {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+}
+
+.donut-chart-wrapper-aportfolio {
+    flex: 1;
+    min-width: 300px;
+}
+
+/* ==================== 계좌 잔액 테이블 ==================== */
+.balance-table-wrapper-aportfolio {
+    flex: 1;
+    min-width: 300px;
+}
+
+.balance-table-aportfolio {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.balance-table-aportfolio th,
+.balance-table-aportfolio td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.balance-table-aportfolio th {
+    background-color: var(--color-bg-header);
+    color: var(--color-text-header);
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.balance-table-aportfolio tbody tr:hover {
+    background-color: var(--color-bg-hover);
+}
+
+/* 계좌명 셀 */
+.account-name-cell-aportfolio {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-text-primary);
+    font-size: 14px;
+}
+
+.color-dot-aportfolio {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* 잔액 셀 */
+.balance-cell-aportfolio {
+    text-align: right;
+    color: var(--color-text-primary);
+    font-weight: 500;
+    font-size: 14px;
+}
+
+/* 비율 셀 */
+.ratio-cell-aportfolio {
+    text-align: right;
+    color: var(--color-text-secondary);
+    font-size: 13px;
+}
+
+/* ==================== 영역 차트 탭 ==================== */
+.area-tab-container-aportfolio {
+    width: 100%;
+}
+
+/* ==================== 커스텀 툴팁 ==================== */
+.asset-tooltip-aportfolio {
+    background-color: var(--color-bg-inset);
+    border: 1px solid var(--color-border-interactive);
+    border-radius: 6px;
+    padding: 12px;
+    box-shadow: 0 4px 12px var(--color-bg-overlay-light);
+}
+
+.tooltip-header-aportfolio {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--color-text-primary);
+    margin-bottom: 8px;
+}
+
+.tooltip-total-aportfolio {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 4px;
+}
+
+.tooltip-change-aportfolio {
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.tooltip-change-aportfolio.positive {
+    color: var(--color-accent-positive);
+}
+
+.tooltip-change-aportfolio.negative {
+    color: var(--color-accent-warning);
+}
+
+.tooltip-divider-aportfolio {
+    height: 1px;
+    background-color: var(--color-border-subtle);
+    margin: 8px 0;
+}
+
+.tooltip-item-aportfolio {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    margin-top: 4px;
+}
+
+.tooltip-item-aportfolio span:first-child {
+    font-weight: 500;
+}
+
+.tooltip-item-aportfolio span:last-child {
+    color: var(--color-text-primary);
+    font-weight: 600;
+}

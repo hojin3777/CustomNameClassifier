@@ -46,6 +46,12 @@
   border-color: white;
 }
 
+.transactions-toolbar button.primary.xel{
+  height: 100%;
+  padding: 6px 12px 2px;
+  font-size: 18px;
+}
+
 /* Table Styles */
 .table-container {
   flex-grow: 1;

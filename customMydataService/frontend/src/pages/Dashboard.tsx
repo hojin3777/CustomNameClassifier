@@ -7,6 +7,7 @@ import MonthlyTreemap from '../components/dashboard/MonthlyTreemap';
 import TopSpending from '../components/dashboard/TopSpending';
 import BudgetManagement from '../components/dashboard/BudgetManagement';
 import FixedExpenseManagement from '../components/dashboard/FixedExpenseManagement';
+import AssetPortfolio from '../components/dashboard/AssetPortfolio';
 import ComingSoon from '../components/dashboard/ComingSoon';
 import FloatingSelectPopup, { type FloatingSelectHandle } from '../components/FloatingSelectPopup';
 import './Dashboard.css';
@@ -488,6 +489,7 @@ const Dashboard = () => {
         <MonthlyTreemap selectedYear={selectedYear} selectedMonth={selectedMonth} />
         <FixedExpenseManagement months={availableMonths} range={range} onPopupStateChange={setIsFixedExpensePopupOpen} isPopupOpen={isFixedExpensePopupOpen} />
         <ComingSoon title="카테고리 심층 분석" />
+        <AssetPortfolio />
         <ComingSoon title="이상 지출 탐지" />
         <ComingSoon title="Coming soon" />
         <ComingSoon title="Coming soon" />

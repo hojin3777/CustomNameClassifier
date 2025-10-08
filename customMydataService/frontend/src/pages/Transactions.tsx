@@ -1139,7 +1139,7 @@ const Transactions = () => {
           <div className="divider"></div>
           <button className="primary" onClick={() => setIsFormModalOpen(true)}>내역입력 폼 열기</button>
           <button className="primary" ref={ocrButtonRef} onClick={() => setOcrModalOpen(true)}>딥러닝 자동입력</button>
-          <button className="primary" ref={excelButtonRef} onClick={handleOpenExcelPopup} title='엑셀 가져오기/내보내기'><RiFileExcel2Fill /></button>
+          <button className="primary xel" ref={excelButtonRef} onClick={handleOpenExcelPopup} title='엑셀 가져오기/내보내기'><RiFileExcel2Fill /></button>
         </div>
 
         {/* 거래내역 테이블 */}
