@@ -332,18 +332,9 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    if (!isRangePopupOpen && !isFixedExpensePopupOpen) return;
+    if (!isRangePopupOpen) return;
 
     const handleOutsideInteraction = (event: Event) => {
-      //   if (!rangePopupRef.current || !rangeSelectorRef.current) return;
-      //   const target = event.target;
-      //   const isNodeTarget = target instanceof Node;
-      //   const clickedInsidePopup = isNodeTarget ? rangePopupRef.current.contains(target) : false;
-      //   const clickedSelector = isNodeTarget ? rangeSelectorRef.current.contains(target) : false;
-      //   if (!clickedInsidePopup && !clickedSelector) {
-      //     setIsRangePopupOpen(false);
-      //   }
-      // };
       if (isRangePopupOpen && rangePopupRef.current && rangeSelectorRef.current) {
         const target = event.target;
         const isNodeTarget = target instanceof Node;
@@ -353,29 +344,12 @@ const Dashboard = () => {
           setIsRangePopupOpen(false);
         }
       }
-
-      // Fixed Expense 팝업 처리
-      if (isFixedExpensePopupOpen && event.type === 'scroll') {
-        const target = event.target as Node | null;
-        const fixedExpensePopupBody = document.querySelector('.detail-popup-body-fexpense');
-
-        // 팝업 내부 스크롤은 무시
-        if (fixedExpensePopupBody && (target === fixedExpensePopupBody || (target && fixedExpensePopupBody.contains(target)))) {
-          return;
-        }
-
-        // 팝업 외부 스크롤 시 팝업 닫기
-        setIsFixedExpensePopupOpen(false);
-      }
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         if (isRangePopupOpen) {
           setIsRangePopupOpen(false);
-        }
-        if (isFixedExpensePopupOpen) {
-          setIsFixedExpensePopupOpen(false);
         }
       }
     };
@@ -391,7 +365,7 @@ const Dashboard = () => {
       window.removeEventListener('resize', handleOutsideInteraction);
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isRangePopupOpen, isFixedExpensePopupOpen]);
+  }, [isRangePopupOpen]);
 
   return (
     <div className="dashboard-page">
@@ -487,7 +461,7 @@ const Dashboard = () => {
         <BudgetManagement selectedYear={selectedYear} selectedMonth={selectedMonth} />
         <TopSpending months={availableMonths} range={range} />
         <MonthlyTreemap selectedYear={selectedYear} selectedMonth={selectedMonth} />
-        <FixedExpenseManagement months={availableMonths} range={range} onPopupStateChange={setIsFixedExpensePopupOpen} isPopupOpen={isFixedExpensePopupOpen} />
+        <FixedExpenseManagement months={availableMonths} range={range} />
         <ComingSoon title="카테고리 심층 분석" />
         <AssetPortfolio />
         <ComingSoon title="이상 지출 탐지" />

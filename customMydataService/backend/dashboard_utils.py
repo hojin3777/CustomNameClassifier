@@ -1,5 +1,6 @@
 import database
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 def get_dashboard_trend_range():
     """데이터베이스에서 저장된 대시보드 기간 설정을 불러옵니다."""
@@ -560,13 +561,25 @@ def get_fixed_expenses(start_month_str, end_month_str):
                     trend = "same"
         
         # ***** 7. 최근 3개월 거래 여부 계산 *****
-        recent_3_months = sorted_months[:3] if len(sorted_months) >= 3 else sorted_months
-        # 부족한 개월 수만큼 None으로 채움 (왼쪽부터)
-        while len(recent_3_months) < 3:
-            recent_3_months.insert(0, None)
-        
-        recent_months = [month in unique_months if month else False for month in recent_3_months]
-        
+        end_month_obj = datetime.strptime(end_month_str, '%Y-%m')
+        last_3_months_list = [
+            (end_month_obj - relativedelta(months=2)).strftime('%Y-%m'),  # 전전월
+            (end_month_obj - relativedelta(months=1)).strftime('%Y-%m'),  # 전월
+            end_month_str  # 마지막 달
+        ]
+
+        # 전체 기간 시작월 확인
+        start_month_obj = datetime.strptime(start_month_str, '%Y-%m')
+
+        # 각 월에 거래가 있는지 확인 (기간 밖이면 None 처리)
+        recent_months = []
+        for month in last_3_months_list:
+            month_obj = datetime.strptime(month, '%Y-%m')
+            if month_obj < start_month_obj:
+                recent_months.append(None)  # 기간 밖이면 None
+            else:
+                recent_months.append(month in unique_months)  # 기간 내에서 거래 여부 확인
+                
         # ***** 8. 거래 상세 내역 *****
         transaction_details = [
             {"date": tx['date'], "amount": tx['amount']}

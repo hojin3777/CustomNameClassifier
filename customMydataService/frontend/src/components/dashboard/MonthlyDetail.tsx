@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { PiChartDonutFill } from 'react-icons/pi';
+import { PieChart, Pie, Cell, Label, Tooltip as RechartsTooltip } from 'recharts';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, LabelList } from 'recharts';
 import './MonthlyDetail.css';
 
@@ -110,6 +112,10 @@ const MonthlyDetail = ({ selectedYear, selectedMonth }: MonthlyDetailProps) => {
   const [monthlySummary, setMonthlySummary] = useState<MonthlySummary | null>(null);
   const [categorySpending, setCategorySpending] = useState<CategorySpending[]>([]);
   const [accountBalances, setAccountBalances] = useState<AccountBalance[]>([]);
+  const [showAccountDonutChart, setShowAccountDonutChart] = useState(false);
+  const [popupPosition, setPopupPosition] = useState<{ top: number; left: number } | null>(null);
+  const donutPopupRef = useRef<HTMLDivElement>(null);
+  const donutButtonRef = useRef<HTMLButtonElement>(null);
 
   // --- useEffect 데이터 호출 (변경 없음) ---
   useEffect(() => {
@@ -163,13 +169,89 @@ const MonthlyDetail = ({ selectedYear, selectedMonth }: MonthlyDetailProps) => {
     fetchMonthlyDetails();
   }, [selectedYear, selectedMonth]);
 
+
+  // ******************** 도넛 차트 관련 로직 추가 ********************
+  const accountDonutData = accountBalances.map(account => ({
+    name: account.account_name,
+    value: account.balance,
+  }));
+  const totalAccountBalance = accountBalances.reduce((sum, acc) => sum + acc.balance, 0);
+  const DONUT_COLORS = [
+    'var(--color-highlight-2-transparent9)',
+    'var(--color-highlight-3-transparent9)',
+    'var(--color-highlight-4-transparent9)',
+    'var(--color-highlight-5-transparent9)',
+    'var(--color-highlight-6-transparent9)',
+    'var(--color-highlight-1-transparent9)',
+    'var(--color-highlight-2-transparent7)',
+    'var(--color-highlight-3-transparent7)',
+    'var(--color-highlight-4-transparent7)',
+    'var(--color-highlight-5-transparent7)',
+    'var(--color-highlight-6-transparent7)',
+    'var(--color-highlight-1-transparent7)'
+  ]
+
+  const AccountDonutTooltip = ({ active, payload }: any) => {
+    if (!active || !payload || payload.length === 0) return null;
+    const data = payload[0];
+    const percentage = totalAccountBalance > 0 ? (data.value / totalAccountBalance) * 100 : 0;
+    return (
+      <div className='asset-tooltip-mdetail'>
+        <div className='tooltip-header-mdetail'>{data.name}</div>
+        <div className='tooltip-total-mdetail'>
+          {data.value.toLocaleString()}원
+        </div>
+        <div style={{ color: 'var(--color-text-secondary)', fontSize: '13px', marginTop: '4px' }}>
+          전체의 {percentage.toFixed(1)}%
+        </div>
+      </div>
+    );
+  };
+
+  // ****** 팝업 토글 핸들러 ******
+  const toggleDonutChart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    if (!showAccountDonutChart && donutButtonRef.current) {
+      const rect = donutButtonRef.current.getBoundingClientRect();
+      setPopupPosition({
+        top: rect.bottom + window.scrollY + 8, // 버튼 아래에 8px 간격
+        left: rect.left + window.scrollX - 150 // 가로 중앙 정렬 (팝업 너비의 절반 가정)
+      });
+    }
+    setShowAccountDonutChart(!showAccountDonutChart);
+  };
+
+  const closeDonutChart = () => {
+    setShowAccountDonutChart(false);
+  };
+
+  // ****** 외부 클릭 감지 및 스크롤 감지 (FixedExpenseManagement 방식) ******
+  useEffect(() => {
+    if (!showAccountDonutChart) return;
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (donutPopupRef.current && !donutPopupRef.current.contains(e.target as Node)) {
+        closeDonutChart();
+      }
+    };
+    const handleScroll = () => {
+      closeDonutChart();
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    window.addEventListener('scroll', handleScroll, true);  // capture 단계에서 모든 스크롤 감지
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      window.removeEventListener('scroll', handleScroll, true);
+    };
+  }, [showAccountDonutChart]);
+
+
   const currentData = chartData.length > 0 ? chartData[0] : null;
   const totalIncome = currentData?.totalIncome || 0;
   const totalExpense = currentData?.totalExpense || 0;
 
   const CustomBarLabel = (props: any) => {
     const { x, y, width, height, value } = props;
-
     // 안전한 타입 체크
     if (
       !value ||
@@ -184,7 +266,6 @@ const MonthlyDetail = ({ selectedYear, selectedMonth }: MonthlyDetailProps) => {
     ) {
       return null;
     }
-
     const dataKey = props.type; // LabelList에서 전달받은 type 사용
     if (!dataKey || typeof dataKey !== 'string') return null;
 
@@ -201,10 +282,8 @@ const MonthlyDetail = ({ selectedYear, selectedMonth }: MonthlyDetailProps) => {
       minimumFractionDigits: 0,
       maximumFractionDigits: 1,
     });
-
     const centerX = x + width / 2;
     const centerY = y + height / 2;
-
     return (
       <g>
         <text
@@ -239,7 +318,7 @@ const MonthlyDetail = ({ selectedYear, selectedMonth }: MonthlyDetailProps) => {
   const rawMax = Math.max(totalIncome, totalExpense);
   // const maxDomain = rawMax > 0 ? Math.ceil(rawMax / 100000) * 100000 : 100000; // 10만 단위로 올림
   const getOptimalTickCount = (rawDomain: number) => {
-    if (rawDomain <= 0) return { maxDomain: 500000, tickCount: 5 }; 
+    if (rawDomain <= 0) return { maxDomain: 500000, tickCount: 5 };
 
     const domainIn10K = rawDomain / 100000;
     const possibleSteps = [3, 2, 2.5, 1.5, 5, 1, 10, 15, 20, 25, 50, 100];
@@ -380,7 +459,17 @@ const MonthlyDetail = ({ selectedYear, selectedMonth }: MonthlyDetailProps) => {
 
         {/* 우측: 계좌별 잔액 */}
         <div className="account-balance-container">
-          <h4 className="account-balance-title">계좌잔고</h4>
+          <h4 className="account-balance-title">계좌잔고
+            <button
+              ref={donutButtonRef}
+              className="donut-toggle-button-mdetail"
+              onClick={toggleDonutChart}
+              title="도넛 차트 보기"
+            >
+              <PiChartDonutFill />
+            </button>
+          </h4>
+
           <div className="account-balance-wrapper">
             <table className="account-balance-table">
               <thead>
@@ -417,6 +506,46 @@ const MonthlyDetail = ({ selectedYear, selectedMonth }: MonthlyDetailProps) => {
           </div>
         </div>
       </div>
+      {showAccountDonutChart && accountBalances.length > 0 && popupPosition && (
+        <div
+          ref={donutPopupRef}
+          className="donut-popup-container-mdetail"
+          style={{ position: 'fixed', top: `${popupPosition.top}px`, left: `${popupPosition.left}px`  }}
+          onClick={e => e.stopPropagation()}>
+          <div className='donut-popup-header-mdetail'>
+            <h4>계좌별 잔액 비율</h4>
+            <button className="donut-popup-close-mdetail" onClick={closeDonutChart}>&times;</button>
+          </div>
+          <div className='donut-popup-chart-mdetail'>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={accountDonutData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={100}
+                  dataKey="value"
+                >
+                  {accountDonutData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={DONUT_COLORS[index % DONUT_COLORS.length]} />
+                  ))}
+                  <Label
+                    value={`총 \n${totalAccountBalance.toLocaleString()}원`}
+                    position="center"
+                    style={{
+                      fontSize: '14px',
+                      fontWeight: 'bold',
+                      fill: 'var(--color-text-header)',
+                    }}
+                  />
+                </Pie>
+                <RechartsTooltip content={<AccountDonutTooltip />} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

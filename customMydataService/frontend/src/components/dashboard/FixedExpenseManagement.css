@@ -42,8 +42,23 @@
     transition: background-color 0.2s;
 }
 
-.fixed-expense-table-fexpense tbody tr:hover {
+.fixed-expense-table-fexpense tbody tr td.clickable-cell-fexpense:first-child:hover,
+.fixed-expense-table-fexpense tbody tr td.clickable-cell-fexpense:nth-child(2):hover {
     background-color: var(--color-bg-content-hover);
+}
+
+.fixed-expense-table-fexpense tbody tr .merchant-cell-fexpense.clickable-cell-fexpense:hover,
+.fixed-expense-table-fexpense tbody tr .category-cell-fexpense.clickable-cell-fexpense:hover {
+    color: var(--color-accent-blue);
+    cursor: pointer;
+}
+
+/* hover 시 형제 셀도 함께 하이라이트 */
+.fixed-expense-table-fexpense tbody tr td.merchant-cell-fexpense:hover ~ td.category-cell-fexpense,
+.fixed-expense-table-fexpense tbody tr:has(td.merchant-cell-fexpense:hover) td.category-cell-fexpense,
+.fixed-expense-table-fexpense tbody tr:has(td.category-cell-fexpense:hover) td.merchant-cell-fexpense {
+    background-color: var(--color-bg-content-hover);
+    color: var(--color-accent-blue);
 }
 
 /* ==================== 컬럼 너비 ==================== */
@@ -61,10 +76,11 @@
     color: var(--color-text-primary);
 }
 
-.merchant-cell-fexpense:hover,
+/* .merchant-cell-fexpense:hover,
 .category-cell-fexpense:hover {
+    background-color: var(--color-bg-content-hover);
     color: var(--color-accent-blue);
-}
+} */
 
 .day-cell-fexpense {
     text-align: center;
@@ -142,6 +158,12 @@
     color: var(--color-text-header);
     text-align: right !important;
     font-size: 16px;
+}
+
+.total-basis-fexpense {
+    text-align: left;
+    color: var(--color-text-secondary);
+    font-size: 13px;
 }
 
 /* ==================== 툴팁 ==================== */
