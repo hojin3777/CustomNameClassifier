@@ -150,13 +150,14 @@ input:checked + .slider:before {
   opacity: 0.98;
   border: 1px solid var(--color-border);
   border-radius: 4px;
-  padding: 0px 12px 12px 12px;
+  padding: 12px;
   box-shadow: 0 2px 8px var(--color-bg-overlay-light);
   min-width: 160px;
 }
 
 .tooltip-label-top-spending {
   font-weight: bold;
+  margin-top: 0;
   margin-bottom: 8px;
   /* color: var(--color-text-primary); */
 }

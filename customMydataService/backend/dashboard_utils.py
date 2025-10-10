@@ -610,3 +610,493 @@ def get_fixed_expenses(start_month_str, end_month_str):
     result.sort(key=lambda x: int(x['day_range'].split('일')[0]))
     
     return result
+
+
+
+
+
+
+def get_consumption_pattern_insights(year, month):
+    """
+    지정된 월의 소비 패턴 인사이트를 생성합니다.
+    반환 데이터:
+    {
+        "heatmap_data": [...],  # 요일별 × 카테고리별 히트맵 데이터
+        "insights": [...]        # 자동 생성된 인사이트 (최대 5개)
+    }
+    """
+    conn = database.get_db_connection()
+    month_str = f"{year}-{month:02d}"
+    insights = []
+    settings = database.get_consumption_pattern_settings()
+    
+    # ***** 1. 요일별 × 카테고리별 히트맵 데이터 생성 *****
+    heatmap_query = """--sql
+        SELECT
+            CASE CAST(strftime('%w', t.transaction_date) AS INTEGER)
+                WHEN 0 THEN '일' WHEN 1 THEN '월' WHEN 2 THEN '화'
+                WHEN 3 THEN '수' WHEN 4 THEN '목' WHEN 5 THEN '금'
+                WHEN 6 THEN '토' END as weekday,
+            mc.id as major_category_id,
+            mc.name as major_category_name,
+            SUM(ABS(t.amount)) as total_amount,
+            COUNT(t.id) as transaction_count
+        FROM transactions t
+        JOIN minor_categories mnc ON t.minor_category_uuid = mnc.uuid
+        JOIN major_categories mc ON mnc.major_category_id = mc.id
+        WHERE strftime('%Y-%m', t.transaction_date) = ?
+          AND t.amount < 0
+          AND mc.name NOT IN ('고정수입', '유동수입', '이체분류')
+        GROUP BY weekday, mc.id, mc.name
+        ORDER BY total_amount DESC
+    """
+    heatmap_data = [dict(row) for row in conn.execute(heatmap_query, (month_str,)).fetchall()]
+    
+    # ***** 1-1. 각 히트맵 셀에 대한 거래내역 추가 *****
+    for cell in heatmap_data:
+        weekday = cell['weekday']
+        category_name = cell['major_category_name']
+        
+        # 요일 문자열을 숫자로 변환
+        weekday_map = {'일': 0, '월': 1, '화': 2, '수': 3, '목': 4, '금': 5, '토': 6}
+        weekday_num = weekday_map[weekday]
+        
+        # 해당 요일 + 카테고리 조합의 거래내역 조회
+        detail_query = """--sql
+            SELECT 
+                t.transaction_date as date,
+                t.merchant,
+                ABS(t.amount) as amount
+            FROM transactions t
+            JOIN minor_categories mnc ON t.minor_category_uuid = mnc.uuid
+            JOIN major_categories mc ON mnc.major_category_id = mc.id
+            WHERE strftime('%Y-%m', t.transaction_date) = ?
+              AND CAST(strftime('%w', t.transaction_date) AS INTEGER) = ?
+              AND mc.name = ?
+              AND t.amount < 0
+            ORDER BY t.transaction_date DESC
+        """
+        transactions = conn.execute(detail_query, (month_str, weekday_num, category_name)).fetchall()
+        
+        cell['transactions'] = [
+            {
+                'date': row['date'],
+                'merchant': row['merchant'],
+                'amount': row['amount']
+            }
+            for row in transactions
+        ]
+
+    # ***** 2. 인사이트 생성 *****
+    
+    # 2-1. 주말/평일 소비 비교
+    weekend_insight = _analyze_weekend_pattern(conn, month_str, settings)
+    if weekend_insight: insights.append(weekend_insight)
+    
+    # 2-2. 특정 요일 집중 소비
+    weekday_insight = _find_recurring_weekday_pattern(conn, month_str, settings)
+    if weekday_insight: insights.append(weekday_insight)
+    
+    # 2-3. 급여일 기준 소비 변화
+    payday_insight = _analyze_payday_spending(conn, year, month_str, settings)
+    if payday_insight: insights.append(payday_insight)
+    
+    # 2-4. 월초/월말 소비 차이
+    month_period_insight = _analyze_month_period_pattern(conn, year, month_str, settings)
+    if month_period_insight: insights.append(month_period_insight)
+    
+    # 2-5. 소액 다빈도 지출
+    impulse_insight = _detect_impulse_spending(conn, year, month_str, settings)
+    if impulse_insight: insights.append(impulse_insight)
+    
+    # 2-6. 특정 카테고리 급증
+    spike_insight = _detect_category_spike(conn, year, month_str, settings)
+    if spike_insight: insights.append(spike_insight)
+    
+    # 2-7. 예산 소진율 경고
+    budget_insight = _analyze_budget_trend(conn, year, month, settings)
+    if budget_insight: insights.append(budget_insight)
+    
+    # 2-8. 무지출 챌린지
+    no_spend_insight = _detect_no_spend_streak(conn, year, month_str, settings)
+    if no_spend_insight: insights.append(no_spend_insight)
+    
+    # 2-9. 작년 동월 대비
+    last_year_insight = _compare_with_last_year(conn, year, month_str, settings)
+    if last_year_insight: insights.append(last_year_insight)
+    
+    # 2-10. 고정비 비중 경고
+    fixed_ratio_insight = _analyze_fixed_vs_variable(conn, month_str, settings)
+    if fixed_ratio_insight: insights.append(fixed_ratio_insight)
+    
+    conn.close()
+    
+    return {
+        "heatmap_data": heatmap_data,
+        "insights": insights[:10]
+    }
+
+
+# ****** 인사이트 보조 함수들 ******
+
+def _analyze_weekend_pattern(conn, month_str, settings):
+    """주말/평일 소비 비교(대분류 기준)"""
+    query = """--sql
+        SELECT 
+            mc.name as category,
+            CASE WHEN CAST(strftime('%w', t.transaction_date) AS INTEGER) IN (0, 6) 
+                 THEN 'weekend' ELSE 'weekday' END as period,
+            AVG(ABS(t.amount)) as avg_amount
+        FROM transactions t
+        JOIN minor_categories mnc ON t.minor_category_uuid = mnc.uuid
+        JOIN major_categories mc ON mnc.major_category_id = mc.id
+        WHERE strftime('%Y-%m', t.transaction_date) = ?
+          AND t.amount < 0
+          AND mc.name NOT IN ('고정수입', '유동수입', '이체분류')
+        GROUP BY mc.name, period
+        HAVING COUNT(*) >= 2
+    """
+    rows = conn.execute(query, (month_str,)).fetchall()
+    
+    # 카테고리별로 주말/평일 비율 계산
+    category_ratios = {}
+    for row in rows:
+        cat = row['category']
+        if cat not in category_ratios:
+            category_ratios[cat] = {}
+        category_ratios[cat][row['period']] = row['avg_amount']
+    
+    # 비율이 1.5배 이상 차이나는 카테고리 찾기
+    threshold = settings.get('weekend_ratio_threshold', 1.5)
+    for cat, data in category_ratios.items():
+        if 'weekend' in data and 'weekday' in data:
+            ratio = data['weekend'] / data['weekday'] if data['weekday'] > 0 else 0
+            if ratio > threshold:
+                return {
+                    'type': 'weekend_spending',
+                    'icon': '💡',
+                    'message': f"주말 '{cat}'이(가) 평일보다 {ratio:.1f}배 높아요"
+                }
+    return None
+
+def _find_recurring_weekday_pattern(conn, month_str, settings):
+    """특정 요일 집중 소비"""
+    min_count = settings.get('weekday_min_count', 3)
+    query = """--sql
+        SELECT 
+            CASE CAST(strftime('%w', t.transaction_date) AS INTEGER)
+                WHEN 0 THEN '일' WHEN 1 THEN '월' WHEN 2 THEN '화'
+                WHEN 3 THEN '수' WHEN 4 THEN '목' WHEN 5 THEN '금'
+                WHEN 6 THEN '토' END as weekday,
+            mc.name as category,
+            AVG(ABS(t.amount)) as avg_amount,
+            COUNT(*) as cnt
+        FROM transactions t
+        JOIN minor_categories mnc ON t.minor_category_uuid = mnc.uuid
+        JOIN major_categories mc ON mnc.major_category_id = mc.id
+        WHERE strftime('%Y-%m', t.transaction_date) = ?
+          AND t.amount < 0
+          AND mc.name NOT IN ('고정수입', '유동수입', '이체분류')
+        GROUP BY weekday, mc.name
+        HAVING cnt >= ?
+        ORDER BY avg_amount DESC
+        LIMIT 1
+    """
+    row = conn.execute(query, (month_str, min_count)).fetchone()
+    if row:
+        return {
+            'type': 'recurring_pattern',
+            'icon': '💡',
+            'message': f"매주 {row['weekday']}요일 {row['category']} 지출이 집중돼요"
+        }
+    return None
+
+def _analyze_payday_spending(conn, year, month_str, settings):
+    """급여일 기준 소비 변화 ('고정수입-정기급여' 기준)"""
+    from datetime import datetime, timedelta
+    
+    # 정기급여 거래일 찾기
+    payday_query = """--sql
+        SELECT transaction_date
+        FROM transactions t
+        JOIN minor_categories mnc ON t.minor_category_uuid = mnc.uuid
+        JOIN major_categories mc ON mnc.major_category_id = mc.id
+        WHERE mc.name = '고정수입' 
+          AND mnc.name = '정기급여'
+          AND t.amount > 0
+          AND strftime('%Y-%m', t.transaction_date) = ?
+        ORDER BY t.transaction_date DESC
+        LIMIT 1
+    """
+    payday_row = conn.execute(payday_query, (month_str,)).fetchone()
+    if not payday_row:
+        return None
+    
+    payday_date = datetime.strptime(payday_row['transaction_date'], '%Y-%m-%d')
+    
+    # D+1 ~ D+7 평균 지출
+    post_query = """--sql
+        SELECT AVG(ABS(amount)) as avg_amount
+        FROM transactions
+        WHERE amount < 0
+          AND transaction_date BETWEEN ? AND ?
+    """
+    post_avg = conn.execute(
+        post_query,
+        ((payday_date + timedelta(days=1)).strftime('%Y-%m-%d'),
+         (payday_date + timedelta(days=7)).strftime('%Y-%m-%d'))
+    ).fetchone()['avg_amount'] or 0
+    
+    # D-7 ~ D-1 평균 지출
+    normal_avg = conn.execute(
+        post_query,
+        ((payday_date - timedelta(days=7)).strftime('%Y-%m-%d'),
+         (payday_date - timedelta(days=1)).strftime('%Y-%m-%d'))
+    ).fetchone()['avg_amount'] or 0
+    
+    threshold = settings.get('payday_spike_threshold', 30)
+    if normal_avg > 0:
+        increase_rate = ((post_avg - normal_avg) / normal_avg * 100)
+        if increase_rate > threshold:
+            return {
+                'type': 'payday_spike',
+                'icon': '💡',
+                'message': f"급여일 직후 3일간 지출이 {int(increase_rate)}% 증가해요"
+            }
+    return None
+
+def _analyze_month_period_pattern(conn, year, month_str, settings):
+    """월초/월말 소비 차이"""
+    from calendar import monthrange
+    
+    year_int = int(month_str.split('-')[0])
+    month_int = int(month_str.split('-')[1])
+    days_in_month = monthrange(year_int, month_int)[1]
+    
+    # 월초 (1~10일) 평균
+    early_query = """--sql
+        SELECT AVG(ABS(amount)) as avg_amount
+        FROM transactions
+        WHERE strftime('%Y-%m', transaction_date) = ?
+          AND CAST(strftime('%d', transaction_date) AS INTEGER) BETWEEN 1 AND 10
+          AND amount < 0
+    """
+    early_avg = conn.execute(early_query, (month_str,)).fetchone()['avg_amount'] or 0
+    
+    # 월말 (21일~말일) 평균
+    late_query = """--sql
+        SELECT AVG(ABS(amount)) as avg_amount
+        FROM transactions
+        WHERE strftime('%Y-%m', transaction_date) = ?
+          AND CAST(strftime('%d', transaction_date) AS INTEGER) >= 21
+          AND amount < 0
+    """
+    late_avg = conn.execute(late_query, (month_str,)).fetchone()['avg_amount'] or 0
+    
+    threshold = settings.get('month_period_threshold', 40)
+    if early_avg > 0 and late_avg > 0:
+        diff_rate = abs((late_avg - early_avg) / early_avg * 100)
+        if diff_rate > threshold:
+            period = "월말" if late_avg > early_avg else "월초"
+            return {
+                'type': 'month_period',
+                'icon': '💡',
+                'message': f"{period} 지출이 {int(diff_rate)}% 높아요"
+            }
+    return None
+
+def _detect_impulse_spending(conn, year, month_str, settings):
+    """소액 다빈도 지출 (1만원 이하)"""
+    # 이번 달 소액 지출 횟수
+    impulse_amount_limit = settings.get('impulse_amount_limit', 10000)
+    current_query = """--sql
+        SELECT COUNT(*) as count
+        FROM transactions
+        WHERE strftime('%Y-%m', transaction_date) = ?
+          AND amount < 0
+          AND ABS(amount) < ?
+    """
+    current_count = conn.execute(current_query, (month_str, impulse_amount_limit)).fetchone()['count']
+    
+    # 전월 소액 지출 횟수
+    from dateutil.relativedelta import relativedelta
+    prev_month = (datetime.strptime(month_str, '%Y-%m') - relativedelta(months=1)).strftime('%Y-%m')
+    prev_count = conn.execute(current_query, (prev_month, impulse_amount_limit)).fetchone()['count']
+    
+    threshold = settings.get('impulse_increase_threshold', 50)
+    if prev_count > 0:
+        increase_rate = ((current_count - prev_count) / prev_count * 100)
+        if increase_rate > threshold:
+            return {
+                'type': 'impulse_spending',
+                'icon': '💡',
+                'message': f"이번 달 소액 지출이 {current_count}회로 평소보다 {int(increase_rate)}% 증가했어요"
+            }
+    return None
+
+def _detect_category_spike(conn, year, month_str, settings):
+    """전월 대비 특정 카테고리 급증"""
+    from dateutil.relativedelta import relativedelta
+    
+    prev_month = (datetime.strptime(month_str, '%Y-%m') - relativedelta(months=1)).strftime('%Y-%m')
+    
+    query = """--sql
+        SELECT 
+            mc.name as category,
+            SUM(ABS(t.amount)) as total
+        FROM transactions t
+        JOIN minor_categories mnc ON t.minor_category_uuid = mnc.uuid
+        JOIN major_categories mc ON mnc.major_category_id = mc.id
+        WHERE strftime('%Y-%m', t.transaction_date) = ?
+          AND t.amount < 0
+          AND mc.name NOT IN ('고정수입', '유동수입', '이체분류')
+        GROUP BY mc.name
+    """
+    
+    current_data = {row['category']: row['total'] for row in conn.execute(query, (month_str,)).fetchall()}
+    prev_data = {row['category']: row['total'] for row in conn.execute(query, (prev_month,)).fetchall()}
+    
+    threshold = settings.get('category_spike_threshold', 100)
+    for cat, current_amount in current_data.items():
+        if cat in prev_data:
+            prev_amount = prev_data[cat]
+            if prev_amount > 0:
+                increase_rate = ((current_amount - prev_amount) / prev_amount * 100)
+                if increase_rate > threshold:
+                    return {
+                        'type': 'category_spike',
+                        'icon': '💡',
+                        'message': f"'{cat}'이(가) 지난달보다 {int(increase_rate)}% 증가했어요"
+                    }
+    return None
+
+def _analyze_budget_trend(conn, year, month, settings):
+    """예산 소진율 경고"""
+    from datetime import datetime
+    import calendar
+    
+    today = datetime.now()
+    if today.year != year or today.month != month:
+        return None  # 현재 월만 분석
+    
+    # 월 진행률
+    days_in_month = calendar.monthrange(year, month)[1]
+    month_progress = (today.day / days_in_month) * 100
+    
+    # 예산 대비 소비율
+    month_str = f"{year}-{month:02d}"
+    total_budget_query = "SELECT SUM(amount) FROM budgets"
+    total_budget = conn.execute(total_budget_query).fetchone()[0] or 0
+    
+    if total_budget == 0:
+        return None
+    
+    total_spent_query = """--sql
+        SELECT SUM(ABS(amount))
+        FROM transactions
+        WHERE strftime('%Y-%m', transaction_date) = ?
+          AND amount < 0
+    """
+    total_spent = conn.execute(total_spent_query, (month_str,)).fetchone()[0] or 0
+    
+    budget_used = (total_spent / total_budget * 100)
+    
+    threshold = settings.get('budget_alert_margin', 10)
+    if budget_used > month_progress + threshold:
+        return {
+            'type': 'budget_alert',
+            'icon': '💡',
+            'message': f"월 진행률({int(month_progress)}%)보다 예산 소진율({int(budget_used)}%)이 빨라요"
+        }
+    return None
+
+def _detect_no_spend_streak(conn, year, month_str, settings):
+    """연속 무지출일 감지"""
+    query = """--sql
+        SELECT DISTINCT transaction_date
+        FROM transactions
+        WHERE strftime('%Y-%m', transaction_date) = ?
+          AND amount < 0
+        ORDER BY transaction_date
+    """
+    spent_dates = {row['transaction_date'] for row in conn.execute(query, (month_str,)).fetchall()}
+    
+    from datetime import datetime, timedelta
+    from calendar import monthrange
+    
+    year_int = int(month_str.split('-')[0])
+    month_int = int(month_str.split('-')[1])
+    days_in_month = monthrange(year_int, month_int)[1]
+    
+    max_streak = 0
+    current_streak = 0
+    
+    for day in range(1, days_in_month + 1):
+        date_str = f"{month_str}-{day:02d}"
+        if date_str not in spent_dates:
+            current_streak += 1
+            max_streak = max(max_streak, current_streak)
+        else:
+            current_streak = 0
+    
+    threshold = settings.get('no_spend_min_days', 3)
+    if max_streak >= threshold:
+        return {
+            'type': 'no_spend_streak',
+            'icon': '🎉',
+            'message': f"{max_streak}일 연속 무지출 달성!"
+        }
+    return None
+
+def _compare_with_last_year(conn, year, month_str, settings):
+    """작년 동월 대비"""
+    current_query = """--sql
+        SELECT SUM(ABS(amount)) as total
+        FROM transactions
+        WHERE strftime('%Y-%m', transaction_date) = ?
+          AND amount < 0
+    """
+    current_total = conn.execute(current_query, (month_str,)).fetchone()['total'] or 0
+    
+    last_year_month = f"{year-1}-{month_str.split('-')[1]}"
+    last_year_total = conn.execute(current_query, (last_year_month,)).fetchone()['total'] or 0
+    
+    threshold = settings.get('year_comparison_threshold', 20)
+    if last_year_total > 0:
+        change_rate = ((current_total - last_year_total) / last_year_total * 100)
+        if abs(change_rate) > threshold:
+            direction = "증가" if change_rate > 0 else "감소"
+            return {
+                'type': 'year_comparison',
+                'icon': '💡',
+                'message': f"작년 {month_str.split('-')[1]}월보다 지출이 {int(abs(change_rate))}% {direction}했어요"
+            }
+    return None
+
+def _analyze_fixed_vs_variable(conn, month_str, settings):
+    """고정비 vs 변동비 비율"""
+    query = """--sql
+        SELECT 
+            t.type,
+            SUM(ABS(t.amount)) as total
+        FROM transactions t
+        WHERE strftime('%Y-%m', t.transaction_date) = ?
+          AND t.amount < 0
+        GROUP BY t.type
+    """
+    results = {row['type']: row['total'] for row in conn.execute(query, (month_str,)).fetchall()}
+    
+    fixed = results.get('고정지출', 0)
+    variable = results.get('유동지출', 0) + results.get('반고정지출', 0)
+    
+    threshold = settings.get('fixed_ratio_warning', 60)
+    total = fixed + variable
+    if total > 0:
+        fixed_ratio = (fixed / total * 100)
+        if fixed_ratio > threshold:
+            return {
+                'type': 'fixed_ratio_warning',
+                'icon': '💡',
+                'message': f"고정비 비중이 {int(fixed_ratio)}%로 높아요. 변동비 절약을 고려해보세요"
+            }
+    return None

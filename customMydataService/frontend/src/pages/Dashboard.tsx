@@ -8,6 +8,7 @@ import TopSpending from '../components/dashboard/TopSpending';
 import BudgetManagement from '../components/dashboard/BudgetManagement';
 import FixedExpenseManagement from '../components/dashboard/FixedExpenseManagement';
 import AssetPortfolio from '../components/dashboard/AssetPortfolio';
+import ConsumptionPattern from '../components/dashboard/ConsumptionPattern';
 import ComingSoon from '../components/dashboard/ComingSoon';
 import FloatingSelectPopup, { type FloatingSelectHandle } from '../components/FloatingSelectPopup';
 import './Dashboard.css';
@@ -458,15 +459,12 @@ const Dashboard = () => {
       <main className="dashboard-content">
         <MonthlyDetail selectedYear={selectedYear} selectedMonth={selectedMonth} />
         <MonthlyTrend months={availableMonths} range={range} />
-        <BudgetManagement selectedYear={selectedYear} selectedMonth={selectedMonth} />
+        <ConsumptionPattern selectedYear={selectedYear} selectedMonth={selectedMonth} />
         <TopSpending months={availableMonths} range={range} />
-        <MonthlyTreemap selectedYear={selectedYear} selectedMonth={selectedMonth} />
+        <BudgetManagement selectedYear={selectedYear} selectedMonth={selectedMonth} />
         <FixedExpenseManagement months={availableMonths} range={range} />
-        <ComingSoon title="카테고리 심층 분석" />
+        <MonthlyTreemap selectedYear={selectedYear} selectedMonth={selectedMonth} />
         <AssetPortfolio />
-        <ComingSoon title="이상 지출 탐지" />
-        <ComingSoon title="Coming soon" />
-        <ComingSoon title="Coming soon" />
       </main>
     </div>
   );

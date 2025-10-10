@@ -205,3 +205,36 @@ def set_setting(key, value):
     """, (key, value))
     conn.commit()
     conn.close()
+
+def get_default_consumption_pattern_settings():
+    """소비 패턴 인사이트 기본 설정값 반환"""
+    return {
+        'weekend_ratio_threshold': 1.5,          # 주말/평일 비율
+        'weekday_min_count': 3,                  # 요일별 최소 거래 횟수
+        'payday_spike_threshold': 30,            # 급여일 후 증가율 (%)
+        'month_period_threshold': 40,            # 월초/말 차이 (%)
+        'impulse_amount_limit': 10000,           # 소액 지출 기준 (원)
+        'impulse_increase_threshold': 50,        # 소액 증가율 (%)
+        'category_spike_threshold': 100,         # 카테고리 급증 (%)
+        'budget_alert_margin': 10,               # 예산 초과 경고 (%)
+        'no_spend_min_days': 3,                  # 무지출 최소 일수
+        'year_comparison_threshold': 20,         # 전년 대비 (%)
+        'fixed_ratio_warning': 60                # 고정비 비중 경고 (%)
+    }
+
+def get_consumption_pattern_settings():
+    """DB에서 소비 패턴 설정 불러오기 (없으면 기본값)"""
+    import json
+    settings_str = get_setting('consumption_pattern_settings')
+    if settings_str:
+        try:
+            return json.loads(settings_str)
+        except Exception:
+            pass
+    return get_default_consumption_pattern_settings()
+
+def set_consumption_pattern_settings(settings_dict):
+    """소비 패턴 설정을 DB에 저장"""
+    import json
+    settings_str = json.dumps(settings_dict)
+    set_setting('consumption_pattern_settings', settings_str)

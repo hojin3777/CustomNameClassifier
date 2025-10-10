@@ -61,7 +61,9 @@ const AssetPortfolio: React.FC<AssetPortfolioProps> = () => {
 
     // 모든 계좌명 목록 (범례용)
     const allAccountNames = monthlyData.length > 0
-        ? monthlyData[0].accounts.map(acc => acc.account_name)
+        ? monthlyData[0].accounts
+            .sort((a, b) => a.account_id - b.account_id)  // account_id 오름차순 정렬
+            .map(acc => acc.account_name)
         : [];
 
     // ****** 색상 팔레트 ******
@@ -86,6 +88,7 @@ const AssetPortfolio: React.FC<AssetPortfolioProps> = () => {
 
         const month = payload[0].payload.month;
         const total = payload[0].payload.total;
+        const formattedMonth = month.substring(0, 4) + '년 ' + month.substring(5) + '월';
 
         // 전월 대비 증감 계산
         const currentIndex = areaChartData.findIndex(d => d.month === month);
@@ -100,7 +103,7 @@ const AssetPortfolio: React.FC<AssetPortfolioProps> = () => {
 
         return (
             <div className="asset-tooltip-aportfolio">
-                <div className="tooltip-header-aportfolio">{month}</div>
+                <div className="tooltip-header-aportfolio">{formattedMonth}</div>
                 <div className="tooltip-total-aportfolio">
                     총 자산: {total.toLocaleString()}원
                 </div>
@@ -112,14 +115,74 @@ const AssetPortfolio: React.FC<AssetPortfolioProps> = () => {
                 <div className="tooltip-divider-aportfolio"></div>
                 {payload.map((entry: any, index: number) => {
                     if (entry.dataKey === 'total') return null;
+                    const percentage = total !== 0 ? (entry.value / total) * 100 : 0;
                     return (
                         <div key={index} className="tooltip-item-aportfolio">
-                            <span style={{ color: entry.color }}>{entry.name}:</span>
-                            <span>{entry.value.toLocaleString()}원</span>
+                            <span className="tooltip-item-name-aportfolio" style={{ color: entry.color }}>
+                                {entry.name}
+                            </span>
+                            <span className="tooltip-item-value-aportfolio">
+                                {entry.value.toLocaleString()}원
+                            </span>
+                            <span className="tooltip-item-percent-aportfolio">
+                                ({percentage.toFixed(0)}%)
+                            </span>
                         </div>
                     );
                 })}
             </div>
+        );
+    };
+
+    // ****** 커스텀 범례 추가 ******
+    const CustomLegend = (props: any) => {
+        const { payload } = props;
+
+        const lastMonthTotal = areaChartData.length > 0 ? areaChartData[areaChartData.length - 1].total : 0;
+        // account_id 순서대로 정렬된 payload
+        const sortedPayload = [...payload].sort((a, b) => {
+            const indexA = allAccountNames.indexOf(a.value);
+            const indexB = allAccountNames.indexOf(b.value);
+            return indexA - indexB;
+        });
+
+        return (
+            <ul style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+                listStyle: 'none',
+                padding: 0,
+                margin: 0,
+                fontSize: '12px'
+            }}>
+                {sortedPayload.map((entry: any, index: number) => {
+                    // const accountBalance = areaChartData.length > 0 ? areaChartData[areaChartData.length - 1][entry.value] : 0;
+                    // let opacity = 1;
+                    // if (accountBalance === 0) {
+                    //     opacity = 0.5;
+                    // } else if (lastMonthTotal > 0 && (accountBalance / lastMonthTotal) <= 0.2) {
+                    //     opacity = 0.7;
+                    // }
+                    return (
+                        <li key={`legend-${index}`} style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            marginRight: '16px',
+                            marginTop: '8px'
+                        }}>
+                            <span style={{
+                                display: 'inline-block',
+                                width: '14px',
+                                height: '14px',
+                                backgroundColor: entry.color,
+                                marginRight: '4px'
+                            }}></span>
+                            <span style={{ color: entry.color }}>{entry.value}</span>
+                        </li>
+                    );
+                })}
+            </ul>
         );
     };
 
@@ -184,7 +247,7 @@ const AssetPortfolio: React.FC<AssetPortfolioProps> = () => {
 
             <div className="dashboard-card-content asset-content-aportfolio">
                 <div className="area-tab-container-aportfolio">
-                    <ResponsiveContainer width="100%" height={470}>
+                    <ResponsiveContainer width="100%" height={490}>
                         <AreaChart data={areaChartData} margin={{ top: 10, right: 30, left: 0, bottom: 20 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-subtle)" />
                             <XAxis
@@ -193,6 +256,7 @@ const AssetPortfolio: React.FC<AssetPortfolioProps> = () => {
                                 // tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
                                 // tickFormatter={monthTickFormatter}
                                 // height={30}
+                                interval={1}
                                 tick={renderMonthTick}
                                 height={40}
                             />
@@ -203,9 +267,13 @@ const AssetPortfolio: React.FC<AssetPortfolioProps> = () => {
                                 tickFormatter={(value) => `${(value / 10000).toFixed(0)}만`}
                             />
                             <Tooltip content={<CustomTooltip />} />
-                            <Legend
-                                wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }}
+                            {/* <Legend
+                                wrapperStyle={{ fontSize: '12px', paddingTop: '30px', alignContent: 'center' }}
                                 iconType="rect"
+                            /> */}
+                            <Legend
+                                content={<CustomLegend />}
+                                wrapperStyle={{ paddingTop: '30px' }}
                             />
                             {allAccountNames.map((accName, index) => (
                                 <Area
@@ -215,12 +283,12 @@ const AssetPortfolio: React.FC<AssetPortfolioProps> = () => {
                                     stackId="1"
                                     stroke={COLORS[index % COLORS.length]}
                                     fill={COLORS[index % COLORS.length]}
-                                    isAnimationActive={true}
+                                    isAnimationActive={false}
                                 />
                             ))}
                             <Brush
                                 dataKey="month"
-                                height={30}
+                                height={25}
                                 stroke="var(--color-accent-blue)"
                                 fill="var(--color-bg-content)"
                                 tickFormatter={brushTickFormatter}

@@ -280,7 +280,45 @@ def get_fixed_expenses_api():
         print(f"Error in get_fixed_expenses_api: {e}")
         return jsonify({"error": "Failed to fetch fixed expenses"}), 500
 
+# ****** 소비 패턴 인사이트 API ******
+@app.route('/api/dashboard/consumption-pattern', methods=['GET'])
+def get_consumption_pattern():
+    """소비 패턴 인사이트 데이터 반환 (히트맵 + 거래내역 +  자동 인사이트)"""
+    year = request.args.get('year', type=int)
+    month = request.args.get('month', type=int)
+    
+    if not year or not month:
+        return jsonify({"error": "year and month parameters are required."}), 400
+    
+    try:
+        data = dashboard_utils.get_consumption_pattern_insights(year, month)
+        return jsonify(data)
+    except Exception as e:
+        print(f"Error getting consumption pattern insights: {e}")
+        return jsonify({"error": "Failed to retrieve consumption pattern insights"}), 500
 
+@app.route('/api/settings/consumption-pattern', methods=['GET', 'POST'])
+def manage_consumption_pattern_settings():
+    """소비 패턴 인사이트 설정 관리"""
+    if request.method == 'GET':
+        try:
+            settings = database.get_consumption_pattern_settings()
+            return jsonify(settings)
+        except Exception as e:
+            print(f"Error getting consumption pattern settings: {e}")
+            return jsonify({"error": "Failed to retrieve settings"}), 500
+    
+    if request.method == 'POST':
+        try:
+            settings_data = request.get_json()
+            if not isinstance(settings_data, dict):
+                return jsonify({"error": "Invalid data format"}), 400
+            
+            database.set_consumption_pattern_settings(settings_data)
+            return jsonify({"message": "Settings saved successfully"})
+        except Exception as e:
+            print(f"Error saving consumption pattern settings: {e}")
+            return jsonify({"error": "Failed to save settings"}), 500
 
 
 

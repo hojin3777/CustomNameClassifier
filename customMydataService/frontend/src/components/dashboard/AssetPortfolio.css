@@ -21,7 +21,7 @@
 /* ==================== 커스텀 툴팁 ==================== */
 .asset-tooltip-aportfolio {
     background-color: var(--color-bg-inset);
-    border: 1px solid var(--color-border-interactive);
+    border: 1px solid var(--color-border);
     border-radius: 6px;
     padding: 12px;
     box-shadow: 0 4px 12px var(--color-bg-overlay-light);
@@ -61,19 +61,31 @@
 }
 
 .tooltip-item-aportfolio {
-    display: flex;
-    justify-content: space-between;
-    gap: 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 0.2fr;  /* 수정: 3컬럼 그리드 */
     font-size: 13px;
-    color: var(--color-text-secondary);
-    margin-top: 4px;
+    gap: 4px;
+    align-items: center;
+    margin-bottom: 6px;
 }
 
-.tooltip-item-aportfolio span:first-child {
+.tooltip-item-name-aportfolio {
+    /* 계좌명: 왼쪽 정렬 */
+    text-align: left;
     font-weight: 500;
 }
 
-.tooltip-item-aportfolio span:last-child {
+.tooltip-item-value-aportfolio {
+    /* 금액: 오른쪽 정렬 */
+    text-align: right;
+    font-weight: 500;
     color: var(--color-text-primary);
-    font-weight: 600;
+    min-width: 80px;  /* 최소 너비 확보 */
+}
+
+.tooltip-item-percent-aportfolio {
+    /* 퍼센테이지: 오른쪽 정렬 */
+    text-align: left;
+    color: var(--color-text-secondary);
+    min-width: 32px;  /* (XX%) 고정 너비 */
 }
