@@ -219,7 +219,7 @@ def get_default_consumption_pattern_settings():
         'budget_alert_margin': 10,               # 예산 초과 경고 (%)
         'no_spend_min_days': 3,                  # 무지출 최소 일수
         'year_comparison_threshold': 20,         # 전년 대비 (%)
-        'fixed_ratio_warning': 60                # 고정비 비중 경고 (%)
+        'fixed_ratio_warning': 50                # 고정비 비중 경고 (%)
     }
 
 def get_consumption_pattern_settings():

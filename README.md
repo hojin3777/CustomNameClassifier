@@ -276,6 +276,11 @@ Classify store names with deeplearning
     - hover시 툴팁으로 이어지는 효과, 인사이트 hover시 해당 셀 강조 효과 적용
     - 설정 버튼 클릭 시 팝업으로 임계값 세팅 팝업 출력
 
+### 1011
+- 소비 패턴 인사이트 개선:
+    - 설정 팝업 추가: 인라인 input 스타일로 설정 조정
+    - 백엔드와 연계하여 인사이트 threshold를 직접 조절할 수 있도록 변경
+    - 초기화 버튼 confirmPopup을 사용하도록 적용하였으며, z-index 순번을 조절하기 위해 confirmPopup의 z-index 조절
 
 
 - TODO: 대분류별 지출 비율에서 만든 로딩스타일 딥러닝 대기에 추가 ( -- ) 

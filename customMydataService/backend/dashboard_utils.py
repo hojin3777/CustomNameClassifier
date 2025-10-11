@@ -861,7 +861,7 @@ def _analyze_payday_spending(conn, year, month_str, settings):
             return {
                 'type': 'payday_spike',
                 'icon': '💡',
-                'message': f"급여일 직후 3일간 지출이 {int(increase_rate)}% 증가해요"
+                'message': f"급여일 직후 7일간 지출이 {int(increase_rate)}% 증가해요"
             }
     return None
 
@@ -919,7 +919,6 @@ def _detect_impulse_spending(conn, year, month_str, settings):
     current_count = conn.execute(current_query, (month_str, impulse_amount_limit)).fetchone()['count']
     
     # 전월 소액 지출 횟수
-    from dateutil.relativedelta import relativedelta
     prev_month = (datetime.strptime(month_str, '%Y-%m') - relativedelta(months=1)).strftime('%Y-%m')
     prev_count = conn.execute(current_query, (prev_month, impulse_amount_limit)).fetchone()['count']
     
@@ -936,7 +935,6 @@ def _detect_impulse_spending(conn, year, month_str, settings):
 
 def _detect_category_spike(conn, year, month_str, settings):
     """전월 대비 특정 카테고리 급증"""
-    from dateutil.relativedelta import relativedelta
     
     prev_month = (datetime.strptime(month_str, '%Y-%m') - relativedelta(months=1)).strftime('%Y-%m')
     
@@ -1089,7 +1087,7 @@ def _analyze_fixed_vs_variable(conn, month_str, settings):
     fixed = results.get('고정지출', 0)
     variable = results.get('유동지출', 0) + results.get('반고정지출', 0)
     
-    threshold = settings.get('fixed_ratio_warning', 60)
+    threshold = settings.get('fixed_ratio_warning', 50)
     total = fixed + variable
     if total > 0:
         fixed_ratio = (fixed / total * 100)
