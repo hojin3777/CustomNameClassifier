@@ -212,14 +212,14 @@ def get_default_consumption_pattern_settings():
         'weekend_ratio_threshold': 1.5,          # 주말/평일 비율
         'weekday_min_count': 3,                  # 요일별 최소 거래 횟수
         'payday_spike_threshold': 30,            # 급여일 후 증가율 (%)
-        'month_period_threshold': 40,            # 월초/말 차이 (%)
-        'impulse_amount_limit': 10000,           # 소액 지출 기준 (원)
-        'impulse_increase_threshold': 50,        # 소액 증가율 (%)
-        'category_spike_threshold': 100,         # 카테고리 급증 (%)
+        'month_period_threshold': 30,            # 월초/말 차이 (%)
+        'impulse_amount_limit': 5000,           # 소액 지출 기준 (원)
+        'impulse_increase_threshold': 20,        # 소액 증가율 (%)
+        'category_spike_threshold': 50,         # 카테고리 급증 (%)
         'budget_alert_margin': 10,               # 예산 초과 경고 (%)
         'no_spend_min_days': 3,                  # 무지출 최소 일수
         'year_comparison_threshold': 20,         # 전년 대비 (%)
-        'fixed_ratio_warning': 50                # 고정비 비중 경고 (%)
+        'fixed_ratio_warning': 40                # 고정비 비중 경고 (%)
     }
 
 def get_consumption_pattern_settings():

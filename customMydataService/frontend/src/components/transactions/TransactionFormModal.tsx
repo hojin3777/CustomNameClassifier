@@ -364,7 +364,20 @@ const TransactionFormModal: React.FC<TransactionFormModalProps> = ({
           <div className='main-panel'>
             <div className="form-modal-header">
               <div className="date-selector">
-                <DatePicker selected={date} onChange={(d: Date | null) => d && setDate(d)} customInput={<button className="calendar-btn"><FaCalendarAlt /></button>} locale="ko" popperClassName="dp-popper" />
+                <DatePicker
+                  selected={date}
+                  onChange={(d: Date | null) => d && setDate(d)}
+                  customInput={<button className="calendar-btn"><FaCalendarAlt /></button>}
+                  locale="ko"
+                  popperClassName="dp-popper"
+                  showYearDropdown
+                  showMonthDropdown
+                  dropdownMode='scroll'
+                  scrollableYearDropdown
+                  yearDropdownItemNumber={10}
+                // minDate={new Date(2020, 0, 1)}
+                // maxDate={new Date(2030, 12, 31)}
+                />
                 <div className="date-part year" onClick={(e) => openDatePopup(e, 'year')}>{date.getFullYear()}</div><span className="separator">년</span>
                 <div className="date-part month" onClick={(e) => openDatePopup(e, 'month')}>{date.getMonth() + 1}</div><span className="separator">월</span>
                 <div className="date-part day" onClick={(e) => openDatePopup(e, 'day')}>{date.getDate()}</div><span className="separator">일</span>
@@ -483,7 +496,7 @@ const TransactionFormModal: React.FC<TransactionFormModalProps> = ({
               )}
             </div>
           )}
-          
+
           {notification && <div className="form-notification">{notification}</div>}
         </div>
       </div>

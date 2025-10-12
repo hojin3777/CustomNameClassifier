@@ -556,6 +556,18 @@ const BudgetManagement: React.FC<BudgetManagementProps> = ({ selectedYear, selec
             &nbsp;(총 예산: {budgetRows.reduce((sum, row) => sum + (row.amount || 0), 0).toLocaleString()}원)
           </span>
         </h3>
+        <div className="heatmap-legend-mbudget">
+          <span className="legend-item-mbudget">
+            낮음
+            <span className="legend-color-mbudget" style={{ backgroundColor: 'var(--color-highlight-1)' }}></span>
+            <span className="legend-color-mbudget" style={{ backgroundColor: 'var(--color-highlight-5)' }}></span>
+            <span className="legend-color-mbudget" style={{ backgroundColor: 'var(--color-highlight-4)' }}></span>
+            <span className="legend-color-mbudget" style={{ backgroundColor: 'var(--color-highlight-3)' }}></span>
+            <span className="legend-color-mbudget" style={{ backgroundColor: 'var(--color-highlight-6)' }}></span>
+            <span className="legend-color-mbudget" style={{ backgroundColor: 'var(--color-highlight-2)' }}></span>
+            높음
+          </span>
+        </div>
         <div className="dashboard-card-subtitle">
           {selectedYear && selectedMonth
             ? `${selectedYear}년 ${selectedMonth}월 기준`

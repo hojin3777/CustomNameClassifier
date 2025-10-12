@@ -893,7 +893,7 @@ def _analyze_month_period_pattern(conn, year, month_str, settings):
     """
     late_avg = conn.execute(late_query, (month_str,)).fetchone()['avg_amount'] or 0
     
-    threshold = settings.get('month_period_threshold', 40)
+    threshold = settings.get('month_period_threshold', 30)
     if early_avg > 0 and late_avg > 0:
         diff_rate = abs((late_avg - early_avg) / early_avg * 100)
         if diff_rate > threshold:
@@ -908,7 +908,7 @@ def _analyze_month_period_pattern(conn, year, month_str, settings):
 def _detect_impulse_spending(conn, year, month_str, settings):
     """소액 다빈도 지출 (1만원 이하)"""
     # 이번 달 소액 지출 횟수
-    impulse_amount_limit = settings.get('impulse_amount_limit', 10000)
+    impulse_amount_limit = settings.get('impulse_amount_limit', 5000)
     current_query = """--sql
         SELECT COUNT(*) as count
         FROM transactions
@@ -922,7 +922,7 @@ def _detect_impulse_spending(conn, year, month_str, settings):
     prev_month = (datetime.strptime(month_str, '%Y-%m') - relativedelta(months=1)).strftime('%Y-%m')
     prev_count = conn.execute(current_query, (prev_month, impulse_amount_limit)).fetchone()['count']
     
-    threshold = settings.get('impulse_increase_threshold', 50)
+    threshold = settings.get('impulse_increase_threshold', 20)
     if prev_count > 0:
         increase_rate = ((current_count - prev_count) / prev_count * 100)
         if increase_rate > threshold:
@@ -954,7 +954,7 @@ def _detect_category_spike(conn, year, month_str, settings):
     current_data = {row['category']: row['total'] for row in conn.execute(query, (month_str,)).fetchall()}
     prev_data = {row['category']: row['total'] for row in conn.execute(query, (prev_month,)).fetchall()}
     
-    threshold = settings.get('category_spike_threshold', 100)
+    threshold = settings.get('category_spike_threshold', 50)
     for cat, current_amount in current_data.items():
         if cat in prev_data:
             prev_amount = prev_data[cat]
@@ -1087,7 +1087,7 @@ def _analyze_fixed_vs_variable(conn, month_str, settings):
     fixed = results.get('고정지출', 0)
     variable = results.get('유동지출', 0) + results.get('반고정지출', 0)
     
-    threshold = settings.get('fixed_ratio_warning', 50)
+    threshold = settings.get('fixed_ratio_warning', 40)
     total = fixed + variable
     if total > 0:
         fixed_ratio = (fixed / total * 100)

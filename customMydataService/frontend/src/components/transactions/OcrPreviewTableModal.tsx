@@ -3,10 +3,12 @@ import { FaPlus, FaArrowRight, FaTrash } from 'react-icons/fa';
 import './OcrPreviewTableModal.css';
 
 import FloatingSelectPopup, { type FloatingSelectHandle, type Opt } from '../FloatingSelectPopup';
-import DatePicker from 'react-datepicker';
+import DatePicker, { registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import './DatePickerOverrides.css'; // DatePicker 커스텀 CSS 재사용
+import { ko } from 'date-fns/locale';
 import ImagePreviewPopup from './ImagePreviewPopup';
+registerLocale('ko', ko);
 
 // Transactions.tsx와 유사한 타입 정의
 type Account = { id: number; name: string; };
@@ -140,7 +142,7 @@ const OcrPreviewTableModal: React.FC<OcrPreviewTableModalProps> = ({
       if (column === 'account_id') {
         const acc = appData.accounts.find(a => a.id === value);
         const targetFileName = updatedRow.file_name;
-        if (targetFileName){
+        if (targetFileName) {
           const cellsToHighlight: HighlightCell[] = [];
           newRows = newRows.map(r => {
             if (r.file_name === targetFileName) {
@@ -155,7 +157,7 @@ const OcrPreviewTableModal: React.FC<OcrPreviewTableModalProps> = ({
         }
         updatedRow.account_name = acc ? acc.name : null;
       }
-        
+
       // 기존 로직
       if (column === 'type' || column === 'major_category_name') {
         if (column === 'type') updatedRow.major_category_name = null;
@@ -221,7 +223,7 @@ const OcrPreviewTableModal: React.FC<OcrPreviewTableModalProps> = ({
           .map(child => `${child.merchant} ${(child.amount || 0).toLocaleString()}원`)
           .join(', ') + ' 정산처리';
         const newMemo = row.memo ? `${dutchPayMemo} | ${row.memo}` : dutchPayMemo;
-        return { ...row, amount: totalAmount, memo: newMemo};
+        return { ...row, amount: totalAmount, memo: newMemo };
       }
       return row; // 자식이 없으면 원래 행 그대로 반환
     });
@@ -331,7 +333,7 @@ const OcrPreviewTableModal: React.FC<OcrPreviewTableModalProps> = ({
 
     setEditedRows(prev => {
       const newRows = [...prev];
-      if (lastCheckedIndex === -1){
+      if (lastCheckedIndex === -1) {
         newRows.push(newRow);
       } else {
         newRows.splice(lastCheckedIndex + 1, 0, newRow);
@@ -558,7 +560,7 @@ const OcrPreviewTableModal: React.FC<OcrPreviewTableModalProps> = ({
                       type="checkbox"
                       onChange={handleToggleCheckAll}
                       checked={editedRows.length > 0 && checkedOcrRows.size === editedRows.length}
-                      />
+                    />
                   </th>
                   <th>파일명</th>
                   <th>날짜</th>
@@ -747,9 +749,17 @@ const OcrPreviewTableModal: React.FC<OcrPreviewTableModalProps> = ({
               onCalendarClose={() => setEditingCell(null)}
               onClickOutside={() => setEditingCell(null)}
               autoFocus
+              locale={ko}
               popperClassName='dp-popper'
               calendarClassName='dp-calendar'
               portalId='root'
+              showYearDropdown
+              showMonthDropdown
+              dropdownMode='scroll'
+              scrollableYearDropdown
+              yearDropdownItemNumber={10}
+            // minDate={new Date(2020, 0, 1)}
+            // maxDate={new Date(2030, 12, 31)}
             />
           </td>
         );

@@ -12,6 +12,29 @@
     min-height: 0;
 }
 
+/* 범례 */
+.heatmap-legend-mbudget {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  margin-right: auto;
+}
+
+.legend-item-mbudget {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.legend-color-mbudget {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
 /* ==================== 테이블 ==================== */
 .budget-table-mbudget {
     width: 100%;

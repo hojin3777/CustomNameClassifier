@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react'; // useRef 추가
-import { FaSave, FaUndo, FaTrash,
+import {
+  FaSave, FaUndo, FaTrash,
   FaBold, FaHighlighter, FaFlag, FaFillDrip,
   FaCaretDown, FaArrowUp, FaArrowDown, FaFilter,
   FaPlus, FaArrowRight, FaAngleDoubleDown,
-  FaFileDownload, FaFileExport, FaFileImport } from 'react-icons/fa'; // 각 아이콘 로드
+  FaFileDownload, FaFileExport, FaFileImport
+} from 'react-icons/fa'; // 각 아이콘 로드
 import { RiFileExcel2Fill } from 'react-icons/ri';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { useDirty } from '../App';
@@ -13,7 +15,7 @@ import { downloadTemplate, exportDataToExcel, importDataFromExcel } from '../com
 import "react-datepicker/dist/react-datepicker.css";
 import "../components/transactions/DatePickerOverrides.css"; // DatePicker 커스텀 CSS
 import FilterPopup from '../components/transactions/FilterPopup.tsx'; // 1. FilterPopup 컴포넌트 import
-// import '../components/FilterPopup.css'; // FilterPopup CSS import
+import '../components/transactions/FilterPopup.css'; // FilterPopup CSS import
 import ConfirmPopup from '../components/ConfirmPopup'; // ConfirmPopup 컴포넌트 import
 import '../components/ConfirmPopup.css'; // ConfirmPopup CSS import
 import HighlightPopup from '../components/transactions/HighlightPopup'; // ighlightPopup 컴포넌트 import
@@ -22,7 +24,7 @@ import FloatingSelectPopup, { type FloatingSelectHandle, type Opt } from '../com
 import '../components/FloatingSelectPopup.css';
 import OcrImageUploadModal from '../components/transactions/OcrImageUploadModal';
 import '../components/transactions/OcrImageUploadModal.css';
-import OcrPreviewTableModal, {type TransactionRow as OcrPreviewRow} from '../components/transactions/OcrPreviewTableModal';
+import OcrPreviewTableModal, { type TransactionRow as OcrPreviewRow } from '../components/transactions/OcrPreviewTableModal';
 import TransactionFormModal from '../components/transactions/TransactionFormModal';
 import ExcelImportModal from '../components/transactions/ExcelImportModal';
 import { ko } from 'date-fns/locale';
@@ -74,16 +76,18 @@ const Transactions = () => {
 
   const [editingCell, setEditingCell] = useState<{ rowId: number | string; column: keyof Transaction | null } | null>(null);
   const editingCellRef = useRef<any>(null);
-  const floatingSelectRef = useRef<FloatingSelectHandle | null >(null);
+  const floatingSelectRef = useRef<FloatingSelectHandle | null>(null);
   const [filters, setFilters] = useState<{ [key: string]: any[] }>({});
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
   const [activeFilter, setActiveFilter] = useState<{ column: keyof Transaction, name: string } | null>(null);
   const [sortConfig, setSortConfig] = useState<{ key: keyof Transaction; direction: 'asc' | 'desc' } | null>(null);
-  const [confirmPopup, setConfirmPopup] = useState({isOpen: false, title: '', message: '', onConfirm: () => {},
-    onCancel: (() => {}) as (() => void) | undefined, type: 'alert' as 'input' | 'confirm' | 'alert' | 'destructive'});
+  const [confirmPopup, setConfirmPopup] = useState({
+    isOpen: false, title: '', message: '', onConfirm: () => { },
+    onCancel: (() => { }) as (() => void) | undefined, type: 'alert' as 'input' | 'confirm' | 'alert' | 'destructive'
+  });
   const [status, setStatus] = useState('Loading...');
   const tableContainerRef = useRef<HTMLDivElement>(null); // 테이블 컨테이너 참조
-  
+
   // highlight 팝업 관련 state
   const [isColorPopupOpen, setColorPopupOpen] = useState(false);
   const [colorPopupPosition, setColorPopupPosition] = useState({ top: 0, left: 0 });
@@ -114,7 +118,7 @@ const Transactions = () => {
   // dirty state
   const dirtyContext = useDirty();
   const isDirty = dirtyContext?.isDirty ?? false;
-  const setIsDirty = dirtyContext?.setIsDirty ?? (() => {});
+  const setIsDirty = dirtyContext?.setIsDirty ?? (() => { });
 
 
   // ESC키로 팝업 닫기
@@ -124,6 +128,7 @@ const Transactions = () => {
         setActiveFilter(null);
         setColorPopupOpen(false);
         setExcelPopupOpen(false);
+        floatingSelectRef.current?.close();
         if (editingCell) {
           setEditingCell(null);
         }
@@ -135,11 +140,11 @@ const Transactions = () => {
 
   // 외부 클릭 감지하여 편집 완료처리
   useEffect(() => {
-    if(!editingCell) return;
+    if (!editingCell) return;
     const handleOutsideClick = (event: MouseEvent) => {
       if (editingCellRef.current && !editingCellRef.current.contains(event.target as Node)) {
         const nodeName = editingCellRef.current.nodeName;
-        if (nodeName === 'INPUT' ) {
+        if (nodeName === 'INPUT') {
           const value = editingCellRef.current.value;
           handleUpdateCell(editingCell.rowId, editingCell.column!, value);
         }
@@ -230,14 +235,14 @@ const Transactions = () => {
     let emptyCellFound = null;
     for (const t of transactions) {
       if (t.account_id === null) {
-       emptyCellFound = { rowId: t.id, column: 'account_name' as keyof Transaction };
+        emptyCellFound = { rowId: t.id, column: 'account_name' as keyof Transaction };
         break;
       }
       if (t.minor_category_uuid === null) {
         emptyCellFound = { rowId: t.id, column: 'minor_category_name' as keyof Transaction };
         break;
       }
-      if (t.merchant === '') {  
+      if (t.merchant === '') {
         emptyCellFound = { rowId: t.id, column: 'merchant' as keyof Transaction };
         break;
       }
@@ -265,11 +270,11 @@ const Transactions = () => {
     }
     proceedSave();
   };
-  
+
   // 실제 저장 로직
   const proceedSave = async () => {
     setStatus('Saving...');
-    try{
+    try {
       const payload = transactions.map(t => ({
         id: t.id,
         transaction_date: t.transaction_date,
@@ -283,25 +288,26 @@ const Transactions = () => {
         flag_color_id: t.flag_color_id,
         highlight_color_id: t.highlight_color_id,
         background_color_id: t.background_color_id
-    }));
-    const response = await fetch(`${API_BASE_URL}/api/transactions`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    if (!response.ok) throw new Error('Save failed');
+      }));
+      const response = await fetch(`${API_BASE_URL}/api/transactions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!response.ok) throw new Error('Save failed');
 
-    const savedData = await response.json();
-    const processedData = savedData.map((t: Transaction) => ({ ...t, checked: false }));
-    setTransactions(processedData);
-    setOriginalTransactions(processedData);
-    setStatus('Saved successfully');
-    setTimeout(() => setStatus(''), 3000);
-  } catch (error) {
-    console.error("Save failed:", error);
-    setStatus("Save failed");
-    await fetchAllData(); // 저장 실패 시 데이터 다시 불러오기
-  }};
+      const savedData = await response.json();
+      const processedData = savedData.map((t: Transaction) => ({ ...t, checked: false }));
+      setTransactions(processedData);
+      setOriginalTransactions(processedData);
+      setStatus('Saved successfully');
+      setTimeout(() => setStatus(''), 3000);
+    } catch (error) {
+      console.error("Save failed:", error);
+      setStatus("Save failed");
+      await fetchAllData(); // 저장 실패 시 데이터 다시 불러오기
+    }
+  };
 
   // 빈 셀 스크롤
   const scrollToAndHighlightCell = (cellinfo: { rowId: number | string; column: keyof Transaction }) => {
@@ -386,12 +392,13 @@ const Transactions = () => {
       background_color_id: 0
     };
     let lastCheckedIndex = -1;
-    if (checkedRows.size > 0){
+    if (checkedRows.size > 0) {
       for (let i = transactions.length - 1; i >= 0; i--) {
-      if (checkedRows.has(transactions[i].id)) {
-        lastCheckedIndex = i;
-        break;
-      }}
+        if (checkedRows.has(transactions[i].id)) {
+          lastCheckedIndex = i;
+          break;
+        }
+      }
     }
     if (lastCheckedIndex === -1) { // 선택된 행이 없으면 맨 뒤에 추가
       setTransactions(prev => [...prev, newRow]);
@@ -414,7 +421,7 @@ const Transactions = () => {
         title: '알림',
         message: '삭제할 행을 선택하세요.',
         onConfirm: () => setConfirmPopup({ ...confirmPopup, isOpen: false }),
-        onCancel: undefined,        
+        onCancel: undefined,
       });
       return;
     }
@@ -428,7 +435,7 @@ const Transactions = () => {
         setCheckedRows(new Set());
         setConfirmPopup({ ...confirmPopup, isOpen: false });
       },
-      onCancel: () => setConfirmPopup({ ...confirmPopup, isOpen: false }),      
+      onCancel: () => setConfirmPopup({ ...confirmPopup, isOpen: false }),
     });
   };
 
@@ -543,7 +550,7 @@ const Transactions = () => {
   };
 
   // 엑셀 팝업 외부 클릭 감지 후 닫기
-    useEffect(() => {
+  useEffect(() => {
     if (!isExcelPopupOpen) return;
 
     const handleOutsideClick = (event: MouseEvent) => {
@@ -629,9 +636,16 @@ const Transactions = () => {
           newRow.account_name = selectedAccount ? selectedAccount.name : null;
         }
         if (column === 'type') {
-          newRow.major_category_name = null;
-          newRow.minor_category_uuid = null;
-          newRow.minor_category_name = null;
+          const oldType = row.type;
+          const newType = value as Transaction['type'];
+          const expenseTypes = ['고정지출', '반고정지출', '유동지출'];
+          const bothExpense = expenseTypes.includes(oldType) && expenseTypes.includes(newType);
+          const sameCategory = (oldType === '수입' && newType === '수입') || (oldType === '이체' && newType === '이체');
+          if (!bothExpense && !sameCategory) {
+            newRow.major_category_name = null;
+            newRow.minor_category_uuid = null;
+            newRow.minor_category_name = null;
+          }
         }
         if (column === 'major_category_name') {
           newRow.minor_category_uuid = null;
@@ -650,22 +664,24 @@ const Transactions = () => {
           const strValue = String(value);
           const isIncomeAmount = strValue.startsWith('+');
           const numValue = parseInt(strValue.replace(/[+,]/g, ''), 10) || 0;
-          newRow.amount = isIncomeAmount ? numValue : -Math.abs(numValue);
-          // 금액과 유형이 맞지 않는경우 알림 출력
-          const type = newRow.type;
-          const expenseTypes = ['고정지출', '반고정지출', '유동지출'];
-          const condition1 = type === '수입' && !isIncomeAmount; // 수입 금액인데 유형이 수입이 아님(이체는 제외)
-          const condition2 = expenseTypes.includes(type) && isIncomeAmount; // 지출 금액인데 유형이 지출이 아님(이체는 제외)
-          
-          if (condition1 || condition2) {
-            setConfirmPopup({
-              isOpen: true,
-              type: 'alert', // 일반 정보 팝업
-              title: '유형/금액 불일치 경고',
-              message: `유형(${type})과 금액(${isIncomeAmount ? '양수 값' : '음수 값'})이 일치하지 않습니다.`,
-              onConfirm: () => setConfirmPopup({ ...confirmPopup, isOpen: false }),
-              onCancel: undefined,
-            });
+          newRow.amount = numValue === 0 ? null : (isIncomeAmount ? numValue : -Math.abs(numValue));
+          // 금액과 유형이 맞지 않는경우 알림 출력(null일때만)
+          if (newRow.amount !== null) {
+            const type = newRow.type;
+            const expenseTypes = ['고정지출', '반고정지출', '유동지출'];
+            const condition1 = type === '수입' && !isIncomeAmount; // 수입 금액인데 유형이 수입이 아님(이체는 제외)
+            const condition2 = expenseTypes.includes(type) && isIncomeAmount; // 지출 금액인데 유형이 지출이 아님(이체는 제외)
+
+            if (condition1 || condition2) {
+              setConfirmPopup({
+                isOpen: true,
+                type: 'alert', // 일반 정보 팝업
+                title: '유형/금액 불일치 경고',
+                message: `유형(${type})과 금액(${isIncomeAmount ? '양수 값' : '음수 값'})이 일치하지 않습니다.`,
+                onConfirm: () => setConfirmPopup({ ...confirmPopup, isOpen: false }),
+                onCancel: undefined,
+              });
+            }
           }
         }
         return newRow;
@@ -748,8 +764,8 @@ const Transactions = () => {
       filtered = [...filtered].sort((a, b) => {
         const aValue = a[sortConfig.key];
         const bValue = b[sortConfig.key];
-        if ( aValue === null || aValue === undefined ) return 1;
-        if ( bValue === null || bValue === undefined ) return -1;
+        if (aValue === null || aValue === undefined) return 1;
+        if (bValue === null || bValue === undefined) return -1;
         if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
         if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
         return 0;
@@ -840,16 +856,9 @@ const Transactions = () => {
       </th>
     );
   };
-  
+
   const renderCell = (transaction: Transaction, column: keyof Transaction) => {
     const isEditing = editingCell?.rowId === transaction.id && editingCell?.column === column;
-    // const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
-    //   if (['amount', 'merchant', 'memo'].includes(column)) {
-    //     handleUpdateCell(transaction.id, column, (e.target as HTMLInputElement).value);
-    //   }
-    //   setEditingCell(null);
-    // };
-    // const commonProps = { onBlur: () => handleBlur, autoFocus: true };
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Enter') {
         handleUpdateCell(transaction.id, column, e.currentTarget.value);
@@ -860,9 +869,10 @@ const Transactions = () => {
     };
 
     if (isEditing) {
-      const commonProps = { ref:editingCellRef, autoFocus: true }
+      const commonProps = { ref: editingCellRef, autoFocus: true }
       switch (column) {
         case 'transaction_date':
+          console.log('rendering date picker for', transaction.id);
           return (
             <td className="editing">
               <DatePicker
@@ -885,6 +895,13 @@ const Transactions = () => {
                 locale={ko}
                 popperClassName='dp-popper'
                 calendarClassName='dp-calendar'
+                showYearDropdown
+                showMonthDropdown
+                dropdownMode='scroll'
+                scrollableYearDropdown
+                yearDropdownItemNumber={10}
+                // minDate={new Date(2020, 0, 1)}
+                // maxDate={new Date(2030, 12, 31)}
                 dayClassName={(date) => {
                   const d = date;
                   const formatted = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -897,15 +914,8 @@ const Transactions = () => {
           return (
             <td className="editing">
               <input {...commonProps} type="text" defaultValue={transaction.account_name ?? ''} onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === 'Escape') setEditingCell(null); 
+                if (e.key === 'Enter' || e.key === 'Escape') setEditingCell(null);
               }} />
-              {/* <select {...commonProps} value={transaction.account_id ?? ''} onChange={(e) => {
-                handleUpdateCell(transaction.id, 'account_id', parseInt(e.target.value));
-                setEditingCell(null);
-              }}>
-                <option value="" disabled>-- 계좌 선택 --</option>
-                {appData.accounts.map(acc => <option key={acc.id} value={acc.id}>{acc.name}</option>)}
-              </select> */}
             </td>
           );
         case 'type':
@@ -914,13 +924,6 @@ const Transactions = () => {
               <input {...commonProps} type="text" defaultValue={transaction.type} onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === 'Escape') setEditingCell(null);
               }} />
-              {/* <select {...commonProps} value={transaction.type} onChange={(e) => {
-                handleUpdateCell(transaction.id, 'type', e.target.value);
-                setEditingCell(null);
-              }}>
-                <option value="" disabled>-- 선택 --</option>
-                {TRANSACTION_TYPES.map(type => <option key={type} value={type}>{type}</option>)}
-              </select> */}
             </td>
           );
         case 'major_category_name': {
@@ -940,18 +943,6 @@ const Transactions = () => {
               <input {...commonProps} type="text" defaultValue={transaction.major_category_name ?? ''} onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === 'Escape') setEditingCell(null);
               }} />
-              {/* <select
-                {...commonProps}
-                value={transaction.major_category_name ?? ''}
-                onChange={(e) => {
-                  handleUpdateCell(transaction.id, 'major_category_name', e.target.value);
-                  setEditingCell(null);
-                }}
-                disabled={!transaction.type}
-              >
-                <option value="" disabled>-- 대분류 --</option>
-                {availableMajors.map(major => <option key={major.id} value={major.name}>{major.name}</option>)}
-              </select> */}
             </td>
           );
         }
@@ -963,18 +954,6 @@ const Transactions = () => {
               <input {...commonProps} type="text" defaultValue={transaction.minor_category_name ?? ''} onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === 'Escape') setEditingCell(null);
               }} />
-              {/* <select
-                {...commonProps}
-                value={transaction.minor_category_uuid ?? ''}
-                onChange={(e) => {
-                  handleUpdateCell(transaction.id, 'minor_category_uuid', e.target.value);
-                  setEditingCell(null); // 선택 후 바로 편집 모드 종료
-                }}
-                disabled={!transaction.major_category_name}
-              >
-                <option value="" disabled>-- 소분류 --</option>
-                {availableMinors.map(minor => <option key={minor.uuid} value={minor.uuid}>{minor.name}</option>)}
-              </select> */}
             </td>
           );
         }
@@ -990,6 +969,7 @@ const Transactions = () => {
             </td>
           );
         default: // 거래처, 메모 등
+          console.log('rendering text input for', transaction.id, column);
           return (
             <td className="editing">
               <input
@@ -1019,27 +999,26 @@ const Transactions = () => {
         displayValue = <span className="placeholder">-- 금액 --</span>;
       } else {
         displayValue = amount.toLocaleString();
-      className = amount >= 0 ? 'amount-income' : 'amount-expense';
+        className = amount >= 0 ? 'amount-income' : 'amount-expense';
       }
     } else if (column === 'merchant') {
-        if (cellValue === '') {
-          displayValue = <span className="placeholder">-- 거래처 --</span>;
-        } else{0.
-          displayValue = cellValue;
-        }
-        const merchantText = displayValue;
-        return(
-          <td id={cellId} onClick={() => setEditingCell({ rowId: transaction.id, column })}>
+      if (cellValue === '') {
+        displayValue = <span className="placeholder">-- 거래처 --</span>;
+      }
+      const merchantText = displayValue;
+      return (
+        <td id={cellId} onClick={() => setEditingCell({ rowId: transaction.id, column })}>
           {transaction.highlight_color_id > 0 ? (
             <span className={`text-highlight-${transaction.highlight_color_id}`}>
               {merchantText}
             </span>
-          ):(merchantText)}
-          </td>
-        );
+          ) : (merchantText)}
+        </td>
+      );
     }
+
     const onCellClick = (e: React.MouseEvent) => {
-      if(['account_name', 'type', 'major_category_name', 'minor_category_name'].includes(String(column))) {
+      if (['account_name', 'type', 'major_category_name', 'minor_category_name'].includes(String(column))) {
         const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
         const pos = { top: rect.bottom + window.scrollY + 2, left: rect.left + window.scrollX, width: rect.width };
         // 옵션 생성 및 select open 콜백
@@ -1077,6 +1056,17 @@ const Transactions = () => {
           return;
         }
         if (column === 'minor_category_name') {
+          if (!transaction.major_category_name) {
+            setConfirmPopup({
+              isOpen: true,
+              type: 'alert',
+              title: '',
+              message: '대분류를 먼저 선택해주세요.',
+              onConfirm: () => setConfirmPopup(prev => ({ ...prev, isOpen: false })),
+              onCancel: undefined,
+            });
+            return;
+          }
           const major = appData.categories.find(c => c.name === transaction.major_category_name);
           const availableMinors = major ? major.minors : [];
           const opts: Opt[] = availableMinors.map(m => ({ value: m.uuid, label: m.name }));
@@ -1091,201 +1081,222 @@ const Transactions = () => {
     };
 
     return (
-      // <td id={cellId} className={className} onClick={() => setEditingCell({ rowId: transaction.id, column })}>
       <td id={cellId} className={className} onClick={onCellClick}>
         {displayValue}
       </td>
     );
   };
 
-  
+
   // ******* 메인 렌더링 *******
   return (
     <>
-    <div className='transactions-page'>
-      <header className="main-header">
-        <div className="header-title-group">
-          <h1>Transactions</h1>
-          <div className="header-actions">
-            <button className={`icon-button-round ${isDirty ? 'active' : ''}`} onClick={handleSave} title="Save Changes" disabled={!isDirty}><FaSave /></button>
-            <button className="icon-button-round" onClick={handleReset} title="초기화"><FaUndo /></button>
-            {ocrLoading && (
-              <div className="ocr-loading-overlay">
-                <div className="ocr-loading-box">
-                  <span>{ocrLoadingText}</span>
-                  {/* 필요시 스피너 아이콘 등 추가 */}
+      <div className='transactions-page'>
+        <header className="main-header">
+          <div className="header-title-group">
+            <h1>Transactions</h1>
+            <div className="header-actions">
+              <button className={`icon-button-round ${isDirty ? 'active' : ''}`} onClick={handleSave} title="Save Changes" disabled={!isDirty}><FaSave /></button>
+              <button className="icon-button-round" onClick={handleReset} title="초기화"><FaUndo /></button>
+              {ocrLoading && (
+                <div className="ocr-loading-overlay">
+                  <div className="ocr-loading-box">
+                    <div className='loading-spinner'></div>
+                    <span>&nbsp;{ocrLoadingText}</span>
+                    {/* 필요시 스피너 아이콘 등 추가 */}
+                  </div>
                 </div>
-              </div>
-            )}
-            <span className="status-text">{status}</span>
+              )}
+              <span className="status-text">{status}</span>
+            </div>
           </div>
-        </div>
-      </header>
-      <div className="content-area transactions-page">
-        {/* 상단 툴바 */}
-        <div className="transactions-toolbar card">
-          <button onClick={handleAddRow}>
-            {hasCheckedRows ? <FaArrowRight /> : <FaPlus />}
-            {hasCheckedRows ? ' 행 삽입' : ' 행 추가'}
-          </button>
-          <button onClick={handleDeleteSelected}><FaTrash /> 행 삭제</button>
-          <button onClick={handleClearAllFilters}><FaFilter /> 전체 필터 해제</button>
-          <button onClick={handleScrollToBottom}><FaAngleDoubleDown /> 맨 아래로</button>
-          <div className="divider"></div>
-          <button onClick={handleApplyBold} disabled={!hasCheckedRows} title="굵게"><FaBold /></button>
-          <button onClick={(e) => handleOpenColorPopup(e, 'flag')} disabled={!hasCheckedRows} title="플래그"><FaFlag /></button>
-          <button onClick={(e) => handleOpenColorPopup(e, 'highlight')} disabled={!hasCheckedRows} title="형광펜"><FaHighlighter /></button>
-          <button onClick={(e) => handleOpenColorPopup(e, 'background')} disabled={!hasCheckedRows} title="배경색"><FaFillDrip /></button>
-          <div className="divider"></div>
-          <button className="primary" onClick={() => setIsFormModalOpen(true)}>내역입력 폼 열기</button>
-          <button className="primary" ref={ocrButtonRef} onClick={() => setOcrModalOpen(true)}>딥러닝 자동입력</button>
-          <button className="primary xel" ref={excelButtonRef} onClick={handleOpenExcelPopup} title='엑셀 가져오기/내보내기'><RiFileExcel2Fill /></button>
-        </div>
+        </header>
+        <div className="content-area transactions-page">
+          {/* 상단 툴바 */}
+          <div className="transactions-toolbar card">
+            <button onClick={handleAddRow}>
+              {hasCheckedRows ? <FaArrowRight /> : <FaPlus />}
+              {hasCheckedRows ? ' 행 삽입' : ' 행 추가'}
+            </button>
+            <button onClick={handleDeleteSelected}><FaTrash /> 행 삭제</button>
+            <button onClick={handleClearAllFilters}><FaFilter /> 전체 필터 해제</button>
+            <button onClick={handleScrollToBottom}><FaAngleDoubleDown /> 맨 아래로</button>
+            <div className="divider"></div>
+            <button onClick={handleApplyBold} disabled={!hasCheckedRows} title="굵게"><FaBold /></button>
+            <button onClick={(e) => handleOpenColorPopup(e, 'flag')} disabled={!hasCheckedRows} title="플래그"><FaFlag /></button>
+            <button onClick={(e) => handleOpenColorPopup(e, 'highlight')} disabled={!hasCheckedRows} title="형광펜"><FaHighlighter /></button>
+            <button onClick={(e) => handleOpenColorPopup(e, 'background')} disabled={!hasCheckedRows} title="배경색"><FaFillDrip /></button>
+            <div className="divider"></div>
+            <button className="primary" onClick={() => setIsFormModalOpen(true)}>내역입력 폼 열기</button>
+            <button className="primary" ref={ocrButtonRef} onClick={() => setOcrModalOpen(true)}>딥러닝 자동입력</button>
+            <button className="primary xel" ref={excelButtonRef} onClick={handleOpenExcelPopup} title='엑셀 가져오기/내보내기'><RiFileExcel2Fill /></button>
+          </div>
 
-        {/* 거래내역 테이블 */}
-        <div className="table-container" ref={tableContainerRef}>
-          <table>
-            <thead>
-              <tr>
-                {/* TODO: 각 헤더에 필터 버튼 추가 */}
-                <th>
-                <input
-                  type="checkbox"
-                  onChange={handleToggleCheckAll}
-                  // 보이는 행이 모두 체크되었을 때만 '전체 선택' 체크박스 활성화
-                  checked={processedTransactions.length > 0 && processedTransactions.every(t => checkedRows.has(t.id))}
-                />
-              </th>
-                {renderHeader('transaction_date', '날짜')}
-                {renderHeader('account_name', '계좌')}
-                {renderHeader('type', '유형')}
-                {renderHeader('major_category_name', '대분류')}
-                {renderHeader('minor_category_name', '소분류')}
-                {renderHeader('amount', '금액')}
-                {renderHeader('merchant', '거래처')}
-                {renderHeader('memo', '메모')}
-              </tr>
-            </thead>
-            <tbody>
-              {processedTransactions.map((transaction) => {
-                // 3가지 스타일 클래스를 모두 조합
-                const classNames = [
-                  transaction.is_bold ? 'bold-row' : '',
-                  transaction.flag_color_id > 0 ? `flag-${transaction.flag_color_id}` : '',
-                  transaction.highlight_color_id > 0 ? `highlight-${transaction.highlight_color_id}` : '',
-                  transaction.background_color_id > 0 ? `bg-${transaction.background_color_id}` : '',
-                ].filter(Boolean).join(' '); // 빈 문자열을 제거하고 공백으로 합침
-                
-                return(
-                  <tr key={transaction.id} id={`row-${transaction.id}`} className={classNames.trim()}>
-                  <td>
-                  <input
-                    type="checkbox"
-                    checked={checkedRows.has(transaction.id)}
-                    onChange={() => handleToggleCheck(transaction.id)}
-                  />
-                </td>
-                  {renderCell(transaction, 'transaction_date')}
-                  {renderCell(transaction, 'account_name')}
-                  {renderCell(transaction, 'type')}
-                  {renderCell(transaction, 'major_category_name')}
-                  {renderCell(transaction, 'minor_category_name')}
-                  {renderCell(transaction, 'amount')}
-                  {renderCell(transaction, 'merchant')}
-                  {renderCell(transaction, 'memo')}
+          {/* 거래내역 테이블 */}
+          <div className="table-container" ref={tableContainerRef}>
+            <table className='table-transaction'>
+              <thead>
+                <tr>
+                  {/* TODO: 각 헤더에 필터 버튼 추가 */}
+                  <th>
+                    <input
+                      type="checkbox"
+                      onChange={handleToggleCheckAll}
+                      // 보이는 행이 모두 체크되었을 때만 '전체 선택' 체크박스 활성화
+                      checked={processedTransactions.length > 0 && processedTransactions.every(t => checkedRows.has(t.id))}
+                    />
+                  </th>
+                  {renderHeader('transaction_date', '날짜')}
+                  {renderHeader('account_name', '계좌')}
+                  {renderHeader('type', '유형')}
+                  {renderHeader('major_category_name', '대분류')}
+                  {renderHeader('minor_category_name', '소분류')}
+                  {renderHeader('amount', '금액')}
+                  {renderHeader('merchant', '거래처')}
+                  {renderHeader('memo', '메모')}
                 </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-        {/* OCR 모달 */}
-        <OcrImageUploadModal
-          isOpen={ocrModalOpen}
-          onClose={() => setOcrModalOpen(false)}
-          onUpload={handleOcrUpload}
-          anchorRef={ocrButtonRef}
-        />
-        {/* 내역입력 폼 모달 */}
-        <TransactionFormModal
-          isOpen={isFormModalOpen}
-          onClose={handleCloseFormModal}
-          onInsert={handleInsertTransactions}
-          appData={appData}
-          allTransactions={originalTransactions}
-          insertedCount={insertedCount}
-          setInsertedCount={setInsertedCount}
-        />
-        {/* OCR 미리보기 팝업 */}
-        <OcrPreviewTableModal
-          open={ocrPreviewOpen}
-          rows={ocrPreviewRows}
-          onClose={() => setOcrPreviewOpen(false)}
-          onInsert={handleOcrInsert}
-          appData={appData}
-          TRANSACTION_TYPES={TRANSACTION_TYPES}
-        />
-        {/* 플로팅 셀렉트 컴포넌트 */}
-        <FloatingSelectPopup ref={floatingSelectRef} />
-        {/* 필터 팝업 조건부 렌더링 */}
-        {activeFilter && (
-          <FilterPopup
-            columnKey={activeFilter.column}
-            columnName={activeFilter.name}
-            allValues={transactions.map(t => t[activeFilter.column])}
-            appliedFilters={filters[activeFilter.column] || []}
-            onApply={handleApplyFilter}
-            onClose={() => setActiveFilter(null)}
-            onSort={handleSort}
-            onClearFilter={handleClearColumnFilter}
-            position={popupPosition}
-          />
-        )}
-        {/* 확인/경고 팝업 조건부 렌더링 */}
-        <ConfirmPopup
-          isOpen={confirmPopup.isOpen}
-          title={confirmPopup.title}
-          message={confirmPopup.message}
-          onConfirm={confirmPopup.onConfirm}
-          onCancel={confirmPopup.onCancel}
-          type={confirmPopup.type}
-        />
-        {/* 하이라이트 팝업 조건부 렌더링 */}
-        {isColorPopupOpen && (
-          <HighlightPopup
-            position={colorPopupPosition}
-            onSelectColor={handleApplyColor}
-            onClose={() => setColorPopupOpen(false)}
-            title={activeStyleType === 'flag' ? 'Flag' : activeStyleType === 'highlight' ? 'Highlight' : 'Background'}
-          />
-        )}
-        {/* 엑셀 팝업 조건부 렌더링 */}
-        {isExcelPopupOpen && (
-          <div ref={excelPopupRef} className="excel-popup" style={{ top: excelPopupPosition.top, left: excelPopupPosition.left }}>
-            <button onClick={handleDownloadTemplate}><FaFileDownload /> 엑셀 템플릿 받기</button>
-            <button onClick={handleImportClick}><FaFileImport /> 불러오기</button>
-            <button onClick={handleExportData}><FaFileExport /> 내보내기</button>
+              </thead>
+              <tbody>
+                {processedTransactions.map((transaction) => {
+                  // 3가지 스타일 클래스를 모두 조합
+                  const classNames = [
+                    transaction.is_bold ? 'bold-row' : '',
+                    transaction.flag_color_id > 0 ? `flag-${transaction.flag_color_id}` : '',
+                    transaction.highlight_color_id > 0 ? `highlight-${transaction.highlight_color_id}` : '',
+                    transaction.background_color_id > 0 ? `bg-${transaction.background_color_id}` : '',
+                  ].filter(Boolean).join(' '); // 빈 문자열을 제거하고 공백으로 합침
+
+                  return (
+                    <tr key={transaction.id} id={`row-${transaction.id}`} className={classNames.trim()}>
+                      <td>
+                        <input
+                          type="checkbox"
+                          checked={checkedRows.has(transaction.id)}
+                          onChange={() => handleToggleCheck(transaction.id)}
+                        />
+                      </td>
+                      {renderCell(transaction, 'transaction_date')}
+                      {renderCell(transaction, 'account_name')}
+                      {renderCell(transaction, 'type')}
+                      {renderCell(transaction, 'major_category_name')}
+                      {renderCell(transaction, 'minor_category_name')}
+                      {renderCell(transaction, 'amount')}
+                      {renderCell(transaction, 'merchant')}
+                      {renderCell(transaction, 'memo')}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
-        )}
-        {/* 엑셀 모달 */}
-        <ExcelImportModal
-          open={isExcelModalOpen}
-          importedData={excelImportData}
-          onClose={() => setIsExcelModalOpen(false)}
-          onInsert={handleExcelInsert}
-          appData={appData}
-          TRANSACTION_TYPES={TRANSACTION_TYPES}
-        />
-        {/* 숨겨진 파일 입력 필드 추가 */}
-        <input
-          type="file"
-          ref={fileInputRef}
-          style={{ display: 'none' }}
-          accept=".xlsx, .xls"
-          onChange={handleFileChange}
-        />
+          {/* OCR 모달 */}
+          <OcrImageUploadModal
+            isOpen={ocrModalOpen}
+            onClose={() => setOcrModalOpen(false)}
+            onUpload={handleOcrUpload}
+            anchorRef={ocrButtonRef}
+          />
+          {/* 내역입력 폼 모달 */}
+          <TransactionFormModal
+            isOpen={isFormModalOpen}
+            onClose={handleCloseFormModal}
+            onInsert={handleInsertTransactions}
+            appData={appData}
+            allTransactions={originalTransactions}
+            insertedCount={insertedCount}
+            setInsertedCount={setInsertedCount}
+          />
+          {/* OCR 미리보기 팝업 */}
+          <OcrPreviewTableModal
+            open={ocrPreviewOpen}
+            rows={ocrPreviewRows}
+            onClose={() => setOcrPreviewOpen(false)}
+            onInsert={handleOcrInsert}
+            appData={appData}
+            TRANSACTION_TYPES={TRANSACTION_TYPES}
+          />
+          {/* 플로팅 셀렉트 컴포넌트 */}
+          <FloatingSelectPopup ref={floatingSelectRef} />
+          {/* 필터 팝업 조건부 렌더링 */}
+          {activeFilter && (
+            <FilterPopup
+              columnKey={activeFilter.column}
+              columnName={activeFilter.name}
+              allValues={(() => {
+                // 현재 클릭한 컬럼을 제외한 다른 필터 개수 계산
+                const otherFiltersCount = Object.keys(filters).filter(key => key !== activeFilter.column).length;
+
+                // 다른 필터가 없으면(첫 번째 필터) 전체 거래내역 기준
+                if (otherFiltersCount === 0) {
+                  return transactions.map(t => t[activeFilter.column]);
+                }
+
+                // 다른 필터가 있으면 현재 필터링된 결과 기준
+                // 현재 클릭한 컬럼의 필터만 제외하고 나머지 필터 적용
+                const tempFiltered = transactions.filter(transaction => {
+                  return Object.entries(filters).every(([key, selectedValues]) => {
+                    if (key === activeFilter.column) return true; // 현재 컬럼 필터는 무시
+                    if (selectedValues.length === 0) return true;
+                    const transactionValue = transaction[key as keyof Transaction];
+                    return selectedValues.includes(transactionValue);
+                  });
+                });
+
+                return tempFiltered.map(t => t[activeFilter.column]);
+              })()}
+              appliedFilters={filters[activeFilter.column] || []}
+              onApply={handleApplyFilter}
+              onClose={() => setActiveFilter(null)}
+              onSort={handleSort}
+              onClearFilter={handleClearColumnFilter}
+              position={popupPosition}
+            />
+          )}
+          {/* 확인/경고 팝업 조건부 렌더링 */}
+          <ConfirmPopup
+            isOpen={confirmPopup.isOpen}
+            title={confirmPopup.title}
+            message={confirmPopup.message}
+            onConfirm={confirmPopup.onConfirm}
+            onCancel={confirmPopup.onCancel}
+            type={confirmPopup.type}
+          />
+          {/* 하이라이트 팝업 조건부 렌더링 */}
+          {isColorPopupOpen && (
+            <HighlightPopup
+              position={colorPopupPosition}
+              onSelectColor={handleApplyColor}
+              onClose={() => setColorPopupOpen(false)}
+              title={activeStyleType === 'flag' ? 'Flag' : activeStyleType === 'highlight' ? 'Highlight' : 'Background'}
+            />
+          )}
+          {/* 엑셀 팝업 조건부 렌더링 */}
+          {isExcelPopupOpen && (
+            <div ref={excelPopupRef} className="excel-popup" style={{ top: excelPopupPosition.top, left: excelPopupPosition.left }}>
+              <button onClick={handleDownloadTemplate}><FaFileDownload /> 엑셀 템플릿 받기</button>
+              <button onClick={handleImportClick}><FaFileImport /> 불러오기</button>
+              <button onClick={handleExportData}><FaFileExport /> 내보내기</button>
+            </div>
+          )}
+          {/* 엑셀 모달 */}
+          <ExcelImportModal
+            open={isExcelModalOpen}
+            importedData={excelImportData}
+            onClose={() => setIsExcelModalOpen(false)}
+            onInsert={handleExcelInsert}
+            appData={appData}
+            TRANSACTION_TYPES={TRANSACTION_TYPES}
+          />
+          {/* 숨겨진 파일 입력 필드 추가 */}
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            accept=".xlsx, .xls"
+            onChange={handleFileChange}
+          />
+        </div>
       </div>
-    </div>
     </>
   );
 };
