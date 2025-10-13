@@ -208,7 +208,7 @@ const Categories = () => {
         setAlertInfo({
           isOpen: true,
           type: 'alert',
-          message: `계좌 '${account.name}'는 거래내역에서 사용 중이므로 삭제할 수 없습니다.`,
+          message: `계좌 '${account.name}'은(는)\n거래내역에서 사용 중이므로 삭제할 수 없습니다.`,
           onConfirm: () => setAlertInfo({ ...alertInfo, isOpen: false }),
         });
         return;
@@ -359,7 +359,7 @@ const Categories = () => {
         setAlertInfo({
           isOpen: true,
           type: 'alert',
-          message: `카테고리 '${majorCategory?.name}-${minorCategory.name}'는 거래내역에서 사용 중이므로 삭제할 수 없습니다.`,
+          message: `카테고리 '${majorCategory?.name}-${minorCategory.name}'은(는)\n거래내역에서 사용 중이므로 삭제할 수 없습니다.`,
           onConfirm: () => setAlertInfo({ ...alertInfo, isOpen: false }),
         });
         return;
