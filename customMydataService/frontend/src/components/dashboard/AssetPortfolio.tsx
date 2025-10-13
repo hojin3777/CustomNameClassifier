@@ -1,17 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { PieChart, Pie, Cell, Label, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Brush, Legend } from 'recharts';
-import { PiChartDonutFill } from 'react-icons/pi';
-import { AiOutlineAreaChart } from 'react-icons/ai';
+import {  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Brush, Legend } from 'recharts';
 import './AssetPortfolio.css';
 
 const API_BASE_URL = 'http://localhost:5000';
 
 // ****** 타입 정의 ******
-interface AccountBalance {
-    account_name: string;
-    balance: number;
-}
-
 interface MonthlyAccountData {
     month: string;
     accounts: {
@@ -137,8 +130,6 @@ const AssetPortfolio: React.FC<AssetPortfolioProps> = () => {
     // ****** 커스텀 범례 추가 ******
     const CustomLegend = (props: any) => {
         const { payload } = props;
-
-        const lastMonthTotal = areaChartData.length > 0 ? areaChartData[areaChartData.length - 1].total : 0;
         // account_id 순서대로 정렬된 payload
         const sortedPayload = [...payload].sort((a, b) => {
             const indexA = allAccountNames.indexOf(a.value);
@@ -188,10 +179,10 @@ const AssetPortfolio: React.FC<AssetPortfolioProps> = () => {
 
     // ****** 이중 X축 렌더링 함수 ******
     // 월 표시 (숫자만)
-    const monthTickFormatter = (tick: string) => {
-        return tick.substring(2, 4) + '-' + tick.substring(5); // "2024-08" → "24-08"
-        // return tick.substring(5); // "2024-08" → "08"
-    };
+    // const monthTickFormatter = (tick: string) => {
+    //     return tick.substring(2, 4) + '-' + tick.substring(5); // "2024-08" → "24-08"
+    //     // return tick.substring(5); // "2024-08" → "08"
+    // };
     const renderMonthTick = (props: any) => {
         const { x, y, payload } = props;
         const tick = payload.value;
@@ -216,7 +207,7 @@ const AssetPortfolio: React.FC<AssetPortfolioProps> = () => {
         );
     };
 
-    const brushTickFormatter = (tick: string, index: number) => {
+    const brushTickFormatter = (tick: string) => {
         const month = tick.substring(5); // "MM"
         const year = tick.substring(2, 4); // "YY"
 

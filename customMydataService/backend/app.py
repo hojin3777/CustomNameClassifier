@@ -1,17 +1,18 @@
 import os
+import sys
+from pathlib import Path
 import sqlite3
 import uuid
 import torch
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
-from datetime import date
+from datetime import datetime
 from werkzeug.utils import secure_filename
 
 # 유틸리티 모듈
 import ocr_service
 import classification_service
 import database
-from database import DB_FOLDER
 import category_utils
 import account_utils
 import transaction_utils
@@ -25,6 +26,91 @@ CORS(app)  # 모든 도메인에서의 요청 허용 (개발 단계에서만 사
 
 # --- 서버 시작 시 한 번만 모델 및 DB 로드 ---
 print("Starting server...")
+
+# ****** 헬스체크 API ******
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    """백엔드 서버 상태 확인"""
+    return jsonify({
+        'status': 'ok',
+        'message': 'Backend is ready',
+        'timestamp': datetime.now().isoformat()
+    }), 200
+
+# ****** 프론트엔드 정적 파일 서빙 (Electron 빌드 시) ******
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_frontend(path):
+    """프론트엔드 정적 파일 제공"""
+    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+    else:
+        return send_from_directory(app.static_folder, 'index.html')
+
+# ****** 패키징 환경 감지 ******
+IS_PACKAGED = os.getenv('IS_PACKAGED', 'false') == 'true'
+RESOURCE_PATH = os.getenv('RESOURCE_PATH', os.path.dirname(os.path.abspath(__file__)))
+
+print(f"🔧 IS_PACKAGED: {IS_PACKAGED}")
+print(f"📂 RESOURCE_PATH: {RESOURCE_PATH}")
+
+# ****** DB 폴더 경로 설정 ******
+DB_FOLDER = str(Path.home() / '.customMydataService')  # ✨ DB_FOLDER 정의
+os.makedirs(DB_FOLDER, exist_ok=True)
+
+# ****** 업로드 폴더 설정 ******
+UPLOAD_FOLDER = os.path.join(DB_FOLDER, 'uploads')  # ✨ 이제 정상 작동
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# ****** DB 경로 설정 ******
+def get_db_path():
+    """사용자 홈 디렉토리에 DB 경로 반환"""
+    user_home = Path.home()
+    app_dir = user_home / '.customMydataService'
+    
+    # 폴더가 없으면 생성
+    if not app_dir.exists():
+        app_dir.mkdir(parents=True, exist_ok=True)
+        print(f"Created app directory: {app_dir}")
+    
+    db_path = app_dir / 'mydata.db'
+    print(f"Database path: {db_path}")
+    
+    return str(db_path)
+
+# DB 경로 전역 변수
+DB_PATH = get_db_path()
+
+# ****** 리소스 경로 가져오기 ******
+def get_resource_path(relative_path):
+    """
+    패키징 여부에 따라 리소스 절대 경로 반환
+    """
+    if IS_PACKAGED:
+        # ✨ 패키징된 경우: RESOURCE_PATH 기준
+        base_path = RESOURCE_PATH
+    else:
+        # ✨ 개발 환경: 현재 파일 기준
+        base_path = os.path.dirname(os.path.abspath(__file__))
+    
+    full_path = os.path.join(base_path, relative_path)
+    print(f"🔍 Resource path for '{relative_path}': {full_path}")
+    return full_path
+
+# ****** 모델 경로 설정 ******
+if IS_PACKAGED:
+    # 프로덕션 모드: 패키징된 리소스 사용
+    OCR_MODEL_PATH = get_resource_path('backend/models/best.pt')
+else:
+    # 개발 모드: 절대 경로 사용
+    OCR_MODEL_PATH = 'C:/code/customOCR/bank_statement_detector/yolov8l_e50_bs8_0828/weights/best.pt'
+
+print(f"🤖 YOLO Model: {OCR_MODEL_PATH}")
+
+# ✨ 모델 파일 존재 확인
+if not os.path.exists(OCR_MODEL_PATH):
+    print(f"⚠️  WARNING: YOLO model not found at {OCR_MODEL_PATH}")
 
 # 1. DB 초기화
 try:

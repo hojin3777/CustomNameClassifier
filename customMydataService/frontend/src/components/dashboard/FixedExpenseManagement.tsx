@@ -115,7 +115,7 @@ const FixedExpenseManagement: React.FC<FixedExpenseManagementProps> = ({ months,
 
         const handleScroll = (e: Event) => {
             const target = e.target as Node | null;
-            const popupElement = document.querySelector('.detail-popup-tooltip-fexpense');
+            // const popupElement = document.querySelector('.detail-popup-tooltip-fexpense');
             const popupBody = document.querySelector('.detail-popup-body-fexpense');
 
             // 팝업 내부 스크롤은 무시

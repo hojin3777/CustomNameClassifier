@@ -8,7 +8,6 @@ import './DatePickerOverrides.css'; // DatePicker 커스텀 CSS 재사용
 
 // Transactions.tsx와 유사한 타입 정의
 import { type CategoryItem, type Transaction, type Appdata } from '../../pages/Transactions';
-import { Route } from 'react-router-dom';
 
 type ExcelRow = Omit<Transaction, 'id' | 'checked' | 'is_bold' | 'flag_color_id' | 'highlight_color_id' | 'background_color_id'> & {
   id: string;
@@ -24,8 +23,6 @@ type ExcelImportModalProps = {
   appData: Appdata;
   TRANSACTION_TYPES: string[];
 };
-
-const API_BASE_URL = 'http://localhost:5000';
 
 const ExcelImportModal: React.FC<ExcelImportModalProps> = ({
   open, importedData, onClose, onInsert, appData, TRANSACTION_TYPES

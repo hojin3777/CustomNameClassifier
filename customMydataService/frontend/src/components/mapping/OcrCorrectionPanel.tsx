@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { FaPlus, FaTrash } from 'react-icons/fa';
 
 // 타입 정의
@@ -14,7 +14,7 @@ interface Props {
   onUpdate: (newData: OcrCorrection[]) => void;
 }
 
-const OcrCorrectionPanel: React.FC<Props> = ({ data, initialData, onUpdate }) => {
+const OcrCorrectionPanel: React.FC<Props> = ({ data, onUpdate }) => {
   const [selectedIds, setSelectedIds] = useState<Set<number | string>>(new Set());
   const [editingCell, setEditingCell] = useState<{ id: number | string; field: keyof Omit<OcrCorrection, 'id'>; originalValue: string } | null>(null);
 

@@ -17,7 +17,7 @@ interface Props {
   onUpdate: (newData: RuleBasedMapping[]) => void;
 }
 
-const RuleBasedMappingPanel: React.FC<Props> = ({ data, initialData, categories, onUpdate }) => {
+const RuleBasedMappingPanel: React.FC<Props> = ({ data, categories, onUpdate }) => {
   const [selectedIds, setSelectedIds] = useState<Set<number | string>>(new Set());
   const [editingCell, setEditingCell] = useState<{
     id: number | string;

@@ -151,11 +151,11 @@ const TransactionFormModal: React.FC<TransactionFormModalProps> = ({
   };
 
   // FloatingSelectPopup 열기 핸들러
-  const openSelectPopup = (e: React.MouseEvent, options: Opt[], currentValue: string | number | null, onSelect: (value: string) => void) => {
-    const target = e.currentTarget as HTMLElement;
-    const rect = target.getBoundingClientRect();
-    floatingSelectRef.current?.open(options, String(currentValue), { top: rect.bottom, left: rect.left, width: rect.width }, onSelect);
-  };
+  // const openSelectPopup = (e: React.MouseEvent, options: Opt[], currentValue: string | number | null, onSelect: (value: string) => void) => {
+  //   const target = e.currentTarget as HTMLElement;
+  //   const rect = target.getBoundingClientRect();
+  //   floatingSelectRef.current?.open(options, String(currentValue), { top: rect.bottom, left: rect.left, width: rect.width }, onSelect);
+  // };
 
   // 금액 입력 핸들러
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {

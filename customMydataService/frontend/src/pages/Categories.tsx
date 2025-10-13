@@ -33,7 +33,7 @@ const Categories = () => {
   const [categories, setCategories] = useState<CategoriesData>([]);
   const [status, setStatus] = useState('Loading...');
   const [editing, setEditing] = useState<EditingState | null>(null);
-  const [originalEditValue, setOriginalEditValue] = useState<string>('');
+  const [_originalEditValue, setOriginalEditValue] = useState<string>('');
   const [alertInfo, setAlertInfo] = useState<AlertInfo>({ isOpen: false, message: '', onConfirm: () => {} });
   const inputRef = useRef<HTMLInputElement>(null);
   // Dirty states
@@ -101,11 +101,11 @@ const Categories = () => {
 
       // 계좌 저장 후 카테고리 저장
       setStatus('Saving Categories...');
-      const categoriesToSave = categories.map(cat => ({
-        id: cat.id,
-        name: cat.name,
-        minors: cat.minors
-      }));
+      // const categoriesToSave = categories.map(cat => ({
+      //   id: cat.id,
+      //   name: cat.name,
+      //   minors: cat.minors
+      // }));
       const categoriesRes = await fetch(`${API_BASE_URL}/api/categories`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

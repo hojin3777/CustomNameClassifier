@@ -1,4 +1,4 @@
-import React, { useState, useRef, useImperativeHandle, forwardRef, useEffect } from 'react';
+import { useState, useRef, useImperativeHandle, forwardRef, useEffect } from 'react';
 import './FloatingSelectPopup.css';
 
 export type Opt = {
@@ -21,7 +21,7 @@ const FloatingSelectPopup = forwardRef<FloatingSelectHandle, {}>((_props, ref) =
   const [value, setValue] = useState('');
   const [pos, setPos] = useState<{ top: number; left: number; width?: number }>({ top: 0, left: 0 });
   const callbackRef = useRef<(v: string) => void>(() => {});
-  const selectRef = useRef<HTMLSelectElement | null>(null);
+  // const selectRef = useRef<HTMLSelectElement | null>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
 

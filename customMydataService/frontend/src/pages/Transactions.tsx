@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react'; // useRef 추가
+import React, { useState, useEffect, useRef } from 'react'; // useRef 추가
 import {
   FaSave, FaUndo, FaTrash,
   FaBold, FaHighlighter, FaFlag, FaFillDrip,
@@ -65,6 +65,10 @@ export type Appdata = {
 
 const API_BASE_URL = 'http://localhost:5000'; // 백엔드 API 기본 URL
 const TRANSACTION_TYPES: Transaction['type'][] = ['수입', '고정지출', '반고정지출', '유동지출', '이체'];
+
+const INCOME_CATEGORIES = ['고정수입', '유동수입'];
+const TRANSFER_CATEGORY = '이체분류';
+const CORE_CATEGORIES = [...INCOME_CATEGORIES, TRANSFER_CATEGORY];
 
 
 const Transactions = () => {
@@ -688,14 +692,6 @@ const Transactions = () => {
       })
     );
   };
-  // 달력 helper
-  const parseYMD = (ymd?: string | null) => {
-    if (!ymd) return null;
-    const parts = ymd.split('-').map(part => parseInt(part, 10));
-    if (parts.length !== 3 || parts.some(isNaN)) return null;
-    return new Date(parts[0], parts[1] - 1, parts[2]);
-  }
-
 
   // ******* 체크박스 관련 핸들러 *******
   // 개별 행 체크박스 토글 핸들러
@@ -927,17 +923,14 @@ const Transactions = () => {
             </td>
           );
         case 'major_category_name': {
-          const INCOME_CATEGORIES = ['고정수입', '유동수입'];
-          const TRANSFER_CATEGORY = '이체분류';
-          const CORE_CATEGORIES = [...INCOME_CATEGORIES, TRANSFER_CATEGORY];
-          let availableMajors: CategoryItem[] = [];
-          if (transaction.type === '수입') { // '수입' 유형일 때는 '고정수입', '유동수입'만 필터링
-            availableMajors = appData.categories.filter(c => INCOME_CATEGORIES.includes(c.name));
-          } else if (transaction.type === '이체') {
-            availableMajors = appData.categories.filter(c => c.name === TRANSFER_CATEGORY);
-          } else if (['고정지출', '반고정지출', '유동지출'].includes(transaction.type)) {
-            availableMajors = appData.categories.filter(c => !CORE_CATEGORIES.includes(c.name));
-          }
+          // let availableMajors: CategoryItem[] = [];
+          // if (transaction.type === '수입') { // '수입' 유형일 때는 '고정수입', '유동수입'만 필터링
+          //   availableMajors = appData.categories.filter(c => INCOME_CATEGORIES.includes(c.name));
+          // } else if (transaction.type === '이체') {
+          //   availableMajors = appData.categories.filter(c => c.name === TRANSFER_CATEGORY);
+          // } else if (['고정지출', '반고정지출', '유동지출'].includes(transaction.type)) {
+          //   availableMajors = appData.categories.filter(c => !CORE_CATEGORIES.includes(c.name));
+          // }
           return (
             <td className="editing">
               <input {...commonProps} type="text" defaultValue={transaction.major_category_name ?? ''} onKeyDown={(e) => {
@@ -947,8 +940,8 @@ const Transactions = () => {
           );
         }
         case 'minor_category_name': {
-          const major = appData.categories.find(c => c.name === transaction.major_category_name);
-          const availableMinors = major ? major.minors : [];
+          // const major = appData.categories.find(c => c.name === transaction.major_category_name);
+          // const availableMinors = major ? major.minors : [];
           return (
             <td className="editing">
               <input {...commonProps} type="text" defaultValue={transaction.minor_category_name ?? ''} onKeyDown={(e) => {
@@ -1038,9 +1031,6 @@ const Transactions = () => {
           return;
         }
         if (column === 'major_category_name') {
-          const INCOME_CATEGORIES = ['고정수입', '유동수입'];
-          const TRANSFER_CATEGORY = '이체분류';
-          const CORE_CATEGORIES = [...INCOME_CATEGORIES, TRANSFER_CATEGORY];
           let availableMajors: CategoryItem[] = [];
           if (transaction.type === '수입') {
             availableMajors = appData.categories.filter(c => INCOME_CATEGORIES.includes(c.name));

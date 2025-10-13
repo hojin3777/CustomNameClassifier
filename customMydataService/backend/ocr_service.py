@@ -14,12 +14,38 @@ import classification_service
 import database
 import mapping_utils
 
+
+# ****** Pororo 모듈 경로 설정 ******
+def get_pororo_path():
+    """패키징 여부에 따라 Pororo 경로 반환"""
+    is_packaged = os.getenv('IS_PACKAGED', 'false') == 'true'
+    resource_path = os.getenv('RESOURCE_PATH', os.path.dirname(os.path.abspath(__file__)))
+    
+    if is_packaged:
+        # ✨ 패키징된 경우
+        pororo_path = os.path.join(resource_path, 'pororo_easyocr_main')
+    else:
+        # ✨ 개발 환경
+        pororo_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'pororo_easyocr_main'))
+    
+    print(f"📦 Pororo 경로: {pororo_path}")
+    
+    if not os.path.exists(pororo_path):
+        print(f"⚠️  WARNING: Pororo module not found at {pororo_path}")
+    
+    return pororo_path
+
 # --- 로컬 Pororo 모듈 경로 설정 ---
 # 이 파일의 위치를 기준으로 경로를 다시 계산해야 합니다.
 # customMydataService/backend/ocr_service.py 이므로, 두 단계 위로 올라가야 합니다.
-PORORO_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'pororo_easyocr_main'))
+# PORORO_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'pororo_easyocr_main'))
+# if PORORO_PATH not in sys.path:
+#     sys.path.append(PORORO_PATH)
+
+PORORO_PATH = get_pororo_path()
 if PORORO_PATH not in sys.path:
     sys.path.append(PORORO_PATH)
+    print(f"✅ Pororo 경로 추가됨: {PORORO_PATH}")
 
 try:
     from main import EasyPororoOcr

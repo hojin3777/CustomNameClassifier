@@ -244,7 +244,7 @@ const TopSpending: React.FC<TopSpendingProps> = ({ months, range }) => {
   };
 
   const handleToogleViewMode = () => setViewMode(prev => (prev === 'total' ? 'average' : 'total'));
-  const formatValue = (value: any, isAmount: boolean = false) => {
+  const formatValue = (value: any, _isAmount: boolean = false) => {
     const rawValue = Math.abs(value);
     const displayValue = viewMode === 'average' ? rawValue / monthCount : rawValue;
     if (viewMode === 'average') {

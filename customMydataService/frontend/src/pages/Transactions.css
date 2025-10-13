@@ -71,7 +71,6 @@ table {
 }
 .table-transaction {
   table-layout: fixed;
-  min-width: 1250px;
 }
 
 /* --- 열 너비 고정 --- */
@@ -79,46 +78,47 @@ table {
 .table-container th:nth-child(1),
 .table-container td:nth-child(1) {
   width: 20px;
+  min-width: 20px;
 }
 /* 2번째 열: 날짜 */
 .table-container th:nth-child(2),
 .table-container td:nth-child(2) {
   width: 100px;
+  min-width: 100px;
 }
 /* 3번째 열: 계좌 */
 .table-container th:nth-child(3),
 .table-container td:nth-child(3) {
   width: 120px;
+  min-width: 120px;
 }
 /* 4번째 열: 유형 */
 .table-container th:nth-child(4),
 .table-container td:nth-child(4) {
   width: 80px;
+  min-width: 80px;
 }
-/* 5번째 열: 대분류 */
+/* 5, 6, 7번째 열: 대분류, 소분류 금액 */
 .table-container th:nth-child(5),
-.table-container td:nth-child(5) {
-  width: 100px;
-}
-/* 6번째 열: 소분류 */
+.table-container td:nth-child(5),
 .table-container th:nth-child(6),
-.table-container td:nth-child(6) {
-  width: 100px;
-}
-/* 7번째 열: 금액 */
+.table-container td:nth-child(6),
 .table-container th:nth-child(7),
 .table-container td:nth-child(7) {
   width: 100px;
+  min-width: 100px;
 }
 /* 8번째 열: 거래처 */
 .table-container th:nth-child(8),
 .table-container td:nth-child(8) {
   width: 160px;
+  min-width: 160px;
 }
 /* 9번째 열: 메모 */
 .table-container th:nth-child(9),
 .table-container td:nth-child(9) {
   width: 200px;
+  min-width: 200px;
 }
 
 /* 테이블 셀 스타일 통합 및 오류 수정 */
@@ -131,7 +131,19 @@ table {
 }
 
 .table-container th:nth-child(3),
-.table-container td:nth-child(3) {
+.table-container td:nth-child(3),
+.table-container th:nth-child(4),
+.table-container td:nth-child(4),
+.table-container th:nth-child(5),
+.table-container td:nth-child(5),
+.table-container th:nth-child(6),
+.table-container td:nth-child(6),
+.table-container th:nth-child(7),
+.table-container td:nth-child(7),
+.table-container th:nth-child(8),
+.table-container td:nth-child(8),
+.table-container th:nth-child(9),
+.table-container td:nth-child(9) {
   overflow: hidden;
   text-overflow: ellipsis;
 }

@@ -24,7 +24,7 @@ const MonthlyTrend: React.FC<MonthlyTrendProps> = ({ months, range }) => {
   const [chartData, setChartData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const chartContainerRef = useRef<HTMLDivElement>(null);
-  const [containerWidth, setContainerWidth] = useState(0);
+  const [_containerWidth, setContainerWidth] = useState(0);
   const [pixelsPerTick, setPixelsPerTick] = useState<number>(20);
   const [xAxisInterval, setXAxisInterval] = useState(0);
 
@@ -319,7 +319,6 @@ const MonthlyTrend: React.FC<MonthlyTrendProps> = ({ months, range }) => {
     const fullDate = dataEntry.fullDate;
 
     if (month === '01' && fullDate) {
-      const year = fullDate.substring(0, 4);
       return (
         <g transform={`translate(${x},${y})`}>
           <text x={0} y={12} textAnchor="middle" fill="var(--color-text-primary)" fontSize={14}>{month}</text>

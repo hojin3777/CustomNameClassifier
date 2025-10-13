@@ -1,20 +1,57 @@
 import sqlite3
 import os
+from pathlib import Path
+
+# ****** DB 연결 관리 ******
+def get_db_path():
+    """사용자 홈 디렉토리에 DB 경로 반환"""
+    user_home = Path.home()
+    app_dir = user_home / '.customMydataService'
+    
+    if not app_dir.exists():
+        app_dir.mkdir(parents=True, exist_ok=True)
+        print(f"DB 폴더 생성: {app_dir}")
+    
+    db_path = app_dir / 'mydata.db'
+    print(f"사용 중인 DB 경로: {db_path}")
+    
+    # ✨ DB 파일 존재 여부 확인
+    if db_path.exists():
+        print(f"DB 파일 존재 (크기: {db_path.stat().st_size / 1024:.2f} KB)")
+    else:
+        print(f"DB 파일 없음 - 새로 생성됨")
+    
+    return str(db_path)
+
+def get_connection():
+    """DB 연결 반환"""
+    db_path = get_db_path()
+    
+    try:
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        print(f"DB 연결 성공: {db_path}")
+        return conn
+    except Exception as e:
+        print(f"DB 연결 실패: {e}")
+        raise
 
 # 데이터베이스 파일 경로 (사용자의 홈 디렉토리에 저장하여 안전하게 관리)
-DB_FOLDER = os.path.join(os.path.expanduser('~'), '.customMydataService')
-os.makedirs(DB_FOLDER, exist_ok=True)
-DB_PATH = os.path.join(DB_FOLDER, 'mydata.db')
+# DB_FOLDER = os.path.join(os.path.expanduser('~'), '.customMydataService')
+# os.makedirs(DB_FOLDER, exist_ok=True)
+# DB_PATH = os.path.join(DB_FOLDER, 'mydata.db')
 
 def get_db_connection():
-    """데이터베이스 연결 객체를 반환합니다."""
-    conn = sqlite3.connect(DB_PATH)
-    conn.execute("PRAGMA foreign_keys = ON")  # 외래 키 제약 조건 활성화
-    conn.row_factory = sqlite3.Row # 컬럼명으로 접근 가능하게 설정
-    return conn
+    return get_connection()
+    # """데이터베이스 연결 객체를 반환합니다."""
+    # conn = sqlite3.connect(DB_PATH)
+    # conn.execute("PRAGMA foreign_keys = ON")  # 외래 키 제약 조건 활성화
+    # conn.row_factory = sqlite3.Row # 컬럼명으로 접근 가능하게 설정
+    # return conn
 
 def init_db():
     """데이터베이스와 테이블들을 생성합니다."""
+    DB_PATH = get_db_path()
     print(f"Initializing database at: {DB_PATH}")
     conn = get_db_connection()
     cursor = conn.cursor()

@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback, useRef, cache } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { FaPlusCircle, FaPen, FaTrash } from 'react-icons/fa';
 import ConfirmPopup from '../ConfirmPopup';
-import FloatingSelectPopup, { type FloatingSelectHandle, type Opt } from '../FloatingSelectPopup';
+import FloatingSelectPopup, { type FloatingSelectHandle } from '../FloatingSelectPopup';
 import './BudgetManagement.css';
 
 const API_BASE_URL = 'http://localhost:5000';

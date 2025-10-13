@@ -109,7 +109,7 @@ const CustomTooltip = ({ active, payload, selectedYear, selectedMonth }: any) =>
 
 const MonthlyDetail = ({ selectedYear, selectedMonth }: MonthlyDetailProps) => {
   const [chartData, setChartData] = useState<any[]>([]);
-  const [monthlySummary, setMonthlySummary] = useState<MonthlySummary | null>(null);
+  const [_monthlySummary, setMonthlySummary] = useState<MonthlySummary | null>(null);
   const [categorySpending, setCategorySpending] = useState<CategorySpending[]>([]);
   const [accountBalances, setAccountBalances] = useState<AccountBalance[]>([]);
   const [showAccountDonutChart, setShowAccountDonutChart] = useState(false);
@@ -527,7 +527,7 @@ const MonthlyDetail = ({ selectedYear, selectedMonth }: MonthlyDetailProps) => {
                   outerRadius={100}
                   dataKey="value"
                 >
-                  {accountDonutData.map((entry, index) => (
+                  {accountDonutData.map((_entry, index) => (
                     <Cell key={`cell-${index}`} fill={DONUT_COLORS[index % DONUT_COLORS.length]} />
                   ))}
                   <Label

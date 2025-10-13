@@ -137,7 +137,7 @@ const MonthlyTreemap: React.FC<MonthlyTreemapProps> = ({ selectedYear, selectedM
 
   // 커스텀 컨텐츠
   const CustomizedContent = (props: any) => {
-    const { root, depth, x, y, width, height, index, name, value, payload } = props;
+    const { depth, x, y, width, height, index, name, value } = props;
 
     const handleMouseEnter = (e: React.MouseEvent) => {
       // 소분류(depth=2) 위에서만 툴팁을 표시합니다.
@@ -163,11 +163,7 @@ const MonthlyTreemap: React.FC<MonthlyTreemapProps> = ({ selectedYear, selectedM
         }
       }
     };
-
-    const handleMouseLeave = () => {
-      setTooltipData(null);
-    };
-
+    
     return (
       <g onMouseEnter={handleMouseEnter}>
         <rect

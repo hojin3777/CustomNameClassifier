@@ -8,7 +8,7 @@ interface Props {
 }
 
 const DraggableBertOutput: React.FC<Props> = ({ item, isOverlay }) => {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `draggable-${item.id}`,
     data: {
       bertId: item.id,

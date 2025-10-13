@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { FaSortAlphaDown, FaSortAlphaUp, FaFilter, FaSortAmountUp } from 'react-icons/fa';
+import { FaSortAlphaDown, FaSortAlphaUp, FaFilter } from 'react-icons/fa';
 import type { Transaction } from '../../pages/Transactions'; // Transaction 타입 import
 import './FilterPopup.css';
 
@@ -25,7 +25,6 @@ type FilterPopupProps<T> = {
 
 const FilterPopup = <T extends React.ReactNode>({
   columnKey,
-  columnName,
   allValues,
   appliedFilters,
   onApply,

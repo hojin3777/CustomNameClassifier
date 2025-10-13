@@ -225,3 +225,5 @@ customOCR/donut_dataset/
 *.psd
 
 .venv_donut/
+.venv_backend/
+dist-electron/

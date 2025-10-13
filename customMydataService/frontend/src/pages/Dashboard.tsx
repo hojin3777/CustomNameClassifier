@@ -9,7 +9,7 @@ import BudgetManagement from '../components/dashboard/BudgetManagement';
 import FixedExpenseManagement from '../components/dashboard/FixedExpenseManagement';
 import AssetPortfolio from '../components/dashboard/AssetPortfolio';
 import ConsumptionPattern from '../components/dashboard/ConsumptionPattern';
-import ComingSoon from '../components/dashboard/ComingSoon';
+// import ComingSoon from '../components/dashboard/ComingSoon';
 import FloatingSelectPopup, { type FloatingSelectHandle } from '../components/FloatingSelectPopup';
 import './Dashboard.css';
 
@@ -26,7 +26,6 @@ const Dashboard = () => {
   const prevRangeRef = useRef<[number, number]>(range);
   const sliderContainerRef = useRef<HTMLDivElement | null>(null);
   const [isRangePopupOpen, setIsRangePopupOpen] = useState(false);
-  const [isFixedExpensePopupOpen, setIsFixedExpensePopupOpen] = useState(false);
   const [rangePopupPos, setRangePopupPos] = useState<{ top: number; left: number; width: number }>({
     top: 0,
     left: 0,
