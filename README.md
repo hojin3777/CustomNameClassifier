@@ -302,3 +302,7 @@ Classify store names with deeplearning
     - Titlebar 생성, 이에 따라 app.tsx의 레이아웃 일부 조절
     - 빌드하기 위해 전체적으로 사용되지 않는 변수 및 함수 전체 정리
     - 빌드용 DB 경로 및 기타 백엔드 에셋 경로 지정 함수 신설
+
+
+
+- TODO: 파이썬 호출시 패키지에 있는 파이썬이 아닌 appdata/local에서 찾아서 다른 유저일때 실행되지 않는 문제
