@@ -22,16 +22,16 @@ def get_pororo_path():
     resource_path = os.getenv('RESOURCE_PATH', os.path.dirname(os.path.abspath(__file__)))
     
     if is_packaged:
-        # ✨ 패키징된 경우
+        # 패키징된 경우
         pororo_path = os.path.join(resource_path, 'pororo_easyocr_main')
     else:
-        # ✨ 개발 환경
+        # 개발 환경
         pororo_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'pororo_easyocr_main'))
     
-    print(f"📦 Pororo 경로: {pororo_path}")
+    print(f"Pororo 경로: {pororo_path}")
     
     if not os.path.exists(pororo_path):
-        print(f"⚠️  WARNING: Pororo module not found at {pororo_path}")
+        print(f"WARNING: Pororo module not found at {pororo_path}")
     
     return pororo_path
 
@@ -45,7 +45,7 @@ def get_pororo_path():
 PORORO_PATH = get_pororo_path()
 if PORORO_PATH not in sys.path:
     sys.path.append(PORORO_PATH)
-    print(f"✅ Pororo 경로 추가됨: {PORORO_PATH}")
+    print(f"Pororo 경로 추가됨: {PORORO_PATH}")
 
 try:
     from main import EasyPororoOcr

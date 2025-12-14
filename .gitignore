@@ -227,3 +227,4 @@ customOCR/donut_dataset/
 .venv_donut/
 .venv_backend/
 dist-electron/
+python-embed/

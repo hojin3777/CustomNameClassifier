@@ -12,78 +12,123 @@ let pythonProcess;
 function startPythonBackend() {
     const isDev = !app.isPackaged;
 
+    const logDir = path.join(require('os').homedir(), '.customMydataService', 'logs');
+    if (!fs.existsSync(logDir)) {
+        fs.mkdirSync(logDir, { recursive: true });
+    }
+    const logFilePath = path.join(logDir, `backend-${Date.now()}.log`);
+    console.log(`Backend logs will be saved to: ${logFilePath}`);
+
     let pythonPath;
     let scriptPath;
+    let pythonHome;
 
     if (isDev) {
-        // ✨ 개발 모드
         pythonPath = 'C:\\code\\.venv_backend\\Scripts\\python.exe';
         scriptPath = path.join(__dirname, '..', '..', '..', 'customMydataService', 'backend', 'app.py');
     } else {
-        // ✨ 프로덕션 모드: 패키징된 Python 사용
-        pythonPath = path.join(process.resourcesPath, 'python', 'Scripts', 'python.exe');
-        scriptPath = path.join(process.resourcesPath, 'backend', 'app.py');
+        const resourcesPath = process.resourcesPath;
+        pythonHome = path.join(resourcesPath, 'python');
+        pythonPath = path.join(pythonHome, 'python.exe');
+        scriptPath = path.join(resourcesPath, 'backend', 'app.py');
+        
+        console.log('Resolved paths:');
+        console.log('  - resourcesPath:', resourcesPath);
+        console.log('  - pythonPath:', pythonPath);
+        console.log('  - scriptPath:', scriptPath);
+        console.log('  - pythonHome:', pythonHome);
+                
+        fs.appendFileSync(logFilePath, `=== Electron Path Info ===\n`);
+        fs.appendFileSync(logFilePath, `resourcesPath: ${resourcesPath}\n`);
+        fs.appendFileSync(logFilePath, `pythonPath: ${pythonPath}\n`);
+        fs.appendFileSync(logFilePath, `scriptPath: ${scriptPath}\n`);
+        fs.appendFileSync(logFilePath, `pythonHome: ${pythonHome}\n\n`);
     }
 
     console.log('Starting Python backend...');
     console.log('Python path:', pythonPath);
     console.log('Script path:', scriptPath);
 
-    // ✨ 경로 검증
     if (!fs.existsSync(pythonPath)) {
-        console.error('❌ Python executable not found at:', pythonPath);
-        dialog.showErrorBox('Python 오류', `Python 실행 파일을 찾을 수 없습니다:\n${pythonPath}`);
+        const errorMsg = `Python 실행 파일을 찾을 수 없습니다:\n${pythonPath}`;
+        console.error(errorMsg);
+        fs.appendFileSync(logFilePath, `ERROR: ${errorMsg}\n`);
+        dialog.showErrorBox('Python 오류', errorMsg);
         return;
     }
 
     if (!fs.existsSync(scriptPath)) {
-        console.error('❌ app.py not found at:', scriptPath);
-        dialog.showErrorBox('백엔드 오류', `백엔드 스크립트를 찾을 수 없습니다:\n${scriptPath}`);
+        const errorMsg = `백엔드 스크립트를 찾을 수 없습니다:\n${scriptPath}`;
+        console.error(errorMsg);
+        fs.appendFileSync(logFilePath, `ERROR: ${errorMsg}\n`);
+        dialog.showErrorBox('백엔드 오류', errorMsg);
         return;
     }
 
     const spawnOptions = {
         cwd: path.dirname(scriptPath),
-        env: {
-            ...process.env,
-            // ✨ Python 경로 설정
-            PYTHONPATH: isDev
-                ? 'C:\\code\\pororo_easyocr_main'
-                : path.join(process.resourcesPath, 'pororo_easyocr_main'),
-
-            // ✨ 리소스 경로 환경 변수로 전달
-            RESOURCE_PATH: isDev
-                ? 'C:\\code'
-                : process.resourcesPath,
-
-            // ✨ 개발/프로덕션 모드 전달
-            IS_PACKAGED: isDev ? 'false' : 'true'
-        }
+        env: isDev 
+            ? process.env
+            : {
+                PYTHONHOME: pythonHome,
+                PYTHONPATH: [
+                    path.join(process.resourcesPath, 'pororo_easyocr_main'),
+                    path.join(pythonHome, 'Lib', 'site-packages'),
+                ].join(path.delimiter),
+                RESOURCE_PATH: process.resourcesPath,
+                IS_PACKAGED: 'true',
+                
+                PATH: pythonHome,
+                
+                PYTHONUNBUFFERED: '1',
+                PYTHONNOUSERSITE: '1', // 사용자 site-packages 차단
+                PYTHONDONTWRITEBYTECODE: '1',
+                PYTHONUTF8: '1',
+                PYTHONIOENCODING: 'utf-8',
+                
+                SYSTEMROOT: process.env.SYSTEMROOT,
+                TEMP: process.env.TEMP,
+                TMP: process.env.TMP,
+            },
+        shell: false, // shell 사용 안 함
+        windowsHide: true,
     };
+
+    fs.appendFileSync(logFilePath, `=== Python Process Starting ===\n`);
+    fs.appendFileSync(logFilePath, `Command: ${pythonPath} ${scriptPath}\n`);
+    fs.appendFileSync(logFilePath, `CWD: ${spawnOptions.cwd}\n`);
+    fs.appendFileSync(logFilePath, `PYTHONHOME: ${spawnOptions.env.PYTHONHOME}\n`);
+    fs.appendFileSync(logFilePath, `PYTHONPATH: ${spawnOptions.env.PYTHONPATH}\n`);
+    fs.appendFileSync(logFilePath, `PATH: ${spawnOptions.env.PATH}\n\n`);
 
     pythonProcess = spawn(pythonPath, [scriptPath], spawnOptions);
 
     pythonProcess.stdout.on('data', (data) => {
-        console.log(`🐍 Python: ${data}`);
+        const output = data.toString();
+        console.log(`[STDOUT] ${output}`);
+        fs.appendFileSync(logFilePath, `[STDOUT] ${output}`);
     });
 
     pythonProcess.stderr.on('data', (data) => {
-        console.error(`🐍 Python Error: ${data}`);
+        const output = data.toString();
+        console.error(`[STDERR] ${output}`);
+        fs.appendFileSync(logFilePath, `[STDERR] ${output}`);
     });
 
-    pythonProcess.on('error', (err) => {
-        console.error('❌ Failed to start Python process:', err);
-        dialog.showErrorBox('백엔드 시작 실패', `Python 프로세스를 시작할 수 없습니다:\n${err.message}`);
+    pythonProcess.on('error', (error) => {
+        console.error('[ERROR] Failed to start Python process:', error);
+        fs.appendFileSync(logFilePath, `[ERROR] ${error.message}\n`);
     });
 
     pythonProcess.on('close', (code) => {
-        console.log(`🐍 Python process exited with code ${code}`);
+        console.log(`[EXIT] Python process exited with code ${code}`);
+        fs.appendFileSync(logFilePath, `[EXIT] Python process exited with code ${code}\n`);
     });
 }
 
 
 async function waitForBackend(maxRetries = 180, interval = 1000) {
-    console.log('⏳ Waiting for backend to be ready...');
+    console.log('Waiting for backend to be ready...');
 
     for (let i = 0; i < maxRetries; i++) {
         try {
@@ -135,7 +180,7 @@ function createWindow() {
     mainWindow.loadURL(startUrl);
 
     mainWindow.webContents.on('did-finish-load', async () => {
-        console.log('✅ Frontend loaded');
+        console.log('Frontend loaded');
         mainWindow.show();
         if (isDev) {
             mainWindow.webContents.openDevTools();

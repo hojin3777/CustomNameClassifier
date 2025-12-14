@@ -1,6 +1,12 @@
 import os
 import sys
 from pathlib import Path
+# ****** 현재 스크립트 경로를 sys.path에 추가 (모듈 import 해결) ******
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+if CURRENT_DIR not in sys.path:
+    sys.path.insert(0, CURRENT_DIR)
+    print(f"Added to sys.path: {CURRENT_DIR}")
+
 import sqlite3
 import uuid
 import torch
@@ -51,8 +57,8 @@ def serve_frontend(path):
 IS_PACKAGED = os.getenv('IS_PACKAGED', 'false') == 'true'
 RESOURCE_PATH = os.getenv('RESOURCE_PATH', os.path.dirname(os.path.abspath(__file__)))
 
-print(f"🔧 IS_PACKAGED: {IS_PACKAGED}")
-print(f"📂 RESOURCE_PATH: {RESOURCE_PATH}")
+print(f"IS_PACKAGED: {IS_PACKAGED}")
+print(f"RESOURCE_PATH: {RESOURCE_PATH}")
 
 # ****** DB 폴더 경로 설정 ******
 DB_FOLDER = str(Path.home() / '.customMydataService')  # ✨ DB_FOLDER 정의
@@ -88,10 +94,10 @@ def get_resource_path(relative_path):
     패키징 여부에 따라 리소스 절대 경로 반환
     """
     if IS_PACKAGED:
-        # ✨ 패키징된 경우: RESOURCE_PATH 기준
+        # 패키징된 경우: RESOURCE_PATH 기준
         base_path = RESOURCE_PATH
     else:
-        # ✨ 개발 환경: 현재 파일 기준
+        # 개발 환경: 현재 파일 기준
         base_path = os.path.dirname(os.path.abspath(__file__))
     
     full_path = os.path.join(base_path, relative_path)
@@ -106,11 +112,11 @@ else:
     # 개발 모드: 절대 경로 사용
     OCR_MODEL_PATH = 'C:/code/customOCR/bank_statement_detector/yolov8l_e50_bs8_0828/weights/best.pt'
 
-print(f"🤖 YOLO Model: {OCR_MODEL_PATH}")
+print(f"YOLO Model: {OCR_MODEL_PATH}")
 
-# ✨ 모델 파일 존재 확인
+# 모델 파일 존재 확인
 if not os.path.exists(OCR_MODEL_PATH):
-    print(f"⚠️  WARNING: YOLO model not found at {OCR_MODEL_PATH}")
+    print(f"WARNING: YOLO model not found at {OCR_MODEL_PATH}")
 
 # 1. DB 초기화
 try:

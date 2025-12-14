@@ -304,5 +304,12 @@ Classify store names with deeplearning
     - 빌드용 DB 경로 및 기타 백엔드 에셋 경로 지정 함수 신설
 
 
+### 1215
+- TODO: 파이썬 호출시 패키지에 있는 파이썬이 아닌 appdata/local에서 찾아서 다른 유저일때 실행되지 않는 문제(V)
+    - 파이썬 임베디드 버전을 받아서 해결, 가상머신에서 동작 확인
 
-- TODO: 파이썬 호출시 패키지에 있는 파이썬이 아닌 appdata/local에서 찾아서 다른 유저일때 실행되지 않는 문제
+
+- TODO: 딥러닝 모델 ONNX 마이그레이션 및 테스트
+- TODO: GPU감지 UI 추가 및 설치 과정에서 CUDA 드라이버 설치 유도
+- TODO: 자동 업데이트 기능 추가
+- TODO: Github Releases 배포 설정

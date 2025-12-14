@@ -46,8 +46,9 @@
         "to": "../dist/icon.png"
       },
       {
-        "from": "../../.venv_backend",
-        "to": "python"
+        "from": "python-embed",
+        "to": "python",
+        "filter": ["**/*", "!**/__pycache__", "!**/*.pyc", "!**/*.pyo"]
       },
       {
         "from": "../backend",
