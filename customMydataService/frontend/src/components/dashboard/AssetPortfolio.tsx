@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Brush, Legend } from 'recharts';
 import './AssetPortfolio.css';
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'http://127.0.0.1:5050';
 
 // ****** 타입 정의 ******
 interface MonthlyAccountData {

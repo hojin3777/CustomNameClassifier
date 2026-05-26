@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ConfirmPopup from '../ConfirmPopup';
 import './ConsumptionPatternSettingsPopup.css';
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'http://127.0.0.1:5050';
 
 interface Settings {
   weekend_ratio_threshold: number;

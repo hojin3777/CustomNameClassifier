@@ -23,8 +23,8 @@ type AlertInfo = {
   placeholder?: string;
 }
 
-// const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
-const API_BASE_URL = 'http://localhost:5000'; // 개발 시
+// const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:5050';
+const API_BASE_URL = 'http://127.0.0.1:5050'; // 개발 시
 const Categories = () => {
   // vars
   const protectedCategories = ['고정수입', '유동수입', '이체분류'];

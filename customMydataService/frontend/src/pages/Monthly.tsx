@@ -4,7 +4,7 @@ import FloatingSelectPopup, { type FloatingSelectHandle, type Opt } from '../com
 import DateDetailPopup from '../components/monthly/DateDetailPopup';
 import './Monthly.css';
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'http://127.0.0.1:5050';
 
 const Monthly = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());

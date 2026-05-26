@@ -13,7 +13,7 @@ import ConsumptionPattern from '../components/dashboard/ConsumptionPattern';
 import FloatingSelectPopup, { type FloatingSelectHandle } from '../components/FloatingSelectPopup';
 import './Dashboard.css';
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'http://127.0.0.1:5050';
 
 const Dashboard = () => {
   const [availableMonths, setAvailableMonths] = useState<string[]>([]);

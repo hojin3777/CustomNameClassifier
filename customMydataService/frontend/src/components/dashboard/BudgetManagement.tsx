@@ -4,7 +4,7 @@ import ConfirmPopup from '../ConfirmPopup';
 import FloatingSelectPopup, { type FloatingSelectHandle } from '../FloatingSelectPopup';
 import './BudgetManagement.css';
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'http://127.0.0.1:5050';
 
 // ******************** 타입 정의 ********************
 interface MajorCategory { id: number; name: string; }

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { FaCircle, FaCaretUp, FaCaretDown, FaMinus } from 'react-icons/fa';
 import './FixedExpenseManagement.css';
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'http://127.0.0.1:5050';
 
 // ******************** 타입 정의 ********************
 interface FixedExpenseItem {

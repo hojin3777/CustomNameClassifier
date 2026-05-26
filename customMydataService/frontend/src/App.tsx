@@ -9,6 +9,9 @@ import Categories from './pages/Categories';
 import Mapping from './pages/Mapping';
 import { FaBars, FaQuestionCircle, FaCog, FaHourglassStart, FaHourglassHalf, FaHourglassEnd } from 'react-icons/fa';
 
+const BACKEND_READY_TIMEOUT = 180;
+const BACKEND_BASE_URL = 'http://127.0.0.1:5050';
+
 // isDirty 상태를 전역적으로 관리하기 위한 Context 생성
 const DirtyContext = createContext<{ isDirty: boolean; setIsDirty: (dirty: boolean) => void; } | null>(null);
 export const useDirty = () => useContext(DirtyContext);
@@ -96,40 +99,60 @@ const App = () => {
   }, [backendReady]);
 
   useEffect(() => {
+    if (backendReady) {
+      return;
+    }
+
     let isMounted = true;
+    let attempts = 0;
+    let intervalId: ReturnType<typeof setInterval> | null = null;
+
     const checkBackend = async () => {
+      if (!isMounted) {
+        return;
+      }
+
       try {
-        const response = await fetch('http://localhost:5000/api/health', {
+        const response = await fetch(`${BACKEND_BASE_URL}/api/health`, {
           method: 'GET',
-          headers: { 'Accept': 'application/json' }
+          headers: { 'Accept': 'application/json' },
         });
 
         if (response.ok && isMounted) {
           console.log('Backend is ready!');
           setBackendReady(true);
-        } else if (isMounted) {
-          throw new Error('Backend not ready');
+          if (intervalId) {
+            clearInterval(intervalId);
+          }
+          return;
         }
       } catch (error) {
-        if (isMounted) {
-          console.log(`Backend not ready yet (attempt ${retryCount + 1})...`);
-          setRetryCount(prev => prev + 1);
+        // 네트워크 준비 전에는 조용히 재시도합니다.
+      }
 
-          // 최대 180번 재시도 (3분)
-          if (retryCount < 180) {
-            setTimeout(checkBackend, 1000); // 1초 후 재시도
-          } else {
-            console.error('Backend failed to start after 180 attempts');
-            alert('백엔드 서버를 시작할 수 없습니다. 앱을 다시 시작해주세요.');
-          }
+      attempts += 1;
+      setRetryCount(attempts);
+      console.log(`Backend not ready yet (attempt ${attempts})...`);
+
+      if (attempts >= BACKEND_READY_TIMEOUT) {
+        if (intervalId) {
+          clearInterval(intervalId);
         }
+        console.error(`Backend failed to start after ${BACKEND_READY_TIMEOUT} attempts`);
+        alert('백엔드 서버를 시작할 수 없습니다. 앱을 다시 시작해주세요.');
       }
     };
+
     checkBackend();
+    intervalId = setInterval(checkBackend, 1000);
+
     return () => {
-      isMounted = false; // 클린업 시 플래그 해제
+      isMounted = false;
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
     };
-  }, [retryCount]); // retryCount 의존성 추가
+  }, [backendReady]);
 
   // getHourglassIcon: 현재 시계 아이콘 반환
   const getHourglassIcon = () => {
@@ -174,7 +197,7 @@ const App = () => {
               최초 실행 시 시간이 소요될 수 있습니다.
             </div>
             <div style={{ fontSize: '13px', color: 'var(--color-text-tertiary)' }}>
-              재시도 {retryCount}/180
+              재시도 {retryCount}/{BACKEND_READY_TIMEOUT}
             </div>
           </div>
         </div>

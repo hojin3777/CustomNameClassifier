@@ -63,7 +63,7 @@ export type Appdata = {
   mappings: { [key: number]: string };
 }
 
-const API_BASE_URL = 'http://localhost:5000'; // 백엔드 API 기본 URL
+const API_BASE_URL = 'http://127.0.0.1:5050'; // 백엔드 API 기본 URL
 const TRANSACTION_TYPES: Transaction['type'][] = ['수입', '고정지출', '반고정지출', '유동지출', '이체'];
 
 const INCOME_CATEGORIES = ['고정수입', '유동수입'];

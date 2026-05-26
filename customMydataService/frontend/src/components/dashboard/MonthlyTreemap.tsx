@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Treemap, ResponsiveContainer } from 'recharts';
 import './MonthlyTreemap.css';
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'http://127.0.0.1:5050';
 interface TreemapDataType {
   name: string;
   size?: number;

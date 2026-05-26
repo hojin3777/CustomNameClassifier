@@ -1,7 +1,6 @@
 # CustomNameClassifier
 Classify store names with deeplearning
 
-
 ### 0725
 - 데이터셋 50000개로 LayoutLM 재학습. 기존 1000개의 결과물이 더 좋음
 - yolov8m 모델 학습 완료, 준수한 성능을 보이나 좀 더 다듬을 필요가 있음
@@ -307,6 +306,31 @@ Classify store names with deeplearning
 ### 1215
 - TODO: 파이썬 호출시 패키지에 있는 파이썬이 아닌 appdata/local에서 찾아서 다른 유저일때 실행되지 않는 문제(V)
     - 파이썬 임베디드 버전을 받아서 해결, 가상머신에서 동작 확인
+
+
+## 2026년
+### 0526_Mac 정리
+- 맥북 개발 환경 재정리
+    - Node/npm 설치 후 frontend 의존성 재설치
+    - Electron 버전 확인 및 dev 실행 흐름 재점검
+    - backend Python은 `custommydata-mac` conda 환경으로 고정
+    - M1 Air에서 PyTorch MPS 사용 가능 여부 확인
+- 실행 포트 정리
+    - macOS의 `5000` 포트가 `AirTunes/ControlCenter`와 충돌하는 문제 확인
+    - Flask 백엔드는 `5050`으로 이동
+    - Vite/Electron dev 서버는 `5173` 기준으로 맞춤
+    - Electron dev의 backend 대기 URL과 프론트 API 기준 주소를 새 포트로 통일
+- 모델/백엔드 정리
+    - 학습 모델 파일을 `customMydataService/models`에서 공통으로 읽도록 정리
+    - OCR / 분류 모델 초기화가 macOS에서도 정상 동작하는 것 확인
+    - `/api/health` 응답 확인 및 백엔드 기동 안정화
+- 프론트-백엔드 연동 정리
+    - 카테고리, 거래내역, 대시보드, 매핑 등 프론트 API 주소를 `127.0.0.1:5050`으로 정리
+    - `Reset` 버튼이 `/api/initialize-defaults`를 통해 계좌/카테고리를 초기화하도록 연동
+    - `category_utils.py`의 하드코딩 기본 카테고리로 다시 채우는 흐름 복구
+    - 카테고리 화면의 저장/불러오기 연동과 기존 포트 참조 문제 정리
+
+
 
 
 - TODO: 딥러닝 모델 ONNX 마이그레이션 및 테스트

@@ -46,6 +46,21 @@ function resolveDevPythonExecutable() {
         return process.env.CUSTOMMYDATA_PYTHON;
     }
 
+    if (process.platform === 'darwin') {
+        const macCondaCandidates = [
+            '/opt/miniconda3/envs/custommydata-mac/bin/python',
+            '/opt/homebrew/Caskroom/miniconda/base/envs/custommydata-mac/bin/python',
+            path.join(require('os').homedir(), 'miniconda3', 'envs', 'custommydata-mac', 'bin', 'python'),
+            path.join(require('os').homedir(), 'anaconda3', 'envs', 'custommydata-mac', 'bin', 'python'),
+        ];
+
+        for (const candidate of macCondaCandidates) {
+            if (fs.existsSync(candidate)) {
+                return candidate;
+            }
+        }
+    }
+
     if (process.env.CONDA_PREFIX) {
         const condaPython = path.join(process.env.CONDA_PREFIX, 'bin', 'python');
         if (fs.existsSync(condaPython)) {
@@ -87,7 +102,7 @@ function resolvePackagedPythonPaths(pythonHome) {
 // resolveFrontendUrl: 개발/배포 환경에 맞는 프론트엔드 진입 URL을 계산합니다.
 function resolveFrontendUrl() {
     if (!app.isPackaged) {
-        return 'http://localhost:5173';
+        return process.env.VITE_DEV_SERVER_URL || 'http://localhost:5173';
     }
 
     return pathToFileURL(path.join(__dirname, '..', 'dist', 'index.html')).toString();
@@ -156,6 +171,7 @@ function startPythonBackend() {
         env: isDev 
             ? {
                 ...process.env,
+                BACKEND_PORT: '5050',
                 PYTHONUNBUFFERED: '1',
                 PYTHONNOUSERSITE: '1',
                 PYTHONDONTWRITEBYTECODE: '1',
@@ -228,7 +244,7 @@ async function waitForBackend(maxRetries = 180, interval = 1000) {
 
     for (let i = 0; i < maxRetries; i++) {
         try {
-            const response = await fetch('http://localhost:5000/api/health');
+            const response = await fetch('http://127.0.0.1:5050/api/health');
             if (response.ok) {
                 console.log('Backend is ready!');
                 return true;

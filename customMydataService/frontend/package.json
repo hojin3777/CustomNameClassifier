@@ -10,7 +10,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "electron:dev": "concurrently \"cross-env BROWSER=none npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
+    "electron:dev": "concurrently \"cross-env BROWSER=none CUSTOMMYDATA_PYTHON=/opt/miniconda3/envs/custommydata-mac/bin/python npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
     "electron:build": "npm run build && electron-builder",
     "electron:build:win": "npm run build && electron-builder --win --x64"
   },
@@ -60,8 +60,8 @@
         "to": "pororo_easyocr_main"
       },
       {
-        "from": "../../customOCR/bank_statement_detector/yolov8l_e50_bs8_0828/weights/best.pt",
-        "to": "backend/models/best.pt"
+        "from": "../models",
+        "to": "models"
       }
     ]
   },

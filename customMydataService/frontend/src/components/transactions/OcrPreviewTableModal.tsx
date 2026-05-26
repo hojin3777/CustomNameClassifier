@@ -60,7 +60,7 @@ type OcrPreviewTableModalProps = {
   TRANSACTION_TYPES: string[];
 };
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'http://127.0.0.1:5050';
 const OCR_IMAGE_BASE_URL = `${API_BASE_URL}/api/ocr/image`;
 
 const OcrPreviewTableModal: React.FC<OcrPreviewTableModalProps> = ({

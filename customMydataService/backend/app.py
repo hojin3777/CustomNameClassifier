@@ -36,12 +36,28 @@ def get_preferred_torch_device():
         return torch.device('mps')
     return torch.device('cpu')
 
+
+# ****** 모델 경로 헬퍼 ******
+def get_model_path(filename):
+    """개발/패키징 환경에서 공통 models 폴더의 파일 경로를 반환합니다."""
+    if IS_PACKAGED:
+        models_dir = Path(RESOURCE_PATH) / 'models'
+    else:
+        models_dir = Path(__file__).resolve().parents[1] / 'models'
+
+    model_path = models_dir / filename
+    print(f"Model path for '{filename}': {model_path}")
+    return str(model_path)
+
 # Flask 앱 초기화
 app = Flask(__name__, static_folder='../frontend/dist', static_url_path='/')
 CORS(app)  # 모든 도메인에서의 요청 허용 (개발 단계에서만 사용 권장)
 
 # --- 서버 시작 시 한 번만 모델 및 DB 로드 ---
 print("Starting server...")
+
+BACKEND_PORT = int(os.getenv('BACKEND_PORT', '5050'))
+print(f"BACKEND_PORT: {BACKEND_PORT}")
 
 # ****** 헬스체크 API ******
 @app.route('/api/health', methods=['GET'])
@@ -115,12 +131,7 @@ def get_resource_path(relative_path):
     return full_path
 
 # ****** 모델 경로 설정 ******
-if IS_PACKAGED:
-    # 프로덕션 모드: 패키징된 리소스 사용
-    OCR_MODEL_PATH = get_resource_path('backend/models/best.pt')
-else:
-    # 개발 모드: 절대 경로 사용
-    OCR_MODEL_PATH = 'C:/code/customOCR/bank_statement_detector/yolov8l_e50_bs8_0828/weights/best.pt'
+OCR_MODEL_PATH = get_model_path('yolov8l_e50_bs8_0828_best.pt')
 
 print(f"YOLO Model: {OCR_MODEL_PATH}")
 
@@ -139,8 +150,6 @@ except Exception as e:
 
 # 1. OCR 서비스 초기화
 print("Initializing OCR service...")
-# ★★★ 모델 경로를 실제 best.pt 파일 위치로 수정해야 합니다. ★★★
-OCR_MODEL_PATH = 'C:/code/customOCR/bank_statement_detector/yolov8l_e50_bs8_0828/weights/best.pt'
 UPLOAD_FOLDER = os.path.join(DB_FOLDER, 'uploads')
 device = get_preferred_torch_device()
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -672,5 +681,5 @@ def manage_rule_based_mappings():
 
 # 이 파일이 직접 실행될 때만 서버를 실행
 if __name__ == '__main__':
-    app.run(debug=False, port=5000) # 개발 시 debug=True
-    # app.run(debug=False, port=5000, host='0.0.0.0') # 실제 서비스 시 debug=False 권장
+    app.run(debug=False, port=BACKEND_PORT) # 개발 시 debug=True
+    # app.run(debug=False, port=BACKEND_PORT, host='0.0.0.0') # 실제 서비스 시 debug=False 권장

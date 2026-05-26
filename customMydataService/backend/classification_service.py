@@ -4,6 +4,7 @@ import torch.nn.functional as F
 from transformers import BertTokenizerFast, BertModel
 import pickle
 import os
+from pathlib import Path
 
 # --- 전역 변수 ---
 # 서버 시작 시 초기화될 분류기 인스턴스
@@ -18,6 +19,21 @@ def get_preferred_torch_device():
     if hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
         return torch.device('mps')
     return torch.device('cpu')
+
+
+def get_model_path(filename):
+    """개발/패키징 환경에서 공통 models 폴더의 파일 경로를 반환합니다."""
+    is_packaged = os.getenv('IS_PACKAGED', 'false') == 'true'
+    resource_path = os.getenv('RESOURCE_PATH', os.path.dirname(os.path.abspath(__file__)))
+
+    if is_packaged:
+        models_dir = Path(resource_path) / 'models'
+    else:
+        models_dir = Path(__file__).resolve().parents[1] / 'models'
+
+    model_path = models_dir / filename
+    print(f"Model path for '{filename}': {model_path}")
+    return str(model_path)
 
 # --- 노트북에서 가져온 모델 아키텍처 ---
 class BertCNNModel(nn.Module):
@@ -86,9 +102,8 @@ def initialize_classifier():
     """서버 시작 시 모델, 토크나이저, 라벨을 로드하여 분류기를 초기화합니다."""
     global classifier, device
     
-    # ★★★ 노트북의 파일 경로를 기반으로 실제 경로를 지정해야 합니다. ★★★
-    MODEL_WEIGHTS_PATH = 'C:/code/saved_model/bert-kor-cnn4_remap_250624_2320/bert-kor-cnn4_remap_250624_2320.pth'
-    LABEL_MAP_PATH = 'C:/code/processed_data/category_mapping_remapped.pkl'
+    MODEL_WEIGHTS_PATH = get_model_path('bert-kor-cnn4_remap_250624_2320.pth')
+    LABEL_MAP_PATH = get_model_path('category_mapping_remapped.pkl')
     TOKENIZER_NAME = 'kykim/bert-kor-base'
 
     if not os.path.exists(MODEL_WEIGHTS_PATH) or not os.path.exists(LABEL_MAP_PATH):

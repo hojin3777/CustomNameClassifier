@@ -4,7 +4,7 @@ import { PieChart, Pie, Cell, Label, Tooltip as RechartsTooltip } from 'recharts
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, LabelList } from 'recharts';
 import './MonthlyDetail.css';
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'http://127.0.0.1:5050';
 // --- 타입 정의 (변경 없음) ---
 interface MonthlySummary {
   fixed_income: number;
