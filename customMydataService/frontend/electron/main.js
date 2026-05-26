@@ -108,6 +108,19 @@ function resolveFrontendUrl() {
     return pathToFileURL(path.join(__dirname, '..', 'dist', 'index.html')).toString();
 }
 
+// resolveAppIconPath: 플랫폼에 맞는 앱 아이콘 파일 경로를 반환합니다.
+function resolveAppIconPath() {
+    if (app.isPackaged) {
+        return IS_WINDOWS
+            ? path.join(process.resourcesPath, 'icon.ico')
+            : path.join(process.resourcesPath, 'icon.icns');
+    }
+
+    return IS_WINDOWS
+        ? path.join(__dirname, '..', 'public', 'icon.ico')
+        : path.join(__dirname, '..', 'dist', 'icon.icns');
+}
+
 // ****** Python 백엔드 관리 ******
 // startPythonBackend: Python 백엔드 프로세스 시작
 function startPythonBackend() {
@@ -278,7 +291,7 @@ function createWindow() {
             enableRemoteModule: false,
             preload: path.join(__dirname, 'preload.js')
         },
-        icon: path.join(__dirname, '..', 'public', IS_WINDOWS ? 'icon.ico' : 'icon.png'),
+        icon: resolveAppIconPath(),
         show: false,
         titleBarStyle: 'hidden',
         trafficLightPosition: { x: 10, y: 10 }

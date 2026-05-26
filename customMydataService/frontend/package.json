@@ -10,20 +10,31 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "pack:python": "node scripts/package-python.mjs",
     "electron:dev": "concurrently \"cross-env BROWSER=none CUSTOMMYDATA_PYTHON=/opt/miniconda3/envs/custommydata-mac/bin/python npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
-    "electron:build": "npm run build && electron-builder",
+    "electron:build": "npm run pack:python && npm run build && electron-builder",
+    "electron:build:mac": "npm run pack:python && npm run build && electron-builder --mac --arm64",
     "electron:build:win": "npm run build && electron-builder --win --x64"
   },
   "build": {
     "appId": "com.workaholiclab.customMydata",
-    "productName": "개인화 마이데이터 서비스",
+    "productName": "Personalized MyData Service",
     "directories": {
       "output": "dist-electron"
     },
+    "mac": {
+      "hardenedRuntime": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "icon": "public/icon.icns",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
     "files": [
       "dist/**/*",
-      "electron/**/*",
-      "public/icon.png"
+      "electron/**/*"
     ],
     "win": {
       "target": [
@@ -42,8 +53,12 @@
     },
     "extraResources": [
       {
-        "from": "public/icon.png",
-        "to": "../dist/icon.png"
+        "from": "dist/icon.icns",
+        "to": "icon.icns"
+      },
+      {
+        "from": "public/icon.ico",
+        "to": "icon.ico"
       },
       {
         "from": "python-embed",

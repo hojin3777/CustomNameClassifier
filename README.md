@@ -329,6 +329,8 @@ Classify store names with deeplearning
     - `Reset` 버튼이 `/api/initialize-defaults`를 통해 계좌/카테고리를 초기화하도록 연동
     - `category_utils.py`의 하드코딩 기본 카테고리로 다시 채우는 흐름 복구
     - 카테고리 화면의 저장/불러오기 연동과 기존 포트 참조 문제 정리
+- 맥용 빌드 정리
+    - 패키지명 영문으로 변경하여 맥에서 실행되지 않는 문제 해결
 
 
 
@@ -337,3 +339,4 @@ Classify store names with deeplearning
 - TODO: GPU감지 UI 추가 및 설치 과정에서 CUDA 드라이버 설치 유도
 - TODO: 자동 업데이트 기능 추가
 - TODO: Github Releases 배포 설정
+- TODO: 맥/윈도우 서명

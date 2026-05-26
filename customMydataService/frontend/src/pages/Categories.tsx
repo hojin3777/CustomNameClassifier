@@ -478,7 +478,7 @@ const Categories = () => {
             <div className="category-column-wrapper">
               <div className='card category-header'>계좌</div>
               <div className="card category-column">
-                {accounts.map((account) => renderAccountItem(account))}
+                {accounts.map((account) => <React.Fragment key={account.id}>{renderAccountItem(account)}</React.Fragment>)}
                 {accounts.length < 20 && (
                   <div className="category-item add-item" onClick={addAccount}>
                     <FaPlusCircle />
@@ -492,7 +492,7 @@ const Categories = () => {
               <div className="category-column-wrapper" key={category.id}>
               {renderHeader(category)}
               <div className="card category-column">
-                {category.minors.map((minor) => renderItem(category.id, minor))}
+                {category.minors.map((minor) => <React.Fragment key={minor.uuid}>{renderItem(category.id, minor)}</React.Fragment>)}
                 {category.minors.length < 20 && (
                   <div className="category-item add-item" onClick={() => addMinorCategory(category.id)}>
                     <FaPlusCircle />

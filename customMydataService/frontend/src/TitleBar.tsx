@@ -7,14 +7,15 @@ const TitleBar: React.FC = () => {
   useEffect(() => {
     // Electron 환경 확인
     const isDev = window.location.protocol === 'http:';
+    const isMac = navigator.platform.toLowerCase().includes('mac');
     
     if (isDev) {
       // 개발 모드: Vite dev server
-      setIconPath('/icon.png');
+      setIconPath(isMac ? '/icon.icns' : '/icon.ico');
     } else {
       // 프로덕션 모드: file:// 프로토콜
-      // Electron에서 app.asar 내부 또는 resources 폴더의 icon.png 사용
-      setIconPath('./icon.png');
+      // Electron에서 app.asar 내부 또는 resources 폴더의 플랫폼별 아이콘 사용
+      setIconPath(isMac ? './icon.icns' : './icon.ico');
     }
   }, []);
 
