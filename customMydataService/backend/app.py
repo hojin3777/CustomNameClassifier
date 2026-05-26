@@ -26,6 +26,16 @@ import mapping_utils
 import dashboard_utils
 import pandas as pd
 
+
+# ****** 디바이스 선택 헬퍼 ******
+def get_preferred_torch_device():
+    """CUDA가 있으면 CUDA, 그다음 MPS, 마지막에 CPU를 사용합니다."""
+    if torch.cuda.is_available():
+        return torch.device('cuda')
+    if hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+        return torch.device('mps')
+    return torch.device('cpu')
+
 # Flask 앱 초기화
 app = Flask(__name__, static_folder='../frontend/dist', static_url_path='/')
 CORS(app)  # 모든 도메인에서의 요청 허용 (개발 단계에서만 사용 권장)
@@ -132,12 +142,11 @@ print("Initializing OCR service...")
 # ★★★ 모델 경로를 실제 best.pt 파일 위치로 수정해야 합니다. ★★★
 OCR_MODEL_PATH = 'C:/code/customOCR/bank_statement_detector/yolov8l_e50_bs8_0828/weights/best.pt'
 UPLOAD_FOLDER = os.path.join(DB_FOLDER, 'uploads')
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = get_preferred_torch_device()
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 try:
-    if device.type == 'cpu': raise EnvironmentError("OCR 모델은 GPU에서만 실행됩니다. CUDA 호환 GPU가 있는지 확인하세요.")
     ocr_service.initialize_predictor(model_path=OCR_MODEL_PATH)
     print("OCR service initialized successfully.")
 except Exception as e:
@@ -146,7 +155,6 @@ except Exception as e:
 # 2. 업종 분류 서비스 초기화
 print("Initializing Classification service...")
 try:
-    if device.type == 'cpu': raise EnvironmentError("분류 모델은 GPU에서만 실행됩니다. CUDA 호환 GPU가 있는지 확인하세요.")
     classification_service.initialize_classifier()
     print("Classification service initialized successfully.")
 except Exception as e:

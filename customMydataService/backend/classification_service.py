@@ -6,9 +6,18 @@ import pickle
 import os
 
 # --- 전역 변수 ---
-# 서버 시작 시 초기화될 분류기 인스턴스 (싱글톤)
+# 서버 시작 시 초기화될 분류기 인스턴스
 classifier = None
 device = None
+
+
+def get_preferred_torch_device():
+    """CUDA가 있으면 CUDA, 그다음 MPS, 마지막에 CPU를 사용합니다."""
+    if torch.cuda.is_available():
+        return torch.device('cuda')
+    if hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+        return torch.device('mps')
+    return torch.device('cpu')
 
 # --- 노트북에서 가져온 모델 아키텍처 ---
 class BertCNNModel(nn.Module):
@@ -85,7 +94,7 @@ def initialize_classifier():
     if not os.path.exists(MODEL_WEIGHTS_PATH) or not os.path.exists(LABEL_MAP_PATH):
         raise FileNotFoundError("업종 분류 모델 또는 라벨 파일을 찾을 수 없습니다. 경로를 확인하세요.")
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = get_preferred_torch_device()
     
     # 1. 라벨 맵 로드
     with open(LABEL_MAP_PATH, 'rb') as f:

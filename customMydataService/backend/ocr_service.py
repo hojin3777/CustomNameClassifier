@@ -58,13 +58,22 @@ except ImportError:
 predictor = None
 
 
+def get_preferred_torch_device():
+    """CUDA가 있으면 CUDA, 그다음 MPS, 마지막에 CPU를 사용합니다."""
+    if torch.cuda.is_available():
+        return 'cuda'
+    if hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+        return 'mps'
+    return 'cpu'
+
+
 class YOLOv8_OCR_Predictor:
     """YOLOv8로 객체를 탐지하고, 탐지된 영역에서 OCR을 수행하는 예측기 (API용)"""
     def __init__(self, model_path):
         if not os.path.exists(model_path):
             raise FileNotFoundError(f"YOLO 모델 가중치 파일을 찾을 수 없습니다: {model_path}")
         
-        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        self.device = get_preferred_torch_device()
         self.model = YOLO(model_path)
         self.model.to(self.device)
         self.ocr_reader = EasyPororoOcr(gpu=(self.device == 'cuda'))

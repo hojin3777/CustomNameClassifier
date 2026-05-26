@@ -3,9 +3,95 @@ const path = require('path');
 const { spawn } = require('child_process');
 const fs = require('fs');
 const { create } = require('domain');
+const { pathToFileURL } = require('url');
 
 let mainWindow;
 let pythonProcess;
+
+const IS_WINDOWS = process.platform === 'win32';
+
+// ****** 경로 해석 헬퍼 ******
+// resolvePythonExecutable: 플랫폼별 Python 실행 파일 후보를 순서대로 찾습니다.
+function resolvePythonExecutable(pythonHome) {
+    const candidates = IS_WINDOWS
+        ? [
+            path.join(pythonHome, 'python.exe'),
+            path.join(pythonHome, 'Scripts', 'python.exe'),
+            'python.exe',
+        ]
+        : [
+            path.join(pythonHome, 'bin', 'python3'),
+            path.join(pythonHome, 'bin', 'python'),
+            path.join(pythonHome, 'python3'),
+            path.join(pythonHome, 'python'),
+            'python3',
+            'python',
+        ];
+
+    for (const candidate of candidates) {
+        if (!candidate) continue;
+        if (path.isAbsolute(candidate)) {
+            if (fs.existsSync(candidate)) return candidate;
+        } else {
+            return candidate;
+        }
+    }
+
+    return IS_WINDOWS ? 'python.exe' : 'python3';
+}
+
+// resolveDevPythonExecutable: 개발 모드에서 사용할 Python 경로를 찾습니다.
+function resolveDevPythonExecutable() {
+    if (process.env.CUSTOMMYDATA_PYTHON) {
+        return process.env.CUSTOMMYDATA_PYTHON;
+    }
+
+    if (process.env.CONDA_PREFIX) {
+        const condaPython = path.join(process.env.CONDA_PREFIX, 'bin', 'python');
+        if (fs.existsSync(condaPython)) {
+            return condaPython;
+        }
+    }
+
+    return IS_WINDOWS ? 'C:\\code\\.venv_backend\\Scripts\\python.exe' : 'python3';
+}
+
+// resolveBackendScriptPath: backend/app.py의 실제 경로를 계산합니다.
+function resolveBackendScriptPath() {
+    if (!app.isPackaged) {
+        return path.resolve(__dirname, '..', '..', '..', 'customMydataService', 'backend', 'app.py');
+    }
+
+    return path.join(process.resourcesPath, 'backend', 'app.py');
+}
+
+// resolvePackagedPythonPaths: 패키징된 Python 배포본에서 PYTHONPATH 후보를 계산합니다.
+function resolvePackagedPythonPaths(pythonHome) {
+    const candidates = IS_WINDOWS
+        ? [
+            path.join(pythonHome, 'Lib', 'site-packages'),
+            path.join(pythonHome, 'lib', 'site-packages'),
+            path.join(pythonHome, 'site-packages'),
+        ]
+        : [
+            path.join(pythonHome, 'lib', 'python3.12', 'site-packages'),
+            path.join(pythonHome, 'lib', 'python3.11', 'site-packages'),
+            path.join(pythonHome, 'lib', 'python3.10', 'site-packages'),
+            path.join(pythonHome, 'lib', 'site-packages'),
+            path.join(pythonHome, 'site-packages'),
+        ];
+
+    return candidates.filter(candidate => fs.existsSync(candidate));
+}
+
+// resolveFrontendUrl: 개발/배포 환경에 맞는 프론트엔드 진입 URL을 계산합니다.
+function resolveFrontendUrl() {
+    if (!app.isPackaged) {
+        return 'http://localhost:5173';
+    }
+
+    return pathToFileURL(path.join(__dirname, '..', 'dist', 'index.html')).toString();
+}
 
 // ****** Python 백엔드 관리 ******
 // startPythonBackend: Python 백엔드 프로세스 시작
@@ -24,13 +110,13 @@ function startPythonBackend() {
     let pythonHome;
 
     if (isDev) {
-        pythonPath = 'C:\\code\\.venv_backend\\Scripts\\python.exe';
-        scriptPath = path.join(__dirname, '..', '..', '..', 'customMydataService', 'backend', 'app.py');
+        pythonPath = resolveDevPythonExecutable();
+        scriptPath = resolveBackendScriptPath();
     } else {
         const resourcesPath = process.resourcesPath;
         pythonHome = path.join(resourcesPath, 'python');
-        pythonPath = path.join(pythonHome, 'python.exe');
-        scriptPath = path.join(resourcesPath, 'backend', 'app.py');
+        pythonPath = resolvePythonExecutable(pythonHome);
+        scriptPath = resolveBackendScriptPath();
         
         console.log('Resolved paths:');
         console.log('  - resourcesPath:', resourcesPath);
@@ -68,17 +154,27 @@ function startPythonBackend() {
     const spawnOptions = {
         cwd: path.dirname(scriptPath),
         env: isDev 
-            ? process.env
+            ? {
+                ...process.env,
+                PYTHONUNBUFFERED: '1',
+                PYTHONNOUSERSITE: '1',
+                PYTHONDONTWRITEBYTECODE: '1',
+                PYTHONUTF8: '1',
+                PYTHONIOENCODING: 'utf-8',
+            }
             : {
                 PYTHONHOME: pythonHome,
                 PYTHONPATH: [
                     path.join(process.resourcesPath, 'pororo_easyocr_main'),
-                    path.join(pythonHome, 'Lib', 'site-packages'),
+                    ...resolvePackagedPythonPaths(pythonHome),
                 ].join(path.delimiter),
                 RESOURCE_PATH: process.resourcesPath,
                 IS_PACKAGED: 'true',
                 
-                PATH: pythonHome,
+                PATH: [
+                    IS_WINDOWS ? pythonHome : path.join(pythonHome, 'bin'),
+                    process.env.PATH || '',
+                ].filter(Boolean).join(path.delimiter),
                 
                 PYTHONUNBUFFERED: '1',
                 PYTHONNOUSERSITE: '1', // 사용자 site-packages 차단
@@ -166,16 +262,14 @@ function createWindow() {
             enableRemoteModule: false,
             preload: path.join(__dirname, 'preload.js')
         },
-        icon: path.join(__dirname, '..', 'public', 'icon.ico'),
+        icon: path.join(__dirname, '..', 'public', IS_WINDOWS ? 'icon.ico' : 'icon.png'),
         show: false,
         titleBarStyle: 'hidden',
         trafficLightPosition: { x: 10, y: 10 }
     });
 
     const isDev = !app.isPackaged;
-    const startUrl = isDev
-        ? 'http://localhost:5173'
-        : `file://${path.join(__dirname, '..', 'dist', 'index.html')}`;
+    const startUrl = resolveFrontendUrl();
 
     mainWindow.loadURL(startUrl);
 
