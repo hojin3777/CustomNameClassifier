@@ -4,18 +4,20 @@ import './TitleBar.css';
 
 const TitleBar: React.FC = () => {
   const [iconPath, setIconPath] = useState<string>('');
+  const [isMac, setIsMac] = useState<boolean>(false);
   useEffect(() => {
     // Electron 환경 확인
     const isDev = window.location.protocol === 'http:';
-    const isMac = navigator.platform.toLowerCase().includes('mac');
+    const detectedIsMac = (window as any).electronAPI?.isMac || navigator.platform.toLowerCase().includes('mac');
+    setIsMac(detectedIsMac);
     
     if (isDev) {
       // 개발 모드: Vite dev server
-      setIconPath(isMac ? '/icon.icns' : '/icon.ico');
+      setIconPath(detectedIsMac ? '/icon.icns' : '/icon.ico');
     } else {
       // 프로덕션 모드: file:// 프로토콜
       // Electron에서 app.asar 내부 또는 resources 폴더의 플랫폼별 아이콘 사용
-      setIconPath(isMac ? './icon.icns' : './icon.ico');
+      setIconPath(detectedIsMac ? './icon.icns' : './icon.ico');
     }
   }, []);
 
@@ -32,7 +34,7 @@ const TitleBar: React.FC = () => {
   };
 
   return (
-    <div className="titlebar">
+    <div className={`titlebar ${isMac ? 'mac' : 'win'}`}>
       <div className="titlebar-drag-region">
         <div className="titlebar-title">
           {iconPath && (
@@ -46,21 +48,23 @@ const TitleBar: React.FC = () => {
               }}
             />
           )}
-          <span>개인화 마이데이터 서비스</span>
+          <span>Personalized MyData Service</span>
         </div>
       </div>
       
-      <div className="titlebar-controls">
-        <button className="titlebar-button minimize" onClick={handleMinimize} title='최소화'>
-          <FaMinus />
-        </button>
-        <button className="titlebar-button maximize" onClick={handleMaximize} title='최대화'>
-          <FaWindowMaximize />
-        </button>
-        <button className="titlebar-button close" onClick={handleClose} title='닫기'>
-          <FaTimes />
-        </button>
-      </div>
+      {!isMac && (
+        <div className="titlebar-controls">
+          <button className="titlebar-button minimize" onClick={handleMinimize} title='최소화'>
+            <FaMinus />
+          </button>
+          <button className="titlebar-button maximize" onClick={handleMaximize} title='최대화'>
+            <FaWindowMaximize />
+          </button>
+          <button className="titlebar-button close" onClick={handleClose} title='닫기'>
+            <FaTimes />
+          </button>
+        </div>
+      )}
     </div>
   );
 };

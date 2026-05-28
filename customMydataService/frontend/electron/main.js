@@ -1,7 +1,8 @@
-const { app, BrowserWindow, dialog, ipcMain } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, shell } = require('electron');
 const path = require('path');
 const { spawn } = require('child_process');
 const fs = require('fs');
+const os = require('os');
 const { create } = require('domain');
 const { pathToFileURL } = require('url');
 
@@ -361,4 +362,29 @@ ipcMain.on('window-maximize', () => {
 
 ipcMain.on('window-close', () => {
     if (mainWindow) mainWindow.close();
+});
+
+ipcMain.handle('open-external', async (event, url) => {
+    try {
+        await shell.openExternal(url);
+        return { ok: true };
+    } catch (error) {
+        console.error('Failed to open external URL:', error);
+        return { ok: false, error: error.message };
+    }
+});
+
+ipcMain.handle('select-directory', async () => {
+  const result = await dialog.showOpenDialog({
+    properties: ['openDirectory', 'createDirectory'],
+  });
+
+  if (result.canceled || result.filePaths.length === 0) {
+    return { canceled: true };
+  }
+  return { canceled: false, path: result.filePaths[0] };
+});
+
+ipcMain.handle('get-default-data-path', async () => {
+  return path.join(os.homedir(), '.customMydataService');
 });

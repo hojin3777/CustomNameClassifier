@@ -309,7 +309,7 @@ Classify store names with deeplearning
 
 
 ## 2026년
-### 0526_Mac 정리
+### 0526
 - 맥북 개발 환경 재정리
     - Node/npm 설치 후 frontend 의존성 재설치
     - Electron 버전 확인 및 dev 실행 흐름 재점검
@@ -332,9 +332,19 @@ Classify store names with deeplearning
 - 맥용 빌드 정리
     - 패키지명 영문으로 변경하여 맥에서 실행되지 않는 문제 해결
 
+### 0527
+- 맥 환경 개선
+    - os가 맥인경우 Title bar 분기: 상단 타이틀 버튼 이후에 배치, 기존 윈도우용 버튼 감춤
+- Help 동작 추가: 버튼 누르면 기본 브라우저로 Help 페이지 열기
+- Settings 페이지 신설
+    - 설정 버튼 누르면 설정 모달 팝업 표시
+
+### 0528
+- repo분리
+    - 앱자체만 담은 새 repo로 이동.
 
 
-
+- TODOOOO: 카테고리 대분류 삭제할때 소분류와 달리 검증하지 않는 문제
 - TODO: 딥러닝 모델 ONNX 마이그레이션 및 테스트
 - TODO: GPU감지 UI 추가 및 설치 과정에서 CUDA 드라이버 설치 유도
 - TODO: 자동 업데이트 기능 추가

@@ -87,11 +87,11 @@ print(f"IS_PACKAGED: {IS_PACKAGED}")
 print(f"RESOURCE_PATH: {RESOURCE_PATH}")
 
 # ****** DB 폴더 경로 설정 ******
-DB_FOLDER = str(Path.home() / '.customMydataService')  # ✨ DB_FOLDER 정의
+DB_FOLDER = str(Path.home() / '.customMydataService')  # DB_FOLDER 정의
 os.makedirs(DB_FOLDER, exist_ok=True)
 
 # ****** 업로드 폴더 설정 ******
-UPLOAD_FOLDER = os.path.join(DB_FOLDER, 'uploads')  # ✨ 이제 정상 작동
+UPLOAD_FOLDER = os.path.join(DB_FOLDER, 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 

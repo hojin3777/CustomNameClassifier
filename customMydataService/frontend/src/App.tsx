@@ -7,10 +7,12 @@ import Monthly from './pages/Monthly';
 import Transactions from './pages/Transactions';
 import Categories from './pages/Categories';
 import Mapping from './pages/Mapping';
+import SettingsModal from './components/SettingsModal';
 import { FaBars, FaQuestionCircle, FaCog, FaHourglassStart, FaHourglassHalf, FaHourglassEnd } from 'react-icons/fa';
 
 const BACKEND_READY_TIMEOUT = 180;
 const BACKEND_BASE_URL = 'http://127.0.0.1:5050';
+const HELP_URL = 'https://hojin3777.notion.site/Personalized-Mydata-Service-Guide-36c39dad673980db8aa3e6d6ce56ec9c';
 
 // isDirty 상태를 전역적으로 관리하기 위한 Context 생성
 const DirtyContext = createContext<{ isDirty: boolean; setIsDirty: (dirty: boolean) => void; } | null>(null);
@@ -39,6 +41,7 @@ const GuardedNavLink = ({ to, children }: { to: string; children: React.ReactNod
 
 const AppContent = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const openSidebar = () => setSidebarOpen(true);
   const closeSidebar = () => setSidebarOpen(false);
 
@@ -60,8 +63,30 @@ const AppContent = () => {
                 </ul>
               </nav>
               <div className="sidebar-footer">
-                <button className="icon-button"><FaQuestionCircle /></button>
-                <button className="icon-button"><FaCog /></button>
+                <button
+                  className="icon-button"
+                  data-tooltip="Open help"
+                  title="Help"
+                  onClick={() => {
+                    const url = HELP_URL;
+                    if ((window as any).electronAPI?.openExternal) {
+                      (window as any).electronAPI.openExternal(url);
+                    } else {
+                      window.open(url, '_blank');
+                    }
+                  }}
+                  >
+                    <FaQuestionCircle />
+                </button>
+                <button
+                  className="icon-button"
+                  data-tooltip="Settings"
+                  title="Settings"
+                  onClick={() => setIsSettingsOpen(true)}
+                  >
+                  <FaCog />
+                </button>
+                {isSettingsOpen && <SettingsModal onClose={() => setIsSettingsOpen(false)} />}
               </div>
             </aside>
           </div>

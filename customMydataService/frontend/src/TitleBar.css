@@ -22,6 +22,11 @@
   padding-left: 12px;
 }
 
+.titlebar.mac .titlebar-drag-region {
+  padding-left: 80px;
+}
+
+
 .titlebar-title {
   display: flex;
   align-items: center;
@@ -29,6 +34,10 @@
   font-size: 13px;
   font-weight: 600;
   color: var(--color-text-header);
+}
+
+.titlebar.mac .titlebar-title {
+  gap: 8px;
 }
 
 .titlebar-icon {
